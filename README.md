@@ -82,9 +82,9 @@ Log files are stored in the `logs/` directory:
 
 ### Contributing
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/YourFeature`)
-3. Commit your changes (`git commit -am 'Add new feature'`)
-4. Push to the branch (`git push origin feature/YourFeature`)
+2. Create your feature branch (`git checkout -b feat/YourFeature`)
+3. Commit your changes (`git commit -m '#Issue Number | feat/fix/update: YourCode'`)
+4. Push to the branch (`git push origin feat/YourFeature`)
 5. Create a pull request
 
 ### License
