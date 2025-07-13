@@ -1,0 +1,15 @@
+venv/
+__pycache__/
+*.pyc
+.DS_Store
+.env
+.idea/
+.vscode/
+*.log
+.pytest_cache/
+logs/
+app/__pycache__/
+app/routes/__pycache__/
+app/util/__pycache__/
+*.rdb
+bash.exe.stackdump

@@ -1,0 +1,122 @@
+2025-06-29 01:23:04 | __main__ | ERROR | example_logging.py:21 | example_usage() | This is an error message
+2025-06-29 01:23:04 | __main__ | ERROR | log.py:225 | log_exception() | Exception in mathematical operation: division by zero
+Traceback (most recent call last):
+  File "d:\Fifth Year Project\Backend\example_logging.py", line 41, in example_usage
+    result = 1 / 0
+             ~~^~~
+ZeroDivisionError: division by zero
+2025-07-09 01:39:08 | app.repositories.program | ERROR | program.py:46 | create_program() | Failed to create program: (pymysql.err.OperationalError) (1054, "Unknown column 'test_type' in 'field list'")
+[SQL: INSERT INTO program_requirements (program_id, requirement_type, requirement_value, test_type, is_mandatory, description) VALUES (%(program_id)s, %(requirement_type)s, %(requirement_value)s, %(test_type)s, %(is_mandatory)s, %(description)s)]
+[parameters: {'program_id': 1, 'requirement_type': 'test_score', 'requirement_value': '450', 'test_type': 'GOV', 'is_mandatory': 1, 'description': None}]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-07-09 01:39:08 | app.routes.program | ERROR | program.py:61 | create_program() | Unexpected error creating program: (pymysql.err.OperationalError) (1054, "Unknown column 'test_type' in 'field list'")
+[SQL: INSERT INTO program_requirements (program_id, requirement_type, requirement_value, test_type, is_mandatory, description) VALUES (%(program_id)s, %(requirement_type)s, %(requirement_value)s, %(test_type)s, %(is_mandatory)s, %(description)s)]
+[parameters: {'program_id': 1, 'requirement_type': 'test_score', 'requirement_value': '450', 'test_type': 'GOV', 'is_mandatory': 1, 'description': None}]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-07-09 01:39:31 | app.repositories.program | ERROR | program.py:46 | create_program() | Failed to create program: (pymysql.err.OperationalError) (1054, "Unknown column 'test_type' in 'field list'")
+[SQL: INSERT INTO program_requirements (program_id, requirement_type, requirement_value, test_type, is_mandatory, description) VALUES (%(program_id)s, %(requirement_type)s, %(requirement_value)s, %(test_type)s, %(is_mandatory)s, %(description)s)]
+[parameters: {'program_id': 2, 'requirement_type': 'test_score', 'requirement_value': '450', 'test_type': None, 'is_mandatory': 1, 'description': None}]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-07-09 01:39:31 | app.routes.program | ERROR | program.py:61 | create_program() | Unexpected error creating program: (pymysql.err.OperationalError) (1054, "Unknown column 'test_type' in 'field list'")
+[SQL: INSERT INTO program_requirements (program_id, requirement_type, requirement_value, test_type, is_mandatory, description) VALUES (%(program_id)s, %(requirement_type)s, %(requirement_value)s, %(test_type)s, %(is_mandatory)s, %(description)s)]
+[parameters: {'program_id': 2, 'requirement_type': 'test_score', 'requirement_value': '450', 'test_type': None, 'is_mandatory': 1, 'description': None}]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-07-09 01:46:57 | app.repositories.program | ERROR | program.py:46 | create_program() | Failed to create program: 'bachelor' is not among the defined enum values. Enum name: degreelevel. Possible values: BACHELOR, MASTER, PHD, ..., CERTIFICATE
+2025-07-09 01:46:57 | app.routes.program | ERROR | program.py:61 | create_program() | Unexpected error creating program: 'bachelor' is not among the defined enum values. Enum name: degreelevel. Possible values: BACHELOR, MASTER, PHD, ..., CERTIFICATE
+2025-07-09 01:51:12 | app.routes.qualification | ERROR | qualification.py:51 | check_user_qualification() | Error checking qualification: 404: User or program not found
+2025-07-09 01:55:20 | app.routes.qualification | ERROR | qualification.py:51 | check_user_qualification() | Error checking qualification: 404: User or program not found
+2025-07-09 01:56:44 | app.routes.qualification | ERROR | qualification.py:51 | check_user_qualification() | Error checking qualification: 404: User or program not found
+2025-07-09 01:56:56 | app.database | ERROR | database.py:118 | test_connection() | MySQL connection test failed: Not an executable object: 'SELECT 1'
+2025-07-09 01:58:33 | sqlalchemy.pool.impl.QueuePool | ERROR | base.py:1008 | _finalize_fairy() | Exception during reset or similar
+Traceback (most recent call last):
+  File "D:\Fifth Year Project\Backend\venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1417, in execute
+    meth = statement._execute_on_connection
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute '_execute_on_connection'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\Fifth Year Project\Backend\app\database.py", line 114, in test_connection
+    connection.execute("SELECT 1")
+  File "D:\Fifth Year Project\Backend\venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1419, in execute
+    raise exc.ObjectNotExecutableError(statement) from err
+sqlalchemy.exc.ObjectNotExecutableError: Not an executable object: 'SELECT 1'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Fifth Year Project\Backend\venv\Lib\site-packages\pymysql\connections.py", line 782, in _read_bytes
+    data = self._rfile.read(num_bytes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python312\Lib\socket.py", line 707, in readinto
+    return self._sock.recv_into(b)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+ConnectionAbortedError: [WinError 10053] An established connection was aborted by the software in your host machine
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Fifth Year Project\Backend\venv\Lib\site-packages\sqlalchemy\pool\base.py", line 986, in _finalize_fairy
+    fairy._reset(
+  File "D:\Fifth Year Project\Backend\venv\Lib\site-packages\sqlalchemy\pool\base.py", line 1432, in _reset
+    pool._dialect.do_rollback(self)
+  File "D:\Fifth Year Project\Backend\venv\Lib\site-packages\sqlalchemy\engine\default.py", line 692, in do_rollback
+    dbapi_connection.rollback()
+  File "D:\Fifth Year Project\Backend\venv\Lib\site-packages\pymysql\connections.py", line 493, in rollback
+    self._read_ok_packet()
+  File "D:\Fifth Year Project\Backend\venv\Lib\site-packages\pymysql\connections.py", line 453, in _read_ok_packet
+    pkt = self._read_packet()
+          ^^^^^^^^^^^^^^^^^^^
+  File "D:\Fifth Year Project\Backend\venv\Lib\site-packages\pymysql\connections.py", line 744, in _read_packet
+    packet_header = self._read_bytes(4)
+                    ^^^^^^^^^^^^^^^^^^^
+  File "D:\Fifth Year Project\Backend\venv\Lib\site-packages\pymysql\connections.py", line 788, in _read_bytes
+    raise err.OperationalError(
+pymysql.err.OperationalError: (2013, 'Lost connection to MySQL server during query ([WinError 10053] An established connection was aborted by the software in your host machine)')
+2025-07-09 01:58:33 | app.database | ERROR | database.py:118 | test_connection() | MySQL connection test failed: Not an executable object: 'SELECT 1'
+2025-07-09 01:59:05 | app.routes.user | ERROR | user.py:142 | get_users() | Unexpected error retrieving users: 1 validation error for UserListResponse
+users.0.qualifications
+  Error extracting attribute: LookupError: 'bachelor' is not among the defined enum values. Enum name: qualificationtype. Possible values: HIGH_SCHOOL, BACHELOR, MASTER, ..., CERTIFICATE [type=get_attribute_error, input_value=<app.models.User object at 0x00000227CEA79280>, input_type=User]
+    For further information visit https://errors.pydantic.dev/2.10/v/get_attribute_error
+2025-07-09 02:00:28 | app.repositories.user_repository | ERROR | user_repository.py:113 | get_users() | Failed to get users list: (pymysql.err.OperationalError) (2013, 'Lost connection to MySQL server during query ([WinError 10053] An established connection was aborted by the software in your host machine)')
+[SQL: SELECT users.id AS users_id, users.email AS users_email, users.password_hash AS users_password_hash, users.first_name AS users_first_name, users.last_name AS users_last_name, users.date_of_birth AS users_date_of_birth, users.nationality AS users_nationality, users.phone AS users_phone, users.created_at AS users_created_at, users.updated_at AS users_updated_at 
+FROM users 
+ LIMIT %(param_1)s, %(param_2)s]
+[parameters: {'param_1': 0, 'param_2': 10}]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-07-09 02:00:28 | app.routes.user | ERROR | user.py:142 | get_users() | Unexpected error retrieving users: (pymysql.err.OperationalError) (2013, 'Lost connection to MySQL server during query ([WinError 10053] An established connection was aborted by the software in your host machine)')
+[SQL: SELECT users.id AS users_id, users.email AS users_email, users.password_hash AS users_password_hash, users.first_name AS users_first_name, users.last_name AS users_last_name, users.date_of_birth AS users_date_of_birth, users.nationality AS users_nationality, users.phone AS users_phone, users.created_at AS users_created_at, users.updated_at AS users_updated_at 
+FROM users 
+ LIMIT %(param_1)s, %(param_2)s]
+[parameters: {'param_1': 0, 'param_2': 10}]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-07-09 02:01:28 | app.database | ERROR | database.py:118 | test_connection() | MySQL connection test failed: Not an executable object: 'SELECT 1'
+2025-07-09 14:57:52 | app.database | ERROR | database.py:118 | test_connection() | MySQL connection test failed: Not an executable object: 'SELECT 1'
+2025-07-09 16:47:33 | app.database | ERROR | database.py:107 | create_tables() | Failed to create MySQL tables: (pymysql.err.OperationalError) (1045, "Access denied for user 'root'@'localhost' (using password: NO)")
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-07-09 16:47:33 | app.main | ERROR | main.py:36 | lifespan() | Failed to initialize application: (pymysql.err.OperationalError) (1045, "Access denied for user 'root'@'localhost' (using password: NO)")
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-07-09 16:48:26 | app.database | ERROR | database.py:107 | create_tables() | Failed to create MySQL tables: 'cryptography' package is required for sha256_password or caching_sha2_password auth methods
+2025-07-09 16:48:26 | app.main | ERROR | main.py:36 | lifespan() | Failed to initialize application: 'cryptography' package is required for sha256_password or caching_sha2_password auth methods
+2025-07-09 16:49:07 | app.database | ERROR | database.py:107 | create_tables() | Failed to create MySQL tables: 'cryptography' package is required for sha256_password or caching_sha2_password auth methods
+2025-07-09 16:49:07 | app.main | ERROR | main.py:36 | lifespan() | Failed to initialize application: 'cryptography' package is required for sha256_password or caching_sha2_password auth methods
+2025-07-09 16:51:46 | app.database | ERROR | database.py:107 | create_tables() | Failed to create MySQL tables: (pymysql.err.OperationalError) (1044, "Access denied for user 'app_user'@'%' to database 'recommend'")
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-07-09 16:51:46 | app.main | ERROR | main.py:36 | lifespan() | Failed to initialize application: (pymysql.err.OperationalError) (1044, "Access denied for user 'app_user'@'%' to database 'recommend'")
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-07-09 16:52:57 | app.database | ERROR | database.py:107 | create_tables() | Failed to create MySQL tables: (pymysql.err.OperationalError) (1049, "Unknown database 'recommend'")
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-07-09 16:52:57 | app.main | ERROR | main.py:36 | lifespan() | Failed to initialize application: (pymysql.err.OperationalError) (1049, "Unknown database 'recommend'")
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-07-09 17:00:24 | app.database | ERROR | database.py:118 | test_connection() | MySQL connection test failed: Not an executable object: 'SELECT 1'
+2025-07-10 22:51:06 | app.database | ERROR | database.py:107 | create_tables() | Failed to create MySQL tables: (pymysql.err.OperationalError) (1045, "Access denied for user 'root'@'localhost' (using password: YES)")
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-07-10 22:51:06 | app.main | ERROR | main.py:36 | lifespan() | Failed to initialize application: (pymysql.err.OperationalError) (1045, "Access denied for user 'root'@'localhost' (using password: YES)")
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-07-11 12:13:16 | app.database | ERROR | database.py:161 | initialize() | Neo4j service unavailable: Couldn't connect to localhost:7687 (resolved to ()):
+Failed to establish connection to ResolvedIPv6Address(('::1', 7687, 0, 0)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 7687)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+2025-07-11 12:13:16 | app.main | ERROR | main.py:36 | lifespan() | Failed to initialize application: Couldn't connect to localhost:7687 (resolved to ()):
+Failed to establish connection to ResolvedIPv6Address(('::1', 7687, 0, 0)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 7687)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
