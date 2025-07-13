@@ -3365,3 +3365,91 @@ FROM universities
 WHERE universities.id = %(pk_1)s
 2025-07-12 21:27:58 | sqlalchemy.engine.Engine | INFO | [cached since 45.33s ago] {'pk_1': 1}
 2025-07-12 21:27:58 | sqlalchemy.engine.Engine | INFO | ROLLBACK
+2025-07-13 22:16:35 | app.util.log | INFO | Logging initialized with level: DEBUG
+2025-07-13 22:16:35 | app.util.log | INFO | Log files: logs\app.log, logs\error.log
+2025-07-13 22:16:35 | app.database | INFO | Initializing databases...
+2025-07-13 22:16:36 | app.database | INFO | MySQL database connection initialized successfully
+2025-07-13 22:16:36 | neo4j.pool | DEBUG | [#0000]  _: <POOL> created, direct address IPv4Address(('localhost', 7687))
+2025-07-13 22:16:36 | neo4j.pool | DEBUG | [#0000]  _: <POOL> acquire direct connection, access_mode='READ', database=None
+2025-07-13 22:16:36 | neo4j.pool | DEBUG | [#0000]  _: <POOL> trying to hand out new connection
+2025-07-13 22:16:36 | neo4j.io | DEBUG | [#0000]  _: <RESOLVE> in: localhost:7687
+2025-07-13 22:16:36 | neo4j.io | DEBUG | [#0000]  _: <RESOLVE> dns resolver out: [::1]:7687
+2025-07-13 22:16:36 | neo4j.io | DEBUG | [#0000]  C: <OPEN> [::1]:7687
+2025-07-13 22:16:38 | neo4j.io | DEBUG | [#0000]  S: <ERROR> ConnectionRefusedError 10061 'No connection could be made because the target machine actively refused it' None 10061 None
+2025-07-13 22:16:38 | neo4j.io | DEBUG | [#0000]  C: <CLOSE> [::1]:7687
+2025-07-13 22:16:38 | neo4j.io | DEBUG | [#0000]  S: <CONNECTION FAILED> ServiceUnavailable: Failed to establish connection to ResolvedIPv6Address(('::1', 7687, 0, 0)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+2025-07-13 22:16:38 | neo4j.io | DEBUG | [#0000]  _: <RESOLVE> dns resolver out: 127.0.0.1:7687
+2025-07-13 22:16:38 | neo4j.io | DEBUG | [#0000]  C: <OPEN> 127.0.0.1:7687
+2025-07-13 22:16:38 | neo4j.io | DEBUG | [#FC21]  C: <MAGIC> 0x6060B017
+2025-07-13 22:16:38 | neo4j.io | DEBUG | [#FC21]  C: <HANDSHAKE> 0x00040405 0x00020404 0x00000104 0x00000003
+2025-07-13 22:16:38 | neo4j.io | DEBUG | [#FC21]  S: <HANDSHAKE> 0x00000405
+2025-07-13 22:16:38 | neo4j.io | DEBUG | [#FC21]  C: HELLO {'user_agent': 'neo4j-python/5.19.0 Python/3.12.0-final-0 (win32)', 'bolt_agent': {'product': 'neo4j-python/5.19.0', 'platform': 'Windows 11; AMD64', 'language': 'Python/3.12.0-final-0', 'language_details': 'CPython; 3.12.0-final-0 (tags/v3.12.0:0fb18b0, Oct  2 2023 13:03:39) [MSC v.1935 64 bit (AMD64)]'}}
+2025-07-13 22:16:38 | neo4j.io | DEBUG | [#FC21]  _: <CONNECTION> client state: CONNECTED > AUTHENTICATION
+2025-07-13 22:16:38 | neo4j.io | DEBUG | [#FC21]  C: LOGON {'scheme': 'basic', 'principal': 'neo4j', 'credentials': '*******'}
+2025-07-13 22:16:38 | neo4j.io | DEBUG | [#FC21]  _: <CONNECTION> client state: AUTHENTICATION > READY
+2025-07-13 22:16:38 | neo4j.io | DEBUG | [#FC21]  S: SUCCESS {'server': 'Neo4j/2025.05.0', 'connection_id': 'bolt-12', 'hints': {'connection.recv_timeout_seconds': 120}}
+2025-07-13 22:16:38 | neo4j.io | DEBUG | [#FC21]  _: <CONNECTION> server state: CONNECTED > AUTHENTICATION
+2025-07-13 22:16:38 | neo4j.io | DEBUG | [#FC21]  S: SUCCESS {}
+2025-07-13 22:16:38 | neo4j.io | DEBUG | [#FC21]  _: <CONNECTION> server state: AUTHENTICATION > READY
+2025-07-13 22:16:38 | neo4j.pool | DEBUG | [#FC21]  _: <POOL> released bolt-12
+2025-07-13 22:16:38 | app.database | INFO | Neo4j database connection initialized successfully
+2025-07-13 22:16:38 | app.database | INFO | All databases initialized successfully
+2025-07-13 22:16:38 | sqlalchemy.engine.Engine | INFO | SELECT DATABASE()
+2025-07-13 22:16:38 | sqlalchemy.engine.Engine | INFO | [raw sql] {}
+2025-07-13 22:16:38 | sqlalchemy.engine.Engine | INFO | SELECT @@sql_mode
+2025-07-13 22:16:38 | sqlalchemy.engine.Engine | INFO | [raw sql] {}
+2025-07-13 22:16:38 | sqlalchemy.engine.Engine | INFO | SELECT @@lower_case_table_names
+2025-07-13 22:16:38 | sqlalchemy.engine.Engine | INFO | [raw sql] {}
+2025-07-13 22:16:38 | sqlalchemy.engine.Engine | INFO | BEGIN (implicit)
+2025-07-13 22:16:38 | sqlalchemy.engine.Engine | INFO | DESCRIBE `recommend`.`users`
+2025-07-13 22:16:38 | sqlalchemy.engine.Engine | INFO | [raw sql] {}
+2025-07-13 22:16:38 | sqlalchemy.engine.Engine | INFO | DESCRIBE `recommend`.`universities`
+2025-07-13 22:16:38 | sqlalchemy.engine.Engine | INFO | [raw sql] {}
+2025-07-13 22:16:38 | sqlalchemy.engine.Engine | INFO | DESCRIBE `recommend`.`programs`
+2025-07-13 22:16:38 | sqlalchemy.engine.Engine | INFO | [raw sql] {}
+2025-07-13 22:16:38 | sqlalchemy.engine.Engine | INFO | DESCRIBE `recommend`.`user_qualifications`
+2025-07-13 22:16:38 | sqlalchemy.engine.Engine | INFO | [raw sql] {}
+2025-07-13 22:16:39 | sqlalchemy.engine.Engine | INFO | DESCRIBE `recommend`.`user_qualification_status`
+2025-07-13 22:16:39 | sqlalchemy.engine.Engine | INFO | [raw sql] {}
+2025-07-13 22:16:39 | sqlalchemy.engine.Engine | INFO | DESCRIBE `recommend`.`user_interests`
+2025-07-13 22:16:39 | sqlalchemy.engine.Engine | INFO | [raw sql] {}
+2025-07-13 22:16:39 | sqlalchemy.engine.Engine | INFO | DESCRIBE `recommend`.`applications`
+2025-07-13 22:16:39 | sqlalchemy.engine.Engine | INFO | [raw sql] {}
+2025-07-13 22:16:39 | sqlalchemy.engine.Engine | INFO | DESCRIBE `recommend`.`regions`
+2025-07-13 22:16:39 | sqlalchemy.engine.Engine | INFO | [raw sql] {}
+2025-07-13 22:16:39 | sqlalchemy.engine.Engine | INFO | DESCRIBE `recommend`.`program_requirements`
+2025-07-13 22:16:39 | sqlalchemy.engine.Engine | INFO | [raw sql] {}
+2025-07-13 22:16:39 | sqlalchemy.engine.Engine | INFO | DESCRIBE `recommend`.`user_test_scores`
+2025-07-13 22:16:39 | sqlalchemy.engine.Engine | INFO | [raw sql] {}
+2025-07-13 22:16:39 | sqlalchemy.engine.Engine | INFO | COMMIT
+2025-07-13 22:16:39 | app.database | INFO | MySQL tables created successfully
+2025-07-13 22:16:39 | app.main | INFO | Application and databases initialized successfully
+2025-07-13 22:16:54 | sqlalchemy.engine.Engine | INFO | BEGIN (implicit)
+2025-07-13 22:16:54 | sqlalchemy.engine.Engine | INFO | SELECT 1
+2025-07-13 22:16:54 | sqlalchemy.engine.Engine | INFO | [generated in 0.00122s] {}
+2025-07-13 22:16:54 | sqlalchemy.engine.Engine | INFO | ROLLBACK
+2025-07-13 22:16:54 | app.database | INFO | MySQL connection test successful
+2025-07-13 22:16:54 | neo4j.pool | DEBUG | [#0000]  _: <POOL> acquire direct connection, access_mode='WRITE', database='neo4j'
+2025-07-13 22:16:54 | neo4j.pool | DEBUG | [#FC21]  _: <POOL> picked existing connection bolt-12
+2025-07-13 22:16:54 | neo4j.pool | DEBUG | [#FC21]  _: <POOL> checked re_auth auth=None updated=False force=False
+2025-07-13 22:16:54 | neo4j.pool | DEBUG | [#FC21]  _: <POOL> handing out existing connection
+2025-07-13 22:16:54 | neo4j.io | DEBUG | [#FC21]  C: RUN 'RETURN 1 AS test' {} {'db': 'neo4j'}
+2025-07-13 22:16:54 | neo4j.io | DEBUG | [#FC21]  _: <CONNECTION> client state: READY > STREAMING
+2025-07-13 22:16:54 | neo4j.io | DEBUG | [#FC21]  C: PULL {'n': 1000}
+2025-07-13 22:16:54 | neo4j.io | DEBUG | [#FC21]  S: SUCCESS {'t_first': 36, 'fields': ['test']}
+2025-07-13 22:16:54 | neo4j.io | DEBUG | [#FC21]  _: <CONNECTION> server state: READY > STREAMING
+2025-07-13 22:16:54 | neo4j.io | DEBUG | [#FC21]  S: RECORD * 1
+2025-07-13 22:16:54 | neo4j.io | DEBUG | [#FC21]  S: SUCCESS {'bookmark': 'FB:kcwQ41gc3l4PSUOF0Ud4FCTxeUiQ', 'type': 'r', 't_last': 2, 'db': 'neo4j'}
+2025-07-13 22:16:54 | neo4j.io | DEBUG | [#FC21]  _: <CONNECTION> server state: STREAMING > READY
+2025-07-13 22:16:54 | neo4j.pool | DEBUG | [#FC21]  _: <POOL> released bolt-12
+2025-07-13 22:16:54 | app.database | INFO | Neo4j connection test successful
+2025-07-13 22:16:54 | app.database | INFO | All database connections are healthy
+2025-07-13 22:17:01 | sqlalchemy.pool.impl.QueuePool | INFO | Pool disposed. Pool size: 10  Connections in pool: 0 Current Overflow: -10 Current Checked out connections: 0
+2025-07-13 22:17:01 | sqlalchemy.pool.impl.QueuePool | INFO | Pool recreating
+2025-07-13 22:17:01 | app.database | INFO | MySQL database connections closed
+2025-07-13 22:17:01 | neo4j.pool | DEBUG | [#0000]  _: <POOL> close
+2025-07-13 22:17:01 | neo4j.io | DEBUG | [#FC21]  C: GOODBYE
+2025-07-13 22:17:01 | neo4j.io | DEBUG | [#FC21]  C: <CLOSE>
+2025-07-13 22:17:01 | app.database | INFO | Neo4j database connections closed
+2025-07-13 22:17:01 | app.database | INFO | All database connections closed
+2025-07-13 22:17:01 | app.main | INFO | Application shutdown completed
