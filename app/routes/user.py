@@ -10,7 +10,8 @@ from app.schemas import (
     UserUpdate, 
     UserResponse, 
     UserListResponse,
-    MessageResponse
+    MessageResponse,
+    RecommendationListResponse
 )
 from app.util.log import get_logger
 
@@ -299,6 +300,49 @@ async def get_user_by_email(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal server error occurred while retrieving user"
+        )
+
+
+@router.get("/users/{user_id}/recommendations", 
+            response_model=RecommendationListResponse,
+            summary="Get user recommendations",
+            description="Get program recommendations for a user based on their profile")
+async def get_user_recommendations(
+    user_id: int,
+    limit: int = Query(10, ge=1, le=50, description="Maximum number of recommendations"),
+    user_repo: UserRepository = Depends(get_user_repository)
+):
+    """
+    Get program recommendations for a user based on their profile in Neo4j.
+    
+    - **user_id**: The ID of the user to get recommendations for
+    - **limit**: Maximum number of recommendations to return (1-50)
+    """
+    try:
+        # Check if user exists
+        user = user_repo.get_user_by_id(user_id)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+        
+        # Get recommendations from Neo4j
+        recommendations = user_repo.get_user_recommendations(user_id, limit)
+        
+        return RecommendationListResponse(
+            user_id=user_id,
+            recommendations=recommendations,
+            total_recommendations=len(recommendations)
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected error getting recommendations for user {user_id}: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error occurred while getting recommendations"
         )
 
 

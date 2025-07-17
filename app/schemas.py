@@ -425,6 +425,19 @@ class RecommendationResponse(BaseModel):
 
 class RecommendationListResponse(BaseModel):
     """Schema for recommendation list response"""
+    
+    user_id: int
+    recommendations: List[dict]
+    total_recommendations: int
+
+
+class UserRecommendationResponse(BaseModel):
+    """Schema for user recommendation response"""
+    
+    program_id: int
+    program_name: str
+    degree_level: str
+    match_score: int
 
     recommendations: List[RecommendationResponse]
     total: int

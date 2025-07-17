@@ -3,6 +3,7 @@ from sqlalchemy.exc import IntegrityError
 from typing import Optional, List
 from app.models import University
 from app.schemas import UniversityCreate
+from app.services.neo4j_program_service import Neo4jProgramService
 import logging
 
 logger = logging.getLogger(__name__)
@@ -13,6 +14,7 @@ class UniversityRepository:
 
     def __init__(self, db: Session):
         self.db = db
+        self.neo4j_service = Neo4jProgramService()
 
     def create_university(self, university_data: UniversityCreate) -> University:
         try:
@@ -20,6 +22,14 @@ class UniversityRepository:
             self.db.add(db_university)
             self.db.commit()
             self.db.refresh(db_university)
+            
+            # Create university node in Neo4j
+            try:
+                self.neo4j_service.create_university_node(db_university)
+            except Exception as neo4j_error:
+                logger.warning(f"Failed to create university in Neo4j: {neo4j_error}")
+                # Don't fail the entire operation if Neo4j fails
+            
             logger.info(f"University created successfully: {db_university.name}")
             return db_university
         except IntegrityError as e:
@@ -67,6 +77,14 @@ class UniversityRepository:
                 setattr(university, field, value)
             self.db.commit()
             self.db.refresh(university)
+            
+            # Update university node in Neo4j
+            try:
+                self.neo4j_service.update_university_node(university)
+            except Exception as neo4j_error:
+                logger.warning(f"Failed to update university in Neo4j: {neo4j_error}")
+                # Don't fail the entire operation if Neo4j fails
+            
             logger.info(f"University updated successfully: {university.name}")
             return university
         except IntegrityError as e:
@@ -87,6 +105,14 @@ class UniversityRepository:
                 return False
             self.db.delete(university)
             self.db.commit()
+            
+            # Delete university node from Neo4j
+            try:
+                self.neo4j_service.delete_university_node(university_id)
+            except Exception as neo4j_error:
+                logger.warning(f"Failed to delete university from Neo4j: {neo4j_error}")
+                # Don't fail the entire operation if Neo4j fails
+            
             logger.info(f"University deleted: {university_id}")
             return True
         except Exception as e:
@@ -105,3 +131,11 @@ class UniversityRepository:
         except Exception as e:
             logger.error(f"Failed to search universities by name {name}: {e}")
             raise
+
+    def get_universities_by_region_neo4j(self, region_id: int) -> List[dict]:
+        """Get universities by region from Neo4j"""
+        try:
+            return self.neo4j_service.get_universities_by_region(region_id)
+        except Exception as e:
+            logger.error(f"Failed to get universities by region {region_id} from Neo4j: {e}")
+            return []
