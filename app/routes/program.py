@@ -220,5 +220,3 @@ async def delete_program(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal server error occurred while deleting program",
         )
-
-

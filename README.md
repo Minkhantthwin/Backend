@@ -163,6 +163,48 @@ The API will be available at `http://127.0.0.1:8000`
 - `POST /users/{user_id}/qualifications/sync-neo4j` - Sync qualification status to Neo4j
 - `GET /programs/{program_id}/qualified-users` - Get users qualified for a specific program
 
+#### Recommendation System
+- `GET /users/{user_id}/recommendations` - Get comprehensive program recommendations (combines all sources)
+- `GET /users/{user_id}/recommendations/interest-based` - Get recommendations based on user interests
+- `GET /users/{user_id}/recommendations/qualification-based` - Get recommendations based on qualification status
+- `GET /users/{user_id}/recommendations/neo4j-graph` - Get recommendations from Neo4j graph relationships
+- `GET /programs/{program_id}/similar` - Get programs similar to a specific program
+- `POST /recommendations/custom` - Get custom recommendations with detailed parameters
+- `GET /recommendations/stats/{user_id}` - Get recommendation statistics and insights
+
+### Recommendation System
+
+The University Recommendation System uses a sophisticated multi-source approach to generate personalized program recommendations:
+
+#### **Recommendation Sources:**
+
+1. **Interest-based Recommendations (40% weight)**
+   - Matches programs to user's declared interests
+   - Considers interest level (high/medium/low)
+   - Supports partial field matching for related areas
+
+2. **Qualification-based Recommendations (50% weight)**
+   - Uses qualification assessment results
+   - Prioritizes programs where user meets requirements
+   - Includes high-match programs (75%+ qualification score)
+
+3. **Neo4j Graph Recommendations (30% weight)**
+   - Leverages graph database relationships
+   - Uses QUALIFIED_FOR relationship data
+   - Includes field-based program clustering
+
+#### **Scoring Algorithm:**
+- Programs appearing in multiple sources receive boosted scores
+- Additional filters apply multipliers for preferred countries, tuition limits, and language preferences
+- Final ranking considers combined weighted scores from all sources
+
+#### **API Features:**
+- Comprehensive recommendations combining all sources
+- Individual source recommendations for targeted results
+- Similar program discovery
+- Custom recommendation parameters
+- Detailed statistics and insights
+
 ### Usage
 - Use an API client (e.g., Postman, curl) to interact with endpoints under `/app`.
 - Refer to the API documentation or code for available routes and request/response formats.

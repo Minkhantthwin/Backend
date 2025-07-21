@@ -225,20 +225,20 @@ async def get_universities_by_region_neo4j(
 ):
     """
     Get universities in a specific region using Neo4j graph data.
-    
+
     This endpoint leverages Neo4j relationships to find universities in a region.
-    
+
     - **region_id**: The ID of the region to get universities for
     """
     try:
         universities = university_repo.get_universities_by_region_neo4j(region_id)
-        
+
         return {
             "region_id": region_id,
             "universities": universities,
-            "total_universities": len(universities)
+            "total_universities": len(universities),
         }
-        
+
     except Exception as e:
         logger.error(f"Unexpected error getting universities by region: {e}")
         raise HTTPException(

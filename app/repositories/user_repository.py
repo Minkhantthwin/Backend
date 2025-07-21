@@ -70,14 +70,14 @@ class UserRepository:
 
             self.db.commit()
             self.db.refresh(db_user)
-            
+
             # Create user node in Neo4j for recommendations
             try:
                 self.neo4j_service.create_user_node(db_user)
             except Exception as neo4j_error:
                 logger.warning(f"Failed to create user in Neo4j: {neo4j_error}")
                 # Don't fail the entire operation if Neo4j fails
-            
+
             logger.info(f"User created successfully: {db_user.email}")
             return db_user
 
@@ -147,14 +147,14 @@ class UserRepository:
 
             self.db.commit()
             self.db.refresh(user)
-            
+
             # Update user node in Neo4j
             try:
                 self.neo4j_service.update_user_node(user)
             except Exception as neo4j_error:
                 logger.warning(f"Failed to update user in Neo4j: {neo4j_error}")
                 # Don't fail the entire operation if Neo4j fails
-            
+
             logger.info(f"User updated successfully: {user.email}")
             return user
         except IntegrityError as e:
@@ -175,14 +175,14 @@ class UserRepository:
 
             self.db.delete(user)
             self.db.commit()
-            
+
             # Delete user node from Neo4j
             try:
                 self.neo4j_service.delete_user_node(user_id)
             except Exception as neo4j_error:
                 logger.warning(f"Failed to delete user from Neo4j: {neo4j_error}")
                 # Don't fail the entire operation if Neo4j fails
-            
+
             logger.info(f"User permanently deleted: {user.email}")
             return True
         except Exception as e:

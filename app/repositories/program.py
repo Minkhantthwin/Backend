@@ -35,14 +35,14 @@ class ProgramRepository:
 
             self.db.commit()
             self.db.refresh(db_program)
-            
+
             # Create program node in Neo4j
             try:
                 self.neo4j_service.create_program_node(db_program)
             except Exception as neo4j_error:
                 logger.warning(f"Failed to create program in Neo4j: {neo4j_error}")
                 # Don't fail the entire operation if Neo4j fails
-            
+
             logger.info(f"Program created successfully: {db_program.name}")
             return db_program
 
@@ -132,14 +132,14 @@ class ProgramRepository:
 
             program.is_active = False
             self.db.commit()
-            
+
             # Update program node in Neo4j
             try:
                 self.neo4j_service.delete_program_node(program_id)
             except Exception as neo4j_error:
                 logger.warning(f"Failed to delete program in Neo4j: {neo4j_error}")
                 # Don't fail the entire operation if Neo4j fails
-            
+
             logger.info(f"Program soft deleted: {program.name}")
             return True
         except Exception as e:
@@ -147,10 +147,16 @@ class ProgramRepository:
             logger.error(f"Failed to delete program {program_id}: {e}")
             raise
 
-    def get_program_recommendations_by_field(self, field_of_study: str, limit: int = 10) -> List[dict]:
+    def get_program_recommendations_by_field(
+        self, field_of_study: str, limit: int = 10
+    ) -> List[dict]:
         """Get program recommendations by field of study from Neo4j"""
         try:
-            return self.neo4j_service.get_program_recommendations_by_field(field_of_study, limit)
+            return self.neo4j_service.get_program_recommendations_by_field(
+                field_of_study, limit
+            )
         except Exception as e:
-            logger.error(f"Failed to get program recommendations for field {field_of_study}: {e}")
+            logger.error(
+                f"Failed to get program recommendations for field {field_of_study}: {e}"
+            )
             return []

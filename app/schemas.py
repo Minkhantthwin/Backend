@@ -111,7 +111,6 @@ class UserCreate(UserBase):
     """Schema for creating a new user"""
 
     password: str = Field(..., min_length=8, max_length=100)
-    qualifications: Optional[List[UserQualificationCreate]] = []
     interests: Optional[List[UserInterestCreate]] = []
     test_scores: Optional[List[UserTestScoreCreate]] = []
 
@@ -425,7 +424,7 @@ class RecommendationResponse(BaseModel):
 
 class RecommendationListResponse(BaseModel):
     """Schema for recommendation list response"""
-    
+
     user_id: int
     recommendations: List[dict]
     total_recommendations: int
@@ -433,7 +432,7 @@ class RecommendationListResponse(BaseModel):
 
 class UserRecommendationResponse(BaseModel):
     """Schema for user recommendation response"""
-    
+
     program_id: int
     program_name: str
     degree_level: str

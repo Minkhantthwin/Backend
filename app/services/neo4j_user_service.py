@@ -20,22 +20,22 @@ class Neo4jUserService:
             with self.db_manager.neo4j.get_db_session() as session:
                 # Create user node
                 self._create_user_node_transaction(session, user)
-                
+
                 # Create qualification nodes and relationships
                 if user.qualifications:
                     self._create_qualification_relationships(session, user)
-                
+
                 # Create interest nodes and relationships
                 if user.interests:
                     self._create_interest_relationships(session, user)
-                
+
                 # Create test score nodes and relationships
                 if user.test_scores:
                     self._create_test_score_relationships(session, user)
-                
+
                 logger.info(f"User node created successfully in Neo4j: {user.email}")
                 return True
-                
+
         except Exception as e:
             logger.error(f"Failed to create user node in Neo4j: {e}")
             return False
@@ -56,19 +56,21 @@ class Neo4jUserService:
         })
         RETURN u
         """
-        
+
         parameters = {
             "user_id": user.id,
             "email": user.email,
             "first_name": user.first_name,
             "last_name": user.last_name,
-            "date_of_birth": user.date_of_birth.isoformat() if user.date_of_birth else None,
+            "date_of_birth": (
+                user.date_of_birth.isoformat() if user.date_of_birth else None
+            ),
             "nationality": user.nationality,
             "phone": user.phone,
             "created_at": user.created_at.isoformat() if user.created_at else None,
-            "updated_at": user.updated_at.isoformat() if user.updated_at else None
+            "updated_at": user.updated_at.isoformat() if user.updated_at else None,
         }
-        
+
         session.run(query, parameters)
 
     def _create_qualification_relationships(self, session: Session, user: User):
@@ -93,7 +95,7 @@ class Neo4jUserService:
             CREATE (u)-[:STUDIED_AT]->(inst)
             CREATE (u)-[:STUDIED_FIELD]->(fs)
             """
-            
+
             parameters = {
                 "user_id": user.id,
                 "qualification_id": qualification.id,
@@ -105,9 +107,9 @@ class Neo4jUserService:
                 "grade_point": qualification.grade_point,
                 "max_grade_point": qualification.max_grade_point,
                 "completion_year": qualification.completion_year,
-                "is_completed": qualification.is_completed
+                "is_completed": qualification.is_completed,
             }
-            
+
             session.run(qual_query, parameters)
 
     def _create_interest_relationships(self, session: Session, user: User):
@@ -121,14 +123,14 @@ class Neo4jUserService:
                 interest_level: $interest_level
             }]->(fs)
             """
-            
+
             parameters = {
                 "user_id": user.id,
                 "interest_id": interest.id,
                 "field_of_study": interest.field_of_study,
-                "interest_level": interest.interest_level
+                "interest_level": interest.interest_level,
             }
-            
+
             session.run(interest_query, parameters)
 
     def _create_test_score_relationships(self, session: Session, user: User):
@@ -145,17 +147,23 @@ class Neo4jUserService:
                 expiry_date: $expiry_date
             }]->(tt)
             """
-            
+
             parameters = {
                 "user_id": user.id,
                 "test_score_id": test_score.id,
                 "test_type": test_score.test_type,
                 "score": test_score.score,
                 "max_score": test_score.max_score,
-                "test_date": test_score.test_date.isoformat() if test_score.test_date else None,
-                "expiry_date": test_score.expiry_date.isoformat() if test_score.expiry_date else None
+                "test_date": (
+                    test_score.test_date.isoformat() if test_score.test_date else None
+                ),
+                "expiry_date": (
+                    test_score.expiry_date.isoformat()
+                    if test_score.expiry_date
+                    else None
+                ),
             }
-            
+
             session.run(test_query, parameters)
 
     def update_user_node(self, user: User) -> bool:
@@ -173,26 +181,32 @@ class Neo4jUserService:
                     u.updated_at = $updated_at
                 RETURN u
                 """
-                
+
                 parameters = {
                     "user_id": user.id,
                     "email": user.email,
                     "first_name": user.first_name,
                     "last_name": user.last_name,
-                    "date_of_birth": user.date_of_birth.isoformat() if user.date_of_birth else None,
+                    "date_of_birth": (
+                        user.date_of_birth.isoformat() if user.date_of_birth else None
+                    ),
                     "nationality": user.nationality,
                     "phone": user.phone,
-                    "updated_at": user.updated_at.isoformat() if user.updated_at else None
+                    "updated_at": (
+                        user.updated_at.isoformat() if user.updated_at else None
+                    ),
                 }
-                
+
                 result = session.run(query, parameters)
                 if result.single():
-                    logger.info(f"User node updated successfully in Neo4j: {user.email}")
+                    logger.info(
+                        f"User node updated successfully in Neo4j: {user.email}"
+                    )
                     return True
                 else:
                     logger.warning(f"User node not found in Neo4j: {user.email}")
                     return False
-                    
+
         except Exception as e:
             logger.error(f"Failed to update user node in Neo4j: {e}")
             return False
@@ -205,16 +219,18 @@ class Neo4jUserService:
                 MATCH (u:User {user_id: $user_id})
                 DETACH DELETE u
                 """
-                
+
                 result = session.run(query, {"user_id": user_id})
                 logger.info(f"User node deleted successfully from Neo4j: {user_id}")
                 return True
-                
+
         except Exception as e:
             logger.error(f"Failed to delete user node from Neo4j: {e}")
             return False
 
-    def get_user_recommendations(self, user_id: int, limit: int = 10) -> List[Dict[str, Any]]:
+    def get_user_recommendations(
+        self, user_id: int, limit: int = 10
+    ) -> List[Dict[str, Any]]:
         """Get program recommendations for a user based on their profile"""
         try:
             with self.db_manager.neo4j.get_db_session() as session:
@@ -316,30 +332,32 @@ class Neo4jUserService:
                 ORDER BY total_score DESC, university.ranking_world ASC
                 LIMIT $limit
                 """
-                
+
                 result = session.run(query, {"user_id": user_id, "limit": limit})
                 recommendations = []
-                
+
                 for record in result:
-                    recommendations.append({
-                        "program_id": record["program_id"],
-                        "program_name": record["program_name"],
-                        "degree_level": record["degree_level"],
-                        "field_of_study": record["field_of_study"],
-                        "tuition_fee": record["tuition_fee"],
-                        "currency": record["currency"],
-                        "duration_years": record["duration_years"],
-                        "language": record["language"],
-                        "university_name": record["university_name"],
-                        "university_city": record["university_city"],
-                        "university_ranking": record["university_ranking"],
-                        "match_score": record["match_score"],
-                        "match_types": record["match_types"],
-                        "matched_fields": record["matched_fields"]
-                    })
-                
+                    recommendations.append(
+                        {
+                            "program_id": record["program_id"],
+                            "program_name": record["program_name"],
+                            "degree_level": record["degree_level"],
+                            "field_of_study": record["field_of_study"],
+                            "tuition_fee": record["tuition_fee"],
+                            "currency": record["currency"],
+                            "duration_years": record["duration_years"],
+                            "language": record["language"],
+                            "university_name": record["university_name"],
+                            "university_city": record["university_city"],
+                            "university_ranking": record["university_ranking"],
+                            "match_score": record["match_score"],
+                            "match_types": record["match_types"],
+                            "matched_fields": record["matched_fields"],
+                        }
+                    )
+
                 return recommendations
-                
+
         except Exception as e:
             logger.error(f"Failed to get user recommendations from Neo4j: {e}")
             return []
@@ -372,30 +390,40 @@ class Neo4jUserService:
                     CREATE (p)-[:DEGREE_LEVEL]->(dl)
                     CREATE (p)-[:OFFERED_BY]->(uni)
                     """
-                    
+
                     parameters = {
                         "program_id": program.id,
                         "name": program.name,
                         "degree_level": program.degree_level.value,
                         "field_of_study": program.field_of_study,
-                        "duration_years": float(program.duration_years) if program.duration_years else None,
+                        "duration_years": (
+                            float(program.duration_years)
+                            if program.duration_years
+                            else None
+                        ),
                         "language": program.language,
-                        "tuition_fee": float(program.tuition_fee) if program.tuition_fee else None,
+                        "tuition_fee": (
+                            float(program.tuition_fee) if program.tuition_fee else None
+                        ),
                         "currency": program.currency,
                         "university_id": program.university_id,
-                        "university_name": program.university.name if program.university else None
+                        "university_name": (
+                            program.university.name if program.university else None
+                        ),
                     }
-                    
+
                     session.run(query, parameters)
-                
+
                 logger.info(f"Created {len(programs)} program nodes in Neo4j")
                 return True
-                
+
         except Exception as e:
             logger.error(f"Failed to create program nodes in Neo4j: {e}")
             return False
 
-    def create_interest_relationship(self, user_id: int, interest: UserInterest) -> bool:
+    def create_interest_relationship(
+        self, user_id: int, interest: UserInterest
+    ) -> bool:
         """Create a single interest relationship in Neo4j"""
         try:
             with self.db_manager.neo4j.get_db_session() as session:
@@ -407,18 +435,20 @@ class Neo4jUserService:
                     interest_level: $interest_level
                 }]->(fs)
                 """
-                
+
                 parameters = {
                     "user_id": user_id,
                     "interest_id": interest.id,
                     "field_of_study": interest.field_of_study,
-                    "interest_level": interest.interest_level
+                    "interest_level": interest.interest_level,
                 }
-                
+
                 session.run(interest_query, parameters)
-                logger.info(f"Interest relationship created in Neo4j for user {user_id}")
+                logger.info(
+                    f"Interest relationship created in Neo4j for user {user_id}"
+                )
                 return True
-                
+
         except Exception as e:
             logger.error(f"Failed to create interest relationship in Neo4j: {e}")
             return False
@@ -432,16 +462,18 @@ class Neo4jUserService:
                 WHERE r.interest_id = $interest_id
                 DELETE r
                 """
-                
+
                 session.run(query, {"interest_id": interest_id})
                 logger.info(f"Interest relationship deleted from Neo4j: {interest_id}")
                 return True
-                
+
         except Exception as e:
             logger.error(f"Failed to delete interest relationship from Neo4j: {e}")
             return False
 
-    def update_interest_relationship(self, user_id: int, interest: UserInterest) -> bool:
+    def update_interest_relationship(
+        self, user_id: int, interest: UserInterest
+    ) -> bool:
         """Update a specific interest relationship in Neo4j"""
         try:
             with self.db_manager.neo4j.get_db_session() as session:
@@ -460,18 +492,20 @@ class Neo4jUserService:
                     interest_level: $interest_level
                 }]->(new_fs)
                 """
-                
+
                 parameters = {
                     "user_id": user_id,
                     "interest_id": interest.id,
                     "field_of_study": interest.field_of_study,
-                    "interest_level": interest.interest_level
+                    "interest_level": interest.interest_level,
                 }
-                
+
                 session.run(query, parameters)
-                logger.info(f"Interest relationship updated in Neo4j for user {user_id}")
+                logger.info(
+                    f"Interest relationship updated in Neo4j for user {user_id}"
+                )
                 return True
-                
+
         except Exception as e:
             logger.error(f"Failed to update interest relationship in Neo4j: {e}")
             return False
@@ -487,25 +521,28 @@ class Neo4jUserService:
                        r.interest_level as interest_level
                 ORDER BY r.interest_level DESC, fs.name ASC
                 """
-                
+
                 result = session.run(query, {"user_id": user_id})
                 interests = []
-                
+
                 for record in result:
-                    interests.append({
-                        "interest_id": record["interest_id"],
-                        "field_of_study": record["field_of_study"],
-                        "interest_level": record["interest_level"]
-                    })
-                
+                    interests.append(
+                        {
+                            "interest_id": record["interest_id"],
+                            "field_of_study": record["field_of_study"],
+                            "interest_level": record["interest_level"],
+                        }
+                    )
+
                 return interests
-                
+
         except Exception as e:
             logger.error(f"Failed to get user interests from Neo4j: {e}")
             return []
 
-    def create_qualification_status_relationship(self, user_id: int, program_id: int, 
-                                               qualification_data: Dict[str, Any]) -> bool:
+    def create_qualification_status_relationship(
+        self, user_id: int, program_id: int, qualification_data: Dict[str, Any]
+    ) -> bool:
         """Create or update qualification status relationship in Neo4j"""
         try:
             with self.db_manager.neo4j.get_db_session() as session:
@@ -514,12 +551,12 @@ class Neo4jUserService:
                 MERGE (p:Program {program_id: $program_id})
                 """
                 session.run(program_query, {"program_id": program_id})
-                
+
                 # Create or update qualification status relationship
                 query = """
                 MATCH (u:User {user_id: $user_id})
                 MATCH (p:Program {program_id: $program_id})
-                MERGE (u)-[r:QUALIFIED_FOR]->(p)
+                MERGE (u)-[r:HAS_QUALIFICATION]->(p)
                 SET r.is_qualified = $is_qualified,
                     r.qualification_score = $qualification_score,
                     r.requirements_met = $requirements_met,
@@ -529,28 +566,42 @@ class Neo4jUserService:
                     r.updated_at = $updated_at
                 RETURN r
                 """
-                
+
                 parameters = {
                     "user_id": user_id,
                     "program_id": program_id,
                     "is_qualified": qualification_data.get("is_qualified", False),
-                    "qualification_score": qualification_data.get("qualification_score", 0.0),
+                    "qualification_score": qualification_data.get(
+                        "qualification_score", 0.0
+                    ),
                     "requirements_met": qualification_data.get("requirements_met", 0),
-                    "total_requirements": qualification_data.get("total_requirements", 0),
-                    "missing_requirements": str(qualification_data.get("missing_requirements", [])),
-                    "checked_at": qualification_data.get("checked_at", datetime.utcnow()).isoformat(),
-                    "updated_at": datetime.utcnow().isoformat()
+                    "total_requirements": qualification_data.get(
+                        "total_requirements", 0
+                    ),
+                    "missing_requirements": str(
+                        qualification_data.get("missing_requirements", [])
+                    ),
+                    "checked_at": qualification_data.get(
+                        "checked_at", datetime.utcnow()
+                    ).isoformat(),
+                    "updated_at": datetime.utcnow().isoformat(),
                 }
-                
+
                 session.run(query, parameters)
-                logger.info(f"Qualification status relationship created/updated in Neo4j for user {user_id}, program {program_id}")
+                logger.info(
+                    f"Qualification status relationship created/updated in Neo4j for user {user_id}, program {program_id}"
+                )
                 return True
-                
+
         except Exception as e:
-            logger.error(f"Failed to create qualification status relationship in Neo4j: {e}")
+            logger.error(
+                f"Failed to create qualification status relationship in Neo4j: {e}"
+            )
             return False
 
-    def get_user_qualification_status_from_neo4j(self, user_id: int, program_id: int = None) -> List[Dict[str, Any]]:
+    def get_user_qualification_status_from_neo4j(
+        self, user_id: int, program_id: int = None
+    ) -> List[Dict[str, Any]]:
         """Get user qualification status from Neo4j"""
         try:
             with self.db_manager.neo4j.get_db_session() as session:
@@ -566,7 +617,9 @@ class Neo4jUserService:
                            r.missing_requirements as missing_requirements,
                            r.checked_at as checked_at
                     """
-                    result = session.run(query, {"user_id": user_id, "program_id": program_id})
+                    result = session.run(
+                        query, {"user_id": user_id, "program_id": program_id}
+                    )
                 else:
                     # Get all qualification statuses for user
                     query = """
@@ -581,26 +634,30 @@ class Neo4jUserService:
                     ORDER BY r.qualification_score DESC
                     """
                     result = session.run(query, {"user_id": user_id})
-                
+
                 statuses = []
                 for record in result:
-                    statuses.append({
-                        "program_id": record["program_id"],
-                        "is_qualified": record["is_qualified"],
-                        "qualification_score": record["qualification_score"],
-                        "requirements_met": record["requirements_met"],
-                        "total_requirements": record["total_requirements"],
-                        "missing_requirements": record["missing_requirements"],
-                        "checked_at": record["checked_at"]
-                    })
-                
+                    statuses.append(
+                        {
+                            "program_id": record["program_id"],
+                            "is_qualified": record["is_qualified"],
+                            "qualification_score": record["qualification_score"],
+                            "requirements_met": record["requirements_met"],
+                            "total_requirements": record["total_requirements"],
+                            "missing_requirements": record["missing_requirements"],
+                            "checked_at": record["checked_at"],
+                        }
+                    )
+
                 return statuses
-                
+
         except Exception as e:
             logger.error(f"Failed to get user qualification status from Neo4j: {e}")
             return []
 
-    def get_qualified_programs_recommendations(self, user_id: int, limit: int = 10) -> List[Dict[str, Any]]:
+    def get_qualified_programs_recommendations(
+        self, user_id: int, limit: int = 10
+    ) -> List[Dict[str, Any]]:
         """Get program recommendations based on qualification status from Neo4j"""
         try:
             with self.db_manager.neo4j.get_db_session() as session:
@@ -614,21 +671,25 @@ class Neo4jUserService:
                 ORDER BY r.qualification_score DESC, r.checked_at DESC
                 LIMIT $limit
                 """
-                
+
                 result = session.run(query, {"user_id": user_id, "limit": limit})
                 recommendations = []
-                
+
                 for record in result:
-                    recommendations.append({
-                        "program_id": record["program_id"],
-                        "qualification_score": record["qualification_score"],
-                        "is_qualified": record["is_qualified"],
-                        "checked_at": record["checked_at"],
-                        "recommendation_reason": "High qualification match"
-                    })
-                
+                    recommendations.append(
+                        {
+                            "program_id": record["program_id"],
+                            "qualification_score": record["qualification_score"],
+                            "is_qualified": record["is_qualified"],
+                            "checked_at": record["checked_at"],
+                            "recommendation_reason": "High qualification match",
+                        }
+                    )
+
                 return recommendations
-                
+
         except Exception as e:
-            logger.error(f"Failed to get qualified programs recommendations from Neo4j: {e}")
+            logger.error(
+                f"Failed to get qualified programs recommendations from Neo4j: {e}"
+            )
             return []

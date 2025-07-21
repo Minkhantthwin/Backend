@@ -11,6 +11,7 @@ from app.routes import (
     qualification,
     region,
     university,
+    recommendation,
 )
 import logging
 from app.util.log import get_logger
@@ -57,11 +58,7 @@ app = FastAPI(
 
 # Include routers
 app.include_router(user.router, prefix=f"/api/{settings.API_V1_STR}", tags=["Users"])
-app.include_router(
-    user_qualification.router,
-    prefix=f"/api/{settings.API_V1_STR}",
-    tags=["User Qualifications"],
-)
+
 app.include_router(
     user_interest.router, prefix=f"/api/{settings.API_V1_STR}", tags=["User Interests"]
 )
@@ -84,6 +81,11 @@ app.include_router(
 )
 app.include_router(
     university.router, prefix=f"/api/{settings.API_V1_STR}", tags=["Universities"]
+)
+app.include_router(
+    recommendation.router,
+    prefix=f"/api/{settings.API_V1_STR}",
+    tags=["Recommendations"],
 )
 app.include_router(health.router, tags=["Health"])
 

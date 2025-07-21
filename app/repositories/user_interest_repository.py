@@ -28,14 +28,14 @@ class UserInterestRepository:
             self.db.add(db_interest)
             self.db.commit()
             self.db.refresh(db_interest)
-            
+
             # Create interest relationship in Neo4j
             try:
                 self.neo4j_service.create_interest_relationship(user_id, db_interest)
             except Exception as neo4j_error:
                 logger.warning(f"Failed to create interest in Neo4j: {neo4j_error}")
                 # Don't fail the entire operation if Neo4j fails
-            
+
             logger.info(f"User interest created successfully for user {user_id}")
             return db_interest
 
@@ -83,14 +83,14 @@ class UserInterestRepository:
 
             self.db.delete(interest)
             self.db.commit()
-            
+
             # Delete interest relationship from Neo4j
             try:
                 self.neo4j_service.delete_interest_relationship(interest_id)
             except Exception as neo4j_error:
                 logger.warning(f"Failed to delete interest from Neo4j: {neo4j_error}")
                 # Don't fail the entire operation if Neo4j fails
-            
+
             logger.info(f"Interest deleted: {interest_id}")
             return True
         except Exception as e:
@@ -106,7 +106,9 @@ class UserInterestRepository:
             logger.error(f"Failed to get interests from Neo4j for user {user_id}: {e}")
             return []
 
-    def update_interest(self, interest_id: int, interest_data: UserInterestCreate) -> Optional[UserInterest]:
+    def update_interest(
+        self, interest_id: int, interest_data: UserInterestCreate
+    ) -> Optional[UserInterest]:
         """Update an existing interest"""
         try:
             interest = self.get_interest_by_id(interest_id)
@@ -116,20 +118,22 @@ class UserInterestRepository:
             # Update MySQL
             for field, value in interest_data.model_dump().items():
                 setattr(interest, field, value)
-            
+
             self.db.commit()
             self.db.refresh(interest)
-            
+
             # Update Neo4j
             try:
-                self.neo4j_service.update_interest_relationship(interest.user_id, interest)
+                self.neo4j_service.update_interest_relationship(
+                    interest.user_id, interest
+                )
             except Exception as neo4j_error:
                 logger.warning(f"Failed to update interest in Neo4j: {neo4j_error}")
                 # Don't fail the entire operation if Neo4j fails
-            
+
             logger.info(f"Interest updated successfully: {interest_id}")
             return interest
-            
+
         except Exception as e:
             self.db.rollback()
             logger.error(f"Failed to update interest {interest_id}: {e}")
