@@ -44,19 +44,6 @@ def get_user_repository(db: Session = Depends(get_mysql_session)) -> UserReposit
                 "phone": "+1234567890",
                 "date_of_birth": "1990-01-01",
                 "nationality": "American",
-                "qualifications": [
-                    {
-                    "qualification_type": "BACHELOR",
-                    "institution_name": "MIT",
-                    "degree_name": "BSc Computer Science",
-                    "field_of_study": "Computer Science",
-                    "grade_point": "3.8",
-                    "max_grade_point": "4.0",
-                    "completion_year": 2012,
-                    "country": "USA",
-                    "is_completed": true
-                    }
-                ],
                 "interests": [
                     {
                     "field_of_study": "Artificial Intelligence",
@@ -352,31 +339,3 @@ async def get_user_recommendations(
             detail="Internal server error occurred while getting recommendations",
         )
 
-
-@router.get(
-    "/users/me",
-    response_model=UserResponse,
-    summary="Get current user profile",
-    description="Get the current authenticated user's profile information",
-)
-async def get_current_user_profile(
-    current_user: User = Depends(get_current_user)
-):
-    """
-    Get the current authenticated user's profile information.
-    
-    **Requires Authentication:** Bearer token in Authorization header
-    
-    This endpoint returns the complete profile of the currently logged-in user,
-    including qualifications, interests, and test scores.
-    """
-    try:
-        logger.info(f"Current user profile requested: {current_user.email}")
-        return current_user
-
-    except Exception as e:
-        logger.error(f"Unexpected error getting current user profile: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Internal server error occurred while retrieving profile",
-        )

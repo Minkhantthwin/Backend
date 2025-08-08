@@ -44,14 +44,6 @@ class UserRepository:
             self.db.add(db_user)
             self.db.flush()  # Get user ID without committing
 
-            # Add qualifications
-            if user_data.qualifications:
-                for qual_data in user_data.qualifications:
-                    qualification = UserQualification(
-                        user_id=db_user.id, **qual_data.model_dump()
-                    )
-                    self.db.add(qualification)
-
             # Add interests
             if user_data.interests:
                 for interest_data in user_data.interests:

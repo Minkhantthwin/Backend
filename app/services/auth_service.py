@@ -61,6 +61,10 @@ class AuthenticationService:
         try:
             to_encode = data.copy()
             
+            # Ensure 'sub' is a string as required by JWT standards
+            if 'sub' in to_encode:
+                to_encode['sub'] = str(to_encode['sub'])
+            
             if expires_delta:
                 expire = datetime.utcnow() + expires_delta
             else:
@@ -83,10 +87,17 @@ class AuthenticationService:
         try:
             payload = jwt.decode(token, self.secret_key, algorithms=[self.algorithm])
             
-            user_id: int = payload.get("sub")
+            user_id_str: str = payload.get("sub")
             email: str = payload.get("email")
             
-            if user_id is None or email is None:
+            if user_id_str is None or email is None:
+                return None
+            
+            # Convert string back to integer
+            try:
+                user_id = int(user_id_str)
+            except (ValueError, TypeError):
+                logger.warning(f"Invalid user_id in token: {user_id_str}")
                 return None
             
             return TokenData(user_id=user_id, email=email)
@@ -130,10 +141,10 @@ class AuthenticationService:
                     headers={"WWW-Authenticate": "Bearer"},
                 )
             
-            # Create access token
+            # Create access token with string user_id
             access_token_expires = timedelta(minutes=self.access_token_expire_minutes)
             access_token = self.create_access_token(
-                data={"sub": user.id, "email": user.email},
+                data={"sub": str(user.id), "email": user.email},
                 expires_delta=access_token_expires
             )
             
@@ -177,10 +188,10 @@ class AuthenticationService:
                     headers={"WWW-Authenticate": "Bearer"},
                 )
             
-            # Create new access token
+            # Create new access token with string user_id
             access_token_expires = timedelta(minutes=self.access_token_expire_minutes)
             access_token = self.create_access_token(
-                data={"sub": user.id, "email": user.email},
+                data={"sub": str(user.id), "email": user.email},
                 expires_delta=access_token_expires
             )
             
