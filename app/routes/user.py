@@ -302,10 +302,10 @@ async def get_user_recommendations(
 ):
     """
     Get personalized program recommendations for a user.
-    
+
     **Requires Authentication:** Users can only access their own recommendations
     unless they have admin privileges.
-    
+
     - **user_id**: The ID of the user to get recommendations for
     """
     try:
@@ -313,29 +313,31 @@ async def get_user_recommendations(
         if current_user.id != user_id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="You can only access your own recommendations"
+                detail="You can only access your own recommendations",
             )
-        
+
         # Check if user exists
         target_user = user_repo.get_user_by_id(user_id)
         if not target_user:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, 
-                detail="User not found"
+                status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
             )
-        
+
         # Get recommendations from Neo4j
         recommendations = user_repo.get_user_recommendations(user_id, limit=10)
-        
-        logger.info(f"Retrieved {len(recommendations)} recommendations for user {user_id}")
+
+        logger.info(
+            f"Retrieved {len(recommendations)} recommendations for user {user_id}"
+        )
         return recommendations
 
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Unexpected error getting recommendations for user {user_id}: {e}")
+        logger.error(
+            f"Unexpected error getting recommendations for user {user_id}: {e}"
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal server error occurred while getting recommendations",
         )
-

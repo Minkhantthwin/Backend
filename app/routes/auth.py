@@ -201,7 +201,7 @@ async def logout(current_user: User = Depends(get_current_user)):
         logger.info(f"User logout: {current_user.email}")
         return {
             "message": "Logout successful",
-            "detail": "Please remove the token from client storage"
+            "detail": "Please remove the token from client storage",
         }
 
     except Exception as e:
@@ -242,7 +242,7 @@ async def verify_token(current_user: User = Depends(get_current_user)):
             "valid": True,
             "user_id": current_user.id,
             "email": current_user.email,
-            "message": "Token is valid"
+            "message": "Token is valid",
         }
 
     except Exception as e:
