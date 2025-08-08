@@ -13,6 +13,8 @@ from app.schemas import (
     MessageResponse,
     RecommendationListResponse,
 )
+from app.dependencies.auth import get_current_user, get_optional_current_user
+from app.models import User
 from app.util.log import get_logger
 
 logger = get_logger(__name__)
@@ -297,4 +299,84 @@ async def get_user_by_email(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal server error occurred while retrieving user",
+        )
+
+
+@router.get(
+    "/users/{user_id}/recommendations",
+    response_model=List[dict],
+    summary="Get user recommendations",
+    description="Get personalized program recommendations for a user (requires authentication)",
+)
+async def get_user_recommendations(
+    user_id: int,
+    current_user: User = Depends(get_current_user),
+    user_repo: UserRepository = Depends(get_user_repository),
+):
+    """
+    Get personalized program recommendations for a user.
+    
+    **Requires Authentication:** Users can only access their own recommendations
+    unless they have admin privileges.
+    
+    - **user_id**: The ID of the user to get recommendations for
+    """
+    try:
+        # Check if user is accessing their own data (basic authorization)
+        if current_user.id != user_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You can only access your own recommendations"
+            )
+        
+        # Check if user exists
+        target_user = user_repo.get_user_by_id(user_id)
+        if not target_user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, 
+                detail="User not found"
+            )
+        
+        # Get recommendations from Neo4j
+        recommendations = user_repo.get_user_recommendations(user_id, limit=10)
+        
+        logger.info(f"Retrieved {len(recommendations)} recommendations for user {user_id}")
+        return recommendations
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected error getting recommendations for user {user_id}: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error occurred while getting recommendations",
+        )
+
+
+@router.get(
+    "/users/me",
+    response_model=UserResponse,
+    summary="Get current user profile",
+    description="Get the current authenticated user's profile information",
+)
+async def get_current_user_profile(
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Get the current authenticated user's profile information.
+    
+    **Requires Authentication:** Bearer token in Authorization header
+    
+    This endpoint returns the complete profile of the currently logged-in user,
+    including qualifications, interests, and test scores.
+    """
+    try:
+        logger.info(f"Current user profile requested: {current_user.email}")
+        return current_user
+
+    except Exception as e:
+        logger.error(f"Unexpected error getting current user profile: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error occurred while retrieving profile",
         )

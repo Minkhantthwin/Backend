@@ -91,85 +91,85 @@ async def get_user_recommendations(
         )
 
 
-@router.get(
-    "/users/{user_id}/recommendations/interest-based",
-    response_model=List[dict],
-    summary="Get interest-based recommendations",
-    description="Get program recommendations based only on user interests",
-)
-async def get_interest_based_recommendations(
-    user_id: int,
-    preferred_fields: Optional[List[str]] = Query(
-        None, description="Additional fields to consider"
-    ),
-    degree_level: Optional[str] = Query(None, description="Filter by degree level"),
-    limit: int = Query(
-        10, ge=1, le=50, description="Maximum number of recommendations"
-    ),
-    recommendation_service: RecommendationService = Depends(get_recommendation_service),
-):
-    """
-    Get program recommendations based only on user interests.
+# @router.get(
+#     "/users/{user_id}/recommendations/interest-based",
+#     response_model=List[dict],
+#     summary="Get interest-based recommendations",
+#     description="Get program recommendations based only on user interests",
+# )
+# async def get_interest_based_recommendations(
+#     user_id: int,
+#     preferred_fields: Optional[List[str]] = Query(
+#         None, description="Additional fields to consider"
+#     ),
+#     degree_level: Optional[str] = Query(None, description="Filter by degree level"),
+#     limit: int = Query(
+#         10, ge=1, le=50, description="Maximum number of recommendations"
+#     ),
+#     recommendation_service: RecommendationService = Depends(get_recommendation_service),
+# ):
+#     """
+#     Get program recommendations based only on user interests.
 
-    This endpoint focuses specifically on matching programs to user's declared interests.
-    """
-    try:
-        recommendations = recommendation_service._get_interest_based_recommendations(
-            user_id=user_id,
-            preferred_fields=preferred_fields,
-            degree_level=degree_level,
-            limit=limit,
-        )
+#     This endpoint focuses specifically on matching programs to user's declared interests.
+#     """
+#     try:
+#         recommendations = recommendation_service._get_interest_based_recommendations(
+#             user_id=user_id,
+#             preferred_fields=preferred_fields,
+#             degree_level=degree_level,
+#             limit=limit,
+#         )
 
-        logger.info(
-            f"Generated {len(recommendations)} interest-based recommendations for user {user_id}"
-        )
-        return recommendations
+#         logger.info(
+#             f"Generated {len(recommendations)} interest-based recommendations for user {user_id}"
+#         )
+#         return recommendations
 
-    except Exception as e:
-        logger.error(f"Error getting interest-based recommendations: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Internal server error occurred while getting interest-based recommendations",
-        )
+#     except Exception as e:
+#         logger.error(f"Error getting interest-based recommendations: {e}")
+#         raise HTTPException(
+#             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+#             detail="Internal server error occurred while getting interest-based recommendations",
+#         )
 
 
-@router.get(
-    "/users/{user_id}/recommendations/qualification-based",
-    response_model=List[dict],
-    summary="Get qualification-based recommendations",
-    description="Get program recommendations based only on user qualification status",
-)
-async def get_qualification_based_recommendations(
-    user_id: int,
-    limit: int = Query(
-        10, ge=1, le=50, description="Maximum number of recommendations"
-    ),
-    recommendation_service: RecommendationService = Depends(get_recommendation_service),
-):
-    """
-    Get program recommendations based only on user qualification status.
+# @router.get(
+#     "/users/{user_id}/recommendations/qualification-based",
+#     response_model=List[dict],
+#     summary="Get qualification-based recommendations",
+#     description="Get program recommendations based only on user qualification status",
+# )
+# async def get_qualification_based_recommendations(
+#     user_id: int,
+#     limit: int = Query(
+#         10, ge=1, le=50, description="Maximum number of recommendations"
+#     ),
+#     recommendation_service: RecommendationService = Depends(get_recommendation_service),
+# ):
+#     """
+#     Get program recommendations based only on user qualification status.
 
-    This endpoint focuses specifically on programs where the user meets requirements.
-    """
-    try:
-        recommendations = (
-            recommendation_service._get_qualification_based_recommendations(
-                user_id=user_id, limit=limit
-            )
-        )
+#     This endpoint focuses specifically on programs where the user meets requirements.
+#     """
+#     try:
+#         recommendations = (
+#             recommendation_service._get_qualification_based_recommendations(
+#                 user_id=user_id, limit=limit
+#             )
+#         )
 
-        logger.info(
-            f"Generated {len(recommendations)} qualification-based recommendations for user {user_id}"
-        )
-        return recommendations
+#         logger.info(
+#             f"Generated {len(recommendations)} qualification-based recommendations for user {user_id}"
+#         )
+#         return recommendations
 
-    except Exception as e:
-        logger.error(f"Error getting qualification-based recommendations: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Internal server error occurred while getting qualification-based recommendations",
-        )
+#     except Exception as e:
+#         logger.error(f"Error getting qualification-based recommendations: {e}")
+#         raise HTTPException(
+#             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+#             detail="Internal server error occurred while getting qualification-based recommendations",
+#         )
 
 
 @router.get(
@@ -244,49 +244,49 @@ async def get_similar_programs(
         )
 
 
-@router.post(
-    "/recommendations/custom",
-    response_model=dict,
-    summary="Get custom recommendations",
-    description="Get recommendations with custom parameters",
-)
-async def get_custom_recommendations(
-    request: RecommendationRequest,
-    recommendation_service: RecommendationService = Depends(get_recommendation_service),
-):
-    """
-    Get custom program recommendations based on specific request parameters.
+# @router.post(
+#     "/recommendations/custom",
+#     response_model=dict,
+#     summary="Get custom recommendations",
+#     description="Get recommendations with custom parameters",
+# )
+# async def get_custom_recommendations(
+#     request: RecommendationRequest,
+#     recommendation_service: RecommendationService = Depends(get_recommendation_service),
+# ):
+#     """
+#     Get custom program recommendations based on specific request parameters.
 
-    This endpoint allows for detailed customization of recommendation parameters.
-    """
-    try:
-        recommendations = recommendation_service.get_comprehensive_recommendations(
-            user_id=request.user_id,
-            preferred_countries=request.preferred_countries,
-            preferred_fields=request.preferred_fields,
-            degree_level=request.degree_level.value if request.degree_level else None,
-            max_tuition_fee=request.max_tuition_fee,
-            language_preference=request.language_preference,
-            limit=10,
-        )
+#     This endpoint allows for detailed customization of recommendation parameters.
+#     """
+#     try:
+#         recommendations = recommendation_service.get_comprehensive_recommendations(
+#             user_id=request.user_id,
+#             preferred_countries=request.preferred_countries,
+#             preferred_fields=request.preferred_fields,
+#             degree_level=request.degree_level.value if request.degree_level else None,
+#             max_tuition_fee=request.max_tuition_fee,
+#             language_preference=request.language_preference,
+#             limit=10,
+#         )
 
-        if "error" in recommendations:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail=recommendations["error"]
-            )
+#         if "error" in recommendations:
+#             raise HTTPException(
+#                 status_code=status.HTTP_404_NOT_FOUND, detail=recommendations["error"]
+#             )
 
-        logger.info(f"Generated custom recommendations for user {request.user_id}")
-        return recommendations
+#         logger.info(f"Generated custom recommendations for user {request.user_id}")
+#         return recommendations
 
-    except ValueError as e:
-        logger.warning(f"Invalid custom recommendation request: {e}")
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-    except Exception as e:
-        logger.error(f"Error getting custom recommendations: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Internal server error occurred while getting custom recommendations",
-        )
+#     except ValueError as e:
+#         logger.warning(f"Invalid custom recommendation request: {e}")
+#         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+#     except Exception as e:
+#         logger.error(f"Error getting custom recommendations: {e}")
+#         raise HTTPException(
+#             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+#             detail="Internal server error occurred while getting custom recommendations",
+#         )
 
 
 @router.get(

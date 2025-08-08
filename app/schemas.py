@@ -229,6 +229,31 @@ class MessageResponse(BaseModel):
     message: str
 
 
+# Authentication schemas
+class UserLogin(BaseModel):
+    """Schema for user login"""
+
+    email: EmailStr
+    password: str
+
+
+class Token(BaseModel):
+    """Schema for authentication token response"""
+
+    access_token: str
+    token_type: str
+    expires_in: int
+    user_id: int
+    email: str
+
+
+class TokenData(BaseModel):
+    """Schema for token data"""
+
+    user_id: Optional[int] = None
+    email: Optional[str] = None
+
+
 # University and Program related schemas
 
 

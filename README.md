@@ -7,6 +7,7 @@ This backend service provides a robust API for university application and recomm
 - University and program recommendation
 - User profile and qualification management
 - Application tracking
+- JWT-based authentication and authorization
 - RESTful API with clear response formats
 - Error handling and logging
 

@@ -4697,3 +4697,188 @@ Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 7687)) (reas
 2025-07-21 20:30:54 | app.database | INFO | Neo4j database connections closed
 2025-07-21 20:30:54 | app.database | INFO | All database connections closed
 2025-07-21 20:30:54 | app.main | INFO | Application shutdown completed
+2025-07-22 12:35:12 | app.util.log | INFO | Logging initialized with level: DEBUG
+2025-07-22 12:35:12 | app.util.log | INFO | Log files: logs\app.log, logs\error.log
+2025-07-22 12:35:12 | passlib.utils.compat | DEBUG | loaded lazy attr 'SafeConfigParser': <class 'configparser.ConfigParser'>
+2025-07-22 12:35:12 | passlib.utils.compat | DEBUG | loaded lazy attr 'NativeStringIO': <class '_io.StringIO'>
+2025-07-22 12:35:12 | passlib.utils.compat | DEBUG | loaded lazy attr 'BytesIO': <class '_io.BytesIO'>
+2025-07-22 12:35:12 | passlib.registry | DEBUG | registered 'bcrypt' handler: <class 'passlib.handlers.bcrypt.bcrypt'>
+2025-07-22 12:35:13 | app.database | INFO | Initializing databases...
+2025-07-22 12:35:15 | app.database | INFO | MySQL database connection initialized successfully
+2025-07-22 12:35:15 | neo4j.pool | DEBUG | [#0000]  _: <POOL> created, direct address IPv4Address(('localhost', 7687))
+2025-07-22 12:35:15 | neo4j.pool | DEBUG | [#0000]  _: <POOL> acquire direct connection, access_mode='READ', database=None
+2025-07-22 12:35:15 | neo4j.pool | DEBUG | [#0000]  _: <POOL> trying to hand out new connection
+2025-07-22 12:35:15 | neo4j.io | DEBUG | [#0000]  _: <RESOLVE> in: localhost:7687
+2025-07-22 12:35:15 | neo4j.io | DEBUG | [#0000]  _: <RESOLVE> dns resolver out: [::1]:7687
+2025-07-22 12:35:15 | neo4j.io | DEBUG | [#0000]  C: <OPEN> [::1]:7687
+2025-07-22 12:35:17 | neo4j.io | DEBUG | [#0000]  S: <ERROR> ConnectionRefusedError 10061 'No connection could be made because the target machine actively refused it' None 10061 None
+2025-07-22 12:35:17 | neo4j.io | DEBUG | [#0000]  C: <CLOSE> [::1]:7687
+2025-07-22 12:35:17 | neo4j.io | DEBUG | [#0000]  S: <CONNECTION FAILED> ServiceUnavailable: Failed to establish connection to ResolvedIPv6Address(('::1', 7687, 0, 0)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+2025-07-22 12:35:17 | neo4j.io | DEBUG | [#0000]  _: <RESOLVE> dns resolver out: 127.0.0.1:7687
+2025-07-22 12:35:17 | neo4j.io | DEBUG | [#0000]  C: <OPEN> 127.0.0.1:7687
+2025-07-22 12:35:17 | neo4j.io | DEBUG | [#F75C]  C: <MAGIC> 0x6060B017
+2025-07-22 12:35:17 | neo4j.io | DEBUG | [#F75C]  C: <HANDSHAKE> 0x00040405 0x00020404 0x00000104 0x00000003
+2025-07-22 12:35:17 | neo4j.io | DEBUG | [#F75C]  S: <HANDSHAKE> 0x00000405
+2025-07-22 12:35:17 | neo4j.io | DEBUG | [#F75C]  C: HELLO {'user_agent': 'neo4j-python/5.19.0 Python/3.12.0-final-0 (win32)', 'bolt_agent': {'product': 'neo4j-python/5.19.0', 'platform': 'Windows 11; AMD64', 'language': 'Python/3.12.0-final-0', 'language_details': 'CPython; 3.12.0-final-0 (tags/v3.12.0:0fb18b0, Oct  2 2023 13:03:39) [MSC v.1935 64 bit (AMD64)]'}}
+2025-07-22 12:35:17 | neo4j.io | DEBUG | [#F75C]  _: <CONNECTION> client state: CONNECTED > AUTHENTICATION
+2025-07-22 12:35:17 | neo4j.io | DEBUG | [#F75C]  C: LOGON {'scheme': 'basic', 'principal': 'neo4j', 'credentials': '*******'}
+2025-07-22 12:35:17 | neo4j.io | DEBUG | [#F75C]  _: <CONNECTION> client state: AUTHENTICATION > READY
+2025-07-22 12:35:17 | neo4j.io | DEBUG | [#F75C]  S: SUCCESS {'server': 'Neo4j/2025.05.0', 'connection_id': 'bolt-13', 'hints': {'connection.recv_timeout_seconds': 120}}
+2025-07-22 12:35:17 | neo4j.io | DEBUG | [#F75C]  _: <CONNECTION> server state: CONNECTED > AUTHENTICATION
+2025-07-22 12:35:17 | neo4j.io | DEBUG | [#F75C]  S: SUCCESS {}
+2025-07-22 12:35:17 | neo4j.io | DEBUG | [#F75C]  _: <CONNECTION> server state: AUTHENTICATION > READY
+2025-07-22 12:35:17 | neo4j.pool | DEBUG | [#F75C]  _: <POOL> released bolt-13
+2025-07-22 12:35:17 | app.database | INFO | Neo4j database connection initialized successfully
+2025-07-22 12:35:17 | app.database | INFO | All databases initialized successfully
+2025-07-22 12:35:17 | app.database | INFO | MySQL tables created successfully
+2025-07-22 12:35:17 | app.main | INFO | Application and databases initialized successfully
+2025-08-06 18:35:22 | app.util.log | INFO | Logging initialized with level: DEBUG
+2025-08-06 18:35:22 | app.util.log | INFO | Log files: logs\app.log, logs\error.log
+2025-08-06 18:35:22 | passlib.utils.compat | DEBUG | loaded lazy attr 'SafeConfigParser': <class 'configparser.ConfigParser'>
+2025-08-06 18:35:22 | passlib.utils.compat | DEBUG | loaded lazy attr 'NativeStringIO': <class '_io.StringIO'>
+2025-08-06 18:35:22 | passlib.utils.compat | DEBUG | loaded lazy attr 'BytesIO': <class '_io.BytesIO'>
+2025-08-06 18:35:22 | passlib.registry | DEBUG | registered 'bcrypt' handler: <class 'passlib.handlers.bcrypt.bcrypt'>
+2025-08-06 18:35:23 | app.database | INFO | Initializing databases...
+2025-08-06 18:35:24 | app.database | INFO | MySQL database connection initialized successfully
+2025-08-06 18:35:24 | neo4j.pool | DEBUG | [#0000]  _: <POOL> created, direct address IPv4Address(('localhost', 7687))
+2025-08-06 18:35:25 | neo4j.pool | DEBUG | [#0000]  _: <POOL> acquire direct connection, access_mode='READ', database=None
+2025-08-06 18:35:25 | neo4j.pool | DEBUG | [#0000]  _: <POOL> trying to hand out new connection
+2025-08-06 18:35:25 | neo4j.io | DEBUG | [#0000]  _: <RESOLVE> in: localhost:7687
+2025-08-06 18:35:25 | neo4j.io | DEBUG | [#0000]  _: <RESOLVE> dns resolver out: [::1]:7687
+2025-08-06 18:35:25 | neo4j.io | DEBUG | [#0000]  C: <OPEN> [::1]:7687
+2025-08-06 18:35:27 | neo4j.io | DEBUG | [#0000]  S: <ERROR> ConnectionRefusedError 10061 'No connection could be made because the target machine actively refused it' None 10061 None
+2025-08-06 18:35:27 | neo4j.io | DEBUG | [#0000]  C: <CLOSE> [::1]:7687
+2025-08-06 18:35:27 | neo4j.io | DEBUG | [#0000]  S: <CONNECTION FAILED> ServiceUnavailable: Failed to establish connection to ResolvedIPv6Address(('::1', 7687, 0, 0)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+2025-08-06 18:35:27 | neo4j.io | DEBUG | [#0000]  _: <RESOLVE> dns resolver out: 127.0.0.1:7687
+2025-08-06 18:35:27 | neo4j.io | DEBUG | [#0000]  C: <OPEN> 127.0.0.1:7687
+2025-08-06 18:35:27 | neo4j.io | DEBUG | [#E4ED]  C: <MAGIC> 0x6060B017
+2025-08-06 18:35:27 | neo4j.io | DEBUG | [#E4ED]  C: <HANDSHAKE> 0x00040405 0x00020404 0x00000104 0x00000003
+2025-08-06 18:35:27 | neo4j.io | DEBUG | [#E4ED]  S: <HANDSHAKE> 0x00000405
+2025-08-06 18:35:27 | neo4j.io | DEBUG | [#E4ED]  C: HELLO {'user_agent': 'neo4j-python/5.19.0 Python/3.12.0-final-0 (win32)', 'bolt_agent': {'product': 'neo4j-python/5.19.0', 'platform': 'Windows 11; AMD64', 'language': 'Python/3.12.0-final-0', 'language_details': 'CPython; 3.12.0-final-0 (tags/v3.12.0:0fb18b0, Oct  2 2023 13:03:39) [MSC v.1935 64 bit (AMD64)]'}}
+2025-08-06 18:35:27 | neo4j.io | DEBUG | [#E4ED]  _: <CONNECTION> client state: CONNECTED > AUTHENTICATION
+2025-08-06 18:35:27 | neo4j.io | DEBUG | [#E4ED]  C: LOGON {'scheme': 'basic', 'principal': 'neo4j', 'credentials': '*******'}
+2025-08-06 18:35:27 | neo4j.io | DEBUG | [#E4ED]  _: <CONNECTION> client state: AUTHENTICATION > READY
+2025-08-06 18:35:27 | neo4j.io | DEBUG | [#E4ED]  S: SUCCESS {'server': 'Neo4j/2025.05.0', 'connection_id': 'bolt-99', 'hints': {'connection.recv_timeout_seconds': 120}}
+2025-08-06 18:35:27 | neo4j.io | DEBUG | [#E4ED]  _: <CONNECTION> server state: CONNECTED > AUTHENTICATION
+2025-08-06 18:35:27 | neo4j.io | DEBUG | [#E4ED]  S: SUCCESS {}
+2025-08-06 18:35:27 | neo4j.io | DEBUG | [#E4ED]  _: <CONNECTION> server state: AUTHENTICATION > READY
+2025-08-06 18:35:27 | neo4j.pool | DEBUG | [#E4ED]  _: <POOL> released bolt-99
+2025-08-06 18:35:27 | app.database | INFO | Neo4j database connection initialized successfully
+2025-08-06 18:35:27 | app.database | INFO | All databases initialized successfully
+2025-08-06 18:35:28 | app.database | INFO | MySQL tables created successfully
+2025-08-06 18:35:28 | app.main | INFO | Application and databases initialized successfully
+2025-08-06 18:36:16 | neo4j.pool | DEBUG | [#0000]  _: <POOL> acquire direct connection, access_mode='WRITE', database='neo4j'
+2025-08-06 18:36:16 | neo4j.pool | DEBUG | [#E4ED]  _: <POOL> picked existing connection bolt-99
+2025-08-06 18:36:16 | neo4j.pool | DEBUG | [#E4ED]  _: <POOL> checked re_auth auth=None updated=False force=False
+2025-08-06 18:36:16 | neo4j.pool | DEBUG | [#E4ED]  _: <POOL> handing out existing connection
+2025-08-06 18:36:16 | neo4j.io | DEBUG | [#E4ED]  C: RUN '\n                MATCH (u:User {user_id: $user_id})-[r:QUALIFIED_FOR]->(p:Program)\n                WHERE r.is_qualified = true OR r.qualification_score >= 80\n                RETURN p.program_id as program_id,\n                       r.qualification_score as qualification_score,\n                       r.is_qualified as is_qualified,\n                       r.checked_at as checked_at\n                ORDER BY r.qualification_score DESC, r.checked_at DESC\n                LIMIT $limit\n                ' {'user_id': 2, 'limit': 10} {'db': 'neo4j'}
+2025-08-06 18:36:16 | neo4j.io | DEBUG | [#E4ED]  _: <CONNECTION> client state: READY > STREAMING
+2025-08-06 18:36:16 | neo4j.io | DEBUG | [#E4ED]  C: PULL {'n': 1000}
+2025-08-06 18:36:23 | neo4j.io | DEBUG | [#E4ED]  S: SUCCESS {'t_first': 6586, 'fields': ['program_id', 'qualification_score', 'is_qualified', 'checked_at']}
+2025-08-06 18:36:23 | neo4j.io | DEBUG | [#E4ED]  _: <CONNECTION> server state: READY > STREAMING
+2025-08-06 18:36:23 | neo4j.io | DEBUG | [#E4ED]  S: SUCCESS {'bookmark': 'FB:kcwQ41gc3l4PSUOF0Ud4FCTxeWuQ', 'type': 'r', 't_last': 221, 'db': 'neo4j', 'notifications': [{'severity': 'WARNING', 'description': "One of the relationship types in your query is not available in the database, make sure you didn't misspell it or that the label is available when you run this statement in your application (the missing relationship type is: QUALIFIED_FOR)", 'code': 'Neo.ClientNotification.Statement.UnknownRelationshipTypeWarning', 'position': {'column': 55, 'offset': 55, 'line': 2}, 'title': 'The provided relationship type is not in the database.', 'category': 'UNRECOGNIZED'}]}
+2025-08-06 18:36:23 | neo4j.io | DEBUG | [#E4ED]  _: <CONNECTION> server state: STREAMING > READY
+2025-08-06 18:36:23 | neo4j.pool | DEBUG | [#E4ED]  _: <POOL> released bolt-99
+2025-08-06 18:36:23 | neo4j.pool | DEBUG | [#0000]  _: <POOL> acquire direct connection, access_mode='WRITE', database='neo4j'
+2025-08-06 18:36:23 | neo4j.pool | DEBUG | [#E4ED]  _: <POOL> picked existing connection bolt-99
+2025-08-06 18:36:23 | neo4j.pool | DEBUG | [#E4ED]  _: <POOL> checked re_auth auth=None updated=False force=False
+2025-08-06 18:36:23 | neo4j.pool | DEBUG | [#E4ED]  _: <POOL> handing out existing connection
+2025-08-06 18:36:23 | neo4j.io | DEBUG | [#E4ED]  C: RUN '\n                MATCH (p:Program)-[:BELONGS_TO_FIELD]->(fs:FieldOfStudy {name: $field_of_study})\n                MATCH (p)-[:OFFERED_BY]->(u:University)\n                WHERE p.is_active = true\n                RETURN p.program_id as program_id,\n                       p.name as program_name,\n                       p.degree_level as degree_level,\n                       p.tuition_fee as tuition_fee,\n                       p.currency as currency,\n                       u.name as university_name,\n                       u.ranking_world as university_ranking\n                ORDER BY u.ranking_world ASC\n                LIMIT $limit\n                ' {'field_of_study': 'Martial Lawyer', 'limit': 5} {'db': 'neo4j'}
+2025-08-06 18:36:23 | neo4j.io | DEBUG | [#E4ED]  C: PULL {'n': 1000}
+2025-08-06 18:36:24 | neo4j.io | DEBUG | [#E4ED]  S: SUCCESS {'t_first': 833, 'fields': ['program_id', 'program_name', 'degree_level', 'tuition_fee', 'currency', 'university_name', 'university_ranking']}
+2025-08-06 18:36:24 | neo4j.io | DEBUG | [#E4ED]  _: <CONNECTION> server state: READY > STREAMING
+2025-08-06 18:36:24 | neo4j.io | DEBUG | [#E4ED]  S: RECORD * 1
+2025-08-06 18:36:24 | neo4j.io | DEBUG | [#E4ED]  S: SUCCESS {'bookmark': 'FB:kcwQ41gc3l4PSUOF0Ud4FCTxeWuQ', 'type': 'r', 't_last': 48, 'db': 'neo4j'}
+2025-08-06 18:36:24 | neo4j.io | DEBUG | [#E4ED]  _: <CONNECTION> server state: STREAMING > READY
+2025-08-06 18:36:24 | neo4j.pool | DEBUG | [#E4ED]  _: <POOL> released bolt-99
+2025-08-06 18:36:24 | app.routes.recommendation | INFO | Generated 1 Neo4j-based recommendations for user 2
+2025-08-06 18:37:58 | app.database | INFO | MySQL database connections closed
+2025-08-06 18:37:58 | neo4j.pool | DEBUG | [#0000]  _: <POOL> close
+2025-08-06 18:37:58 | neo4j.io | DEBUG | [#E4ED]  C: GOODBYE
+2025-08-06 18:37:58 | neo4j.io | DEBUG | [#E4ED]  C: <CLOSE>
+2025-08-06 18:37:58 | app.database | INFO | Neo4j database connections closed
+2025-08-06 18:37:58 | app.database | INFO | All database connections closed
+2025-08-06 18:37:58 | app.main | INFO | Application shutdown completed
+2025-08-06 18:38:03 | app.util.log | INFO | Logging initialized with level: DEBUG
+2025-08-06 18:38:03 | app.util.log | INFO | Log files: logs\app.log, logs\error.log
+2025-08-06 18:38:03 | passlib.utils.compat | DEBUG | loaded lazy attr 'SafeConfigParser': <class 'configparser.ConfigParser'>
+2025-08-06 18:38:03 | passlib.utils.compat | DEBUG | loaded lazy attr 'NativeStringIO': <class '_io.StringIO'>
+2025-08-06 18:38:03 | passlib.utils.compat | DEBUG | loaded lazy attr 'BytesIO': <class '_io.BytesIO'>
+2025-08-06 18:38:03 | passlib.registry | DEBUG | registered 'bcrypt' handler: <class 'passlib.handlers.bcrypt.bcrypt'>
+2025-08-06 18:38:04 | app.database | INFO | Initializing databases...
+2025-08-06 18:38:04 | app.database | INFO | MySQL database connection initialized successfully
+2025-08-06 18:38:04 | neo4j.pool | DEBUG | [#0000]  _: <POOL> created, direct address IPv4Address(('localhost', 7687))
+2025-08-06 18:38:04 | neo4j.pool | DEBUG | [#0000]  _: <POOL> acquire direct connection, access_mode='READ', database=None
+2025-08-06 18:38:04 | neo4j.pool | DEBUG | [#0000]  _: <POOL> trying to hand out new connection
+2025-08-06 18:38:04 | neo4j.io | DEBUG | [#0000]  _: <RESOLVE> in: localhost:7687
+2025-08-06 18:38:04 | neo4j.io | DEBUG | [#0000]  _: <RESOLVE> dns resolver out: [::1]:7687
+2025-08-06 18:38:04 | neo4j.io | DEBUG | [#0000]  C: <OPEN> [::1]:7687
+2025-08-06 18:38:06 | neo4j.io | DEBUG | [#0000]  S: <ERROR> ConnectionRefusedError 10061 'No connection could be made because the target machine actively refused it' None 10061 None
+2025-08-06 18:38:06 | neo4j.io | DEBUG | [#0000]  C: <CLOSE> [::1]:7687
+2025-08-06 18:38:06 | neo4j.io | DEBUG | [#0000]  S: <CONNECTION FAILED> ServiceUnavailable: Failed to establish connection to ResolvedIPv6Address(('::1', 7687, 0, 0)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+2025-08-06 18:38:06 | neo4j.io | DEBUG | [#0000]  _: <RESOLVE> dns resolver out: 127.0.0.1:7687
+2025-08-06 18:38:06 | neo4j.io | DEBUG | [#0000]  C: <OPEN> 127.0.0.1:7687
+2025-08-06 18:38:06 | neo4j.io | DEBUG | [#EDC3]  C: <MAGIC> 0x6060B017
+2025-08-06 18:38:06 | neo4j.io | DEBUG | [#EDC3]  C: <HANDSHAKE> 0x00040405 0x00020404 0x00000104 0x00000003
+2025-08-06 18:38:06 | neo4j.io | DEBUG | [#EDC3]  S: <HANDSHAKE> 0x00000405
+2025-08-06 18:38:06 | neo4j.io | DEBUG | [#EDC3]  C: HELLO {'user_agent': 'neo4j-python/5.19.0 Python/3.12.0-final-0 (win32)', 'bolt_agent': {'product': 'neo4j-python/5.19.0', 'platform': 'Windows 11; AMD64', 'language': 'Python/3.12.0-final-0', 'language_details': 'CPython; 3.12.0-final-0 (tags/v3.12.0:0fb18b0, Oct  2 2023 13:03:39) [MSC v.1935 64 bit (AMD64)]'}}
+2025-08-06 18:38:06 | neo4j.io | DEBUG | [#EDC3]  _: <CONNECTION> client state: CONNECTED > AUTHENTICATION
+2025-08-06 18:38:06 | neo4j.io | DEBUG | [#EDC3]  C: LOGON {'scheme': 'basic', 'principal': 'neo4j', 'credentials': '*******'}
+2025-08-06 18:38:06 | neo4j.io | DEBUG | [#EDC3]  _: <CONNECTION> client state: AUTHENTICATION > READY
+2025-08-06 18:38:06 | neo4j.io | DEBUG | [#EDC3]  S: SUCCESS {'server': 'Neo4j/2025.05.0', 'connection_id': 'bolt-154', 'hints': {'connection.recv_timeout_seconds': 120}}
+2025-08-06 18:38:06 | neo4j.io | DEBUG | [#EDC3]  _: <CONNECTION> server state: CONNECTED > AUTHENTICATION
+2025-08-06 18:38:06 | neo4j.io | DEBUG | [#EDC3]  S: SUCCESS {}
+2025-08-06 18:38:06 | neo4j.io | DEBUG | [#EDC3]  _: <CONNECTION> server state: AUTHENTICATION > READY
+2025-08-06 18:38:06 | neo4j.pool | DEBUG | [#EDC3]  _: <POOL> released bolt-154
+2025-08-06 18:38:06 | app.database | INFO | Neo4j database connection initialized successfully
+2025-08-06 18:38:06 | app.database | INFO | All databases initialized successfully
+2025-08-06 18:38:06 | app.database | INFO | MySQL tables created successfully
+2025-08-06 18:38:06 | app.main | INFO | Application and databases initialized successfully
+2025-08-06 20:32:01 | app.database | INFO | MySQL database connections closed
+2025-08-06 20:32:01 | neo4j.pool | DEBUG | [#0000]  _: <POOL> close
+2025-08-06 20:32:01 | neo4j.io | DEBUG | [#EDC3]  C: GOODBYE
+2025-08-06 20:32:01 | neo4j.io | DEBUG | [#EDC3]  C: <CLOSE>
+2025-08-06 20:32:01 | app.database | INFO | Neo4j database connections closed
+2025-08-06 20:32:01 | app.database | INFO | All database connections closed
+2025-08-06 20:32:01 | app.main | INFO | Application shutdown completed
+2025-08-08 20:27:15 | app.util.log | INFO | Logging initialized with level: DEBUG
+2025-08-08 20:27:15 | app.util.log | INFO | Log files: logs\app.log, logs\error.log
+2025-08-08 20:27:15 | passlib.utils.compat | DEBUG | loaded lazy attr 'SafeConfigParser': <class 'configparser.ConfigParser'>
+2025-08-08 20:27:15 | passlib.utils.compat | DEBUG | loaded lazy attr 'NativeStringIO': <class '_io.StringIO'>
+2025-08-08 20:27:15 | passlib.utils.compat | DEBUG | loaded lazy attr 'BytesIO': <class '_io.BytesIO'>
+2025-08-08 20:27:15 | passlib.registry | DEBUG | registered 'bcrypt' handler: <class 'passlib.handlers.bcrypt.bcrypt'>
+2025-08-08 20:27:16 | app.database | INFO | Initializing databases...
+2025-08-08 20:27:17 | app.database | INFO | MySQL database connection initialized successfully
+2025-08-08 20:27:17 | neo4j.pool | DEBUG | [#0000]  _: <POOL> created, direct address IPv4Address(('localhost', 7687))
+2025-08-08 20:27:17 | neo4j.pool | DEBUG | [#0000]  _: <POOL> acquire direct connection, access_mode='READ', database=None
+2025-08-08 20:27:17 | neo4j.pool | DEBUG | [#0000]  _: <POOL> trying to hand out new connection
+2025-08-08 20:27:17 | neo4j.io | DEBUG | [#0000]  _: <RESOLVE> in: localhost:7687
+2025-08-08 20:27:17 | neo4j.io | DEBUG | [#0000]  _: <RESOLVE> dns resolver out: [::1]:7687
+2025-08-08 20:27:17 | neo4j.io | DEBUG | [#0000]  C: <OPEN> [::1]:7687
+2025-08-08 20:27:19 | neo4j.io | DEBUG | [#0000]  S: <ERROR> ConnectionRefusedError 10061 'No connection could be made because the target machine actively refused it' None 10061 None
+2025-08-08 20:27:19 | neo4j.io | DEBUG | [#0000]  C: <CLOSE> [::1]:7687
+2025-08-08 20:27:19 | neo4j.io | DEBUG | [#0000]  S: <CONNECTION FAILED> ServiceUnavailable: Failed to establish connection to ResolvedIPv6Address(('::1', 7687, 0, 0)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+2025-08-08 20:27:19 | neo4j.io | DEBUG | [#0000]  _: <RESOLVE> dns resolver out: 127.0.0.1:7687
+2025-08-08 20:27:19 | neo4j.io | DEBUG | [#0000]  C: <OPEN> 127.0.0.1:7687
+2025-08-08 20:27:19 | neo4j.io | DEBUG | [#CC09]  C: <MAGIC> 0x6060B017
+2025-08-08 20:27:19 | neo4j.io | DEBUG | [#CC09]  C: <HANDSHAKE> 0x00040405 0x00020404 0x00000104 0x00000003
+2025-08-08 20:27:20 | neo4j.io | DEBUG | [#CC09]  S: <HANDSHAKE> 0x00000405
+2025-08-08 20:27:20 | neo4j.io | DEBUG | [#CC09]  C: HELLO {'user_agent': 'neo4j-python/5.19.0 Python/3.12.0-final-0 (win32)', 'bolt_agent': {'product': 'neo4j-python/5.19.0', 'platform': 'Windows 11; AMD64', 'language': 'Python/3.12.0-final-0', 'language_details': 'CPython; 3.12.0-final-0 (tags/v3.12.0:0fb18b0, Oct  2 2023 13:03:39) [MSC v.1935 64 bit (AMD64)]'}}
+2025-08-08 20:27:20 | neo4j.io | DEBUG | [#CC09]  _: <CONNECTION> client state: CONNECTED > AUTHENTICATION
+2025-08-08 20:27:20 | neo4j.io | DEBUG | [#CC09]  C: LOGON {'scheme': 'basic', 'principal': 'neo4j', 'credentials': '*******'}
+2025-08-08 20:27:20 | neo4j.io | DEBUG | [#CC09]  _: <CONNECTION> client state: AUTHENTICATION > READY
+2025-08-08 20:27:20 | neo4j.io | DEBUG | [#CC09]  S: SUCCESS {'server': 'Neo4j/2025.05.0', 'connection_id': 'bolt-51', 'hints': {'connection.recv_timeout_seconds': 120}}
+2025-08-08 20:27:20 | neo4j.io | DEBUG | [#CC09]  _: <CONNECTION> server state: CONNECTED > AUTHENTICATION
+2025-08-08 20:27:20 | neo4j.io | DEBUG | [#CC09]  S: SUCCESS {}
+2025-08-08 20:27:20 | neo4j.io | DEBUG | [#CC09]  _: <CONNECTION> server state: AUTHENTICATION > READY
+2025-08-08 20:27:20 | neo4j.pool | DEBUG | [#CC09]  _: <POOL> released bolt-51
+2025-08-08 20:27:20 | app.database | INFO | Neo4j database connection initialized successfully
+2025-08-08 20:27:20 | app.database | INFO | All databases initialized successfully
+2025-08-08 20:27:21 | app.database | INFO | MySQL tables created successfully
+2025-08-08 20:27:21 | app.main | INFO | Application and databases initialized successfully
+2025-08-08 20:59:43 | app.util.log | INFO | Logging initialized with level: DEBUG
+2025-08-08 20:59:43 | app.util.log | INFO | Log files: logs\app.log, logs\error.log
+2025-08-08 20:59:43 | passlib.utils.compat | DEBUG | loaded lazy attr 'SafeConfigParser': <class 'configparser.ConfigParser'>
+2025-08-08 20:59:43 | passlib.utils.compat | DEBUG | loaded lazy attr 'NativeStringIO': <class '_io.StringIO'>
+2025-08-08 20:59:43 | passlib.utils.compat | DEBUG | loaded lazy attr 'BytesIO': <class '_io.BytesIO'>
+2025-08-08 20:59:43 | passlib.registry | DEBUG | registered 'bcrypt' handler: <class 'passlib.handlers.bcrypt.bcrypt'>

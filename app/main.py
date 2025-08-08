@@ -12,6 +12,7 @@ from app.routes import (
     region,
     university,
     recommendation,
+    auth,
 )
 import logging
 from app.util.log import get_logger
@@ -86,6 +87,9 @@ app.include_router(
     recommendation.router,
     prefix=f"/api/{settings.API_V1_STR}",
     tags=["Recommendations"],
+)
+app.include_router(
+    auth.router, prefix=f"/api/{settings.API_V1_STR}", tags=["Authentication"]
 )
 app.include_router(health.router, tags=["Health"])
 
