@@ -4,9 +4,10 @@ from sqlalchemy.orm import Session
 
 from app.database import get_mysql_session
 from app.services.auth_service import AuthenticationService
-from app.schemas import UserLogin, Token, UserResponse
+from app.schemas import UserLogin, Token, UserResponse, UserCreate
 from app.dependencies.auth import get_current_user
 from app.models import User
+from app.repositories.user_repository import UserRepository
 from app.util.log import get_logger
 
 logger = get_logger(__name__)
@@ -250,4 +251,40 @@ async def verify_token(current_user: User = Depends(get_current_user)):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal server error during token verification",
+        )
+
+
+@router.post(
+    "/auth/admin/register",
+    response_model=UserResponse,
+    summary="Admin registration",
+    description="Create a new administrator account",
+)
+async def admin_register(
+    user_data: UserCreate,
+    db: Session = Depends(get_mysql_session),
+):
+    """
+    Create a new administrator account.
+
+    **Note:** This endpoint should be secured or disabled in production.
+    Consider implementing proper admin invitation flows.
+    """
+    try:
+        user_repo = UserRepository(db)
+        new_admin = user_repo.create_admin_user(user_data)
+        logger.info(f"Admin user registered successfully: {new_admin.email}")
+        return new_admin
+
+    except ValueError as e:
+        logger.warning(f"Admin registration failed: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
+    except Exception as e:
+        logger.error(f"Unexpected error during admin registration: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error during admin registration",
         )

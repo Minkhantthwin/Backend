@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import func
 from typing import Optional, List
 from app.models import Application
 from app.schemas import ApplicationCreate, ApplicationUpdate
@@ -129,4 +130,19 @@ class ApplicationRepository:
             return count
         except Exception as e:
             logger.error(f"Failed to count applications: {e}")
+            raise
+
+    def get_status_counts(self) -> dict:
+        """Return counts by application status."""
+        try:
+            rows = (
+                self.db.query(Application.status, func.count(Application.id))
+                .group_by(Application.status)
+                .all()
+            )
+            data = {status.name.lower(): count for status, count in rows}
+            data["total"] = sum(data.values())
+            return data
+        except Exception as e:
+            logger.error(f"Failed to get application status counts: {e}")
             raise

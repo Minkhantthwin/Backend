@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from app.database import get_mysql_session
+from app.dependencies.auth import require_admin
 from app.repositories.region_repository import RegionRepository
 from app.schemas import RegionCreate, RegionResponse, MessageResponse
 from app.util.log import get_logger
@@ -25,6 +26,7 @@ def get_region_repository(db: Session = Depends(get_mysql_session)) -> RegionRep
 async def create_region(
     region_data: RegionCreate,
     region_repo: RegionRepository = Depends(get_region_repository),
+    current_admin=Depends(require_admin),
 ):
     try:
         region = region_repo.create_region(region_data)
@@ -48,7 +50,9 @@ async def create_region(
     description="Retrieve a specific region by its ID",
 )
 async def get_region(
-    region_id: int, region_repo: RegionRepository = Depends(get_region_repository)
+    region_id: int,
+    region_repo: RegionRepository = Depends(get_region_repository),
+    current_admin=Depends(require_admin),
 ):
     try:
         region = region_repo.get_region_by_id(region_id)
@@ -71,12 +75,13 @@ async def get_region(
     "/regions",
     response_model=List[RegionResponse],
     summary="Get list of regions",
-    description="Retrieve a paginated list of regions",
+    description="Retrieve a list of regions (admin only, paginated client-side).",
 )
 async def get_regions(
     page: int = Query(1, ge=1, description="Page number"),
-    per_page: int = Query(10, ge=1, le=100, description="Number of regions per page"),
+    per_page: int = Query(100, ge=1, le=100, description="Number of regions per page"),
     region_repo: RegionRepository = Depends(get_region_repository),
+    current_admin=Depends(require_admin),
 ):
     try:
         skip = (page - 1) * per_page
@@ -90,6 +95,29 @@ async def get_regions(
         )
 
 
+@router.get(
+    "/regions/search",
+    response_model=List[RegionResponse],
+    summary="Search regions",
+    description="Search regions by name or code (case-insensitive)",
+)
+async def search_regions(
+    query: str = Query(..., min_length=1, description="Partial name or code"),
+    limit: int = Query(50, ge=1, le=100),
+    region_repo: RegionRepository = Depends(get_region_repository),
+    current_admin=Depends(require_admin),
+):
+    try:
+        results = region_repo.search_regions(query, limit=limit)
+        return results
+    except Exception as e:
+        logger.error(f"Unexpected error searching regions '{query}': {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error occurred while searching regions",
+        )
+
+
 @router.put(
     "/regions/{region_id}",
     response_model=RegionResponse,
@@ -100,6 +128,7 @@ async def update_region(
     region_id: int,
     region_data: RegionCreate,
     region_repo: RegionRepository = Depends(get_region_repository),
+    current_admin=Depends(require_admin),
 ):
     try:
         region = region_repo.update_region(region_id, region_data)
@@ -129,7 +158,9 @@ async def update_region(
     description="Delete a specific region",
 )
 async def delete_region(
-    region_id: int, region_repo: RegionRepository = Depends(get_region_repository)
+    region_id: int,
+    region_repo: RegionRepository = Depends(get_region_repository),
+    current_admin=Depends(require_admin),
 ):
     try:
         success = region_repo.delete_region(region_id)

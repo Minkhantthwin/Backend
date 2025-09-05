@@ -160,3 +160,46 @@ class ProgramRepository:
                 f"Failed to get program recommendations for field {field_of_study}: {e}"
             )
             return []
+
+    def update_program(self, program_id: int, program_data: ProgramCreate) -> Optional[Program]:
+        """Update program details and replace requirements"""
+        try:
+            program = self.get_program_by_id(program_id)
+            if not program:
+                return None
+
+            # Update scalar fields
+            update_fields = program_data.model_dump(exclude={"requirements"})
+            for field, value in update_fields.items():
+                setattr(program, field, value)
+
+            # Replace requirements if provided
+            if program_data.requirements is not None:
+                # Delete existing
+                for req in list(program.requirements):
+                    self.db.delete(req)
+                self.db.flush()
+                # Add new
+                for req_data in program_data.requirements:
+                    new_req = ProgramRequirement(program_id=program.id, **req_data.model_dump())
+                    self.db.add(new_req)
+
+            self.db.commit()
+            self.db.refresh(program)
+
+            # Update Neo4j node
+            try:
+                self.neo4j_service.update_program_node(program)
+            except Exception as neo4j_error:
+                logger.warning(f"Failed to update program in Neo4j: {neo4j_error}")
+
+            logger.info(f"Program updated successfully: {program.name}")
+            return program
+        except IntegrityError as e:
+            self.db.rollback()
+            logger.error(f"Failed to update program due to integrity constraint: {e}")
+            raise ValueError("Invalid university ID or duplicate program")
+        except Exception as e:
+            self.db.rollback()
+            logger.error(f"Failed to update program {program_id}: {e}")
+            raise

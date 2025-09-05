@@ -13,7 +13,7 @@ from app.schemas import (
     MessageResponse,
     RecommendationListResponse,
 )
-from app.dependencies.auth import get_current_user, get_optional_current_user
+from app.dependencies.auth import get_current_user, get_optional_current_user, require_admin
 from app.models import User
 from app.util.log import get_logger
 
@@ -44,6 +44,7 @@ def get_user_repository(db: Session = Depends(get_mysql_session)) -> UserReposit
                 "phone": "+1234567890",
                 "date_of_birth": "1990-01-01",
                 "nationality": "American",
+                "is_admin": false,
                 "interests": [
                     {
                     "field_of_study": "Artificial Intelligence",
@@ -79,6 +80,7 @@ async def create_user(
     - **qualifications**: Optional list of user qualifications
     - **interests**: Optional list of user interests
     - **test_scores**: Optional list of test scores
+    - **is_admin**: Ignored on public registration (always False)
     """
     try:
         # Check if user already exists
@@ -103,6 +105,35 @@ async def create_user(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal server error occurred while creating user",
+        )
+
+
+@router.get(
+    "/users/stats",
+    summary="User statistics",
+    description="Get aggregate user statistics (admin only)",
+)
+async def user_stats(
+    user_repo: UserRepository = Depends(get_user_repository),
+    current_admin=Depends(require_admin),
+):
+    """
+    Get aggregate user statistics.
+
+    **Admin Only:** This endpoint is restricted to admin users.
+
+    Returns total user count and admin count.
+    """
+    try:
+        total = user_repo.count_users()
+        # quick admin count
+        admin_count = user_repo.db.query(User).filter(User.is_admin == True).count()
+        return {"total": total, "admins": admin_count}
+    except Exception as e:
+        logger.error(f"Unexpected error retrieving user stats: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error retrieving user stats",
         )
 
 
@@ -340,4 +371,33 @@ async def get_user_recommendations(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal server error occurred while getting recommendations",
+        )
+
+
+@router.get(
+    "/users/stats",
+    summary="User statistics",
+    description="Get aggregate user statistics (admin only)",
+)
+async def user_stats(
+    user_repo: UserRepository = Depends(get_user_repository),
+    current_admin=Depends(require_admin),
+):
+    """
+    Get aggregate user statistics.
+
+    **Admin Only:** This endpoint is restricted to admin users.
+
+    Returns total user count and admin count.
+    """
+    try:
+        total = user_repo.count_users()
+        # quick admin count
+        admin_count = user_repo.db.query(User).filter(User.is_admin == True).count()
+        return {"total": total, "admins": admin_count}
+    except Exception as e:
+        logger.error(f"Unexpected error retrieving user stats: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error retrieving user stats",
         )

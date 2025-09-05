@@ -86,6 +86,7 @@ class UserBase(BaseModel):
     phone: Optional[str] = Field(None, max_length=20)
     date_of_birth: Optional[date] = None
     nationality: Optional[str] = Field(None, max_length=100)
+    is_admin: bool = False  # Exposed for responses; creation will enforce safety
 
     @field_validator("phone")
     @classmethod
@@ -113,6 +114,8 @@ class UserCreate(UserBase):
     password: str = Field(..., min_length=8, max_length=100)
     interests: Optional[List[UserInterestCreate]] = []
     test_scores: Optional[List[UserTestScoreCreate]] = []
+    # Allow client to attempt to set but server will enforce False unless elevated context
+    is_admin: bool = False
 
     @field_validator("password")
     @classmethod
@@ -136,6 +139,7 @@ class UserUpdate(BaseModel):
     phone: Optional[str] = Field(None, max_length=20)
     date_of_birth: Optional[date] = None
     nationality: Optional[str] = Field(None, max_length=100)
+    is_admin: Optional[bool] = None  # Only processed if requester is admin (enforced in route/service layer)
 
     @field_validator("phone")
     @classmethod
@@ -368,6 +372,17 @@ class ProgramBase(BaseModel):
     start_date: Optional[date] = None
     description: Optional[str] = None
     is_active: bool = True
+
+    @field_validator("degree_level", mode="before")
+    @classmethod
+    def normalize_degree_level(cls, v):
+        if isinstance(v, str):
+            v_lower = v.lower()
+            try:
+                return DegreeLevel(v_lower)
+            except ValueError:
+                raise ValueError("Invalid degree_level. Valid: bachelor, master, phd, diploma, certificate")
+        return v
 
 
 class ProgramCreate(ProgramBase):

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>UniRecommend Admin Dashboard</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script>
+		tailwind.config = {
+			theme: {
+				extend: {
+					colors: {
+						primary: '#3B82F6',
+						accent: '#F59E0B',
+						'danger': '#DC2626',
+						'success': '#059669',
+						'gray-border': '#E5E7EB',
+					}
+				}
+			}
+		}
+	</script>
+	<link rel="stylesheet" href="../css/style.css" />
+</head>
+<body class="min-h-screen bg-gray-50">
+	<!-- Mount points -->
+	<div id="navbarMount"></div>
+	<main class="max-w-7xl mx-auto px-4 py-10 space-y-10">
+		<!-- Greeting -->
+		<section>
+			<h2 class="text-2xl font-semibold text-gray-800 mb-2">Welcome back, <span id="adminName">Admin</span></h2>
+			<p class="text-gray-600 text-sm">Here is an overview of platform activity and key system metrics.</p>
+		</section>
+
+		<!-- KPI Cards -->
+		<section class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+			<div class="bg-white p-5 rounded-xl border border-gray-border shadow-sm">
+				<div class="flex items-center justify-between mb-3">
+					<h3 class="text-sm font-medium text-gray-500">Total Users</h3>
+					<span class="text-xs px-2 py-0.5 rounded bg-blue-50 text-primary" id="usersDelta">+0%</span>
+				</div>
+				<div class="text-3xl font-bold text-gray-800" id="totalUsers">--</div>
+				<p class="text-xs text-gray-500 mt-2">All registered accounts</p>
+			</div>
+			<div class="bg-white p-5 rounded-xl border border-gray-border shadow-sm">
+				<div class="flex items-center justify-between mb-3">
+					<h3 class="text-sm font-medium text-gray-500">Programs</h3>
+					<span class="text-xs px-2 py-0.5 rounded bg-green-50 text-success" id="programsDelta">+0</span>
+				</div>
+				<div class="text-3xl font-bold text-gray-800" id="totalPrograms">--</div>
+				<p class="text-xs text-gray-500 mt-2">Active listings</p>
+			</div>
+			<div class="bg-white p-5 rounded-xl border border-gray-border shadow-sm">
+				<div class="flex items-center justify-between mb-3">
+					<h3 class="text-sm font-medium text-gray-500">Applications</h3>
+					<span class="text-xs px-2 py-0.5 rounded bg-amber-50 text-accent" id="applicationsDelta">0 today</span>
+				</div>
+				<div class="text-3xl font-bold text-gray-800" id="totalApplications">--</div>
+				<p class="text-xs text-gray-500 mt-2">Submitted by users</p>
+			</div>
+			<div class="bg-white p-5 rounded-xl border border-gray-border shadow-sm">
+				<div class="flex items-center justify-between mb-3">
+					<h3 class="text-sm font-medium text-gray-500">System Health</h3>
+					<span class="inline-flex items-center gap-1 text-xs text-success">
+						<span class="w-2 h-2 rounded-full bg-success animate-pulse"></span> OK
+					</span>
+				</div>
+				<div class="text-3xl font-bold text-gray-800" id="systemScore">99%</div>
+				<p class="text-xs text-gray-500 mt-2">Uptime (mock)</p>
+			</div>
+		</section>
+
+		<!-- Two Column Panels -->
+		<section class="grid gap-8 lg:grid-cols-3">
+			<!-- Recent Activity -->
+			<div class="lg:col-span-2 bg-white border border-gray-border rounded-xl shadow-sm">
+				<div class="p-5 border-b border-gray-border flex items-center justify-between">
+					<h3 class="font-semibold text-gray-800">Recent Activity</h3>
+					<button class="text-xs text-primary hover:underline">View all</button>
+				</div>
+				<ul id="activityList" class="divide-y divide-gray-100">
+					<li class="p-4 text-sm text-gray-500">Loading activity...</li>
+				</ul>
+			</div>
+
+			<!-- Quick Actions -->
+			<div class="space-y-6">
+				<div class="bg-white border border-gray-border rounded-xl shadow-sm p-5">
+					<h3 class="font-semibold text-gray-800 mb-4">Quick Actions</h3>
+					<div class="grid gap-3">
+						<a href="#" class="group flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-primary hover:bg-blue-50 transition">
+							<span class="w-8 h-8 rounded bg-primary/10 text-primary flex items-center justify-center font-semibold">U</span>
+							<div>
+								<p class="text-sm font-medium text-gray-800 group-hover:text-primary">Add University</p>
+								<p class="text-xs text-gray-500">Create a new university entry</p>
+							</div>
+						</a>
+						<a href="#" class="group flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-primary hover:bg-blue-50 transition">
+							<span class="w-8 h-8 rounded bg-primary/10 text-primary flex items-center justify-center font-semibold">P</span>
+							<div>
+								<p class="text-sm font-medium text-gray-800 group-hover:text-primary">Add Program</p>
+								<p class="text-xs text-gray-500">Publish a new degree program</p>
+							</div>
+						</a>
+						<a href="#" class="group flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-primary hover:bg-blue-50 transition">
+							<span class="w-8 h-8 rounded bg-primary/10 text-primary flex items-center justify-center font-semibold">R</span>
+							<div>
+								<p class="text-sm font-medium text-gray-800 group-hover:text-primary">Review Applications</p>
+								<p class="text-xs text-gray-500">Process pending submissions</p>
+							</div>
+						</a>
+					</div>
+				</div>
+
+				<div class="bg-white border border-gray-border rounded-xl shadow-sm p-5">
+					<h3 class="font-semibold text-gray-800 mb-4">System Notes</h3>
+					<ul class="space-y-3 text-xs text-gray-600">
+						<li>• Neo4j sync status: <span class="text-success font-medium">Operational</span></li>
+						<li>• Pending database migrations: <span class="text-gray-800">0</span></li>
+						<li>• Last data refresh: <span id="lastRefresh" class="text-gray-800">--</span></li>
+					</ul>
+				</div>
+			</div>
+		</section>
+	</main>
+	<div id="footerMount"></div>
+
+	<script src="../js/admin.js"></script>
+	<script>
+		// Initialize dashboard when DOM is loaded
+		document.addEventListener('DOMContentLoaded', async () => {
+			// Use admin.js layout injection and admin authentication
+			await injectAdminLayout('dashboard');
+			
+			// Load dashboard-specific data
+			await loadAdminDashboard();
+		});
+	</script>
+</body>
+</html>

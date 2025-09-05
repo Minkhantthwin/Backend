@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+	<title>Programs - UniRecommend</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script>
+	tailwind.config = {
+	  theme: {
+	    extend: {
+	      colors: {
+	        primary: '#3B82F6',
+	        accent: '#F59E0B',
+	        'light-blue': '#EFF6FF',
+	        'lighter-blue': '#DBEAFE',
+	        'gray-border': '#E5E7EB',
+	        'gray-medium': '#6B7280',
+	        'dark-bg': '#1F2937',
+	        'dark-nav': '#374151',
+	        'dark-text': '#F3F4F6',
+	        'muted-text': '#D1D5DB'
+	      }
+	    }
+	  }
+	}
+	</script>
+	<link rel="stylesheet" href="/css/style.css" />
+	<script>
+		window.__LAYOUT_PATHS__ = [
+			'user/partials/layout.html',
+			'view/user/partials/layout.html',
+			'/view/user/partials/layout.html'
+		];
+	</script>
+	<script defer src="/js/index.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+	<div id="navbarContainer"></div>
+
+	<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+		<!-- Header with breadcrumb -->
+		<div class="mb-6">
+			<nav class="flex" aria-label="Breadcrumb">
+				<ol class="flex items-center space-x-4">
+					<li>
+						<a href="/universities" class="text-gray-500 hover:text-gray-700 text-sm">Universities</a>
+					</li>
+					<li>
+						<svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+							<path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+						</svg>
+					</li>
+					<li>
+						<span class="text-gray-900 text-sm font-medium" id="universityName">Programs</span>
+					</li>
+				</ol>
+			</nav>
+		</div>
+
+		<div class="mb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+			<div>
+				<h1 class="text-2xl font-bold text-gray-900 mb-2" id="pageTitle">Programs</h1>
+				<p class="text-gray-600 text-sm" id="pageDescription">Browse available programs. Use search & filters to narrow down.</p>
+			</div>
+			<div class="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+				<div class="relative flex-1 sm:w-72">
+					<input id="programSearch" type="text" placeholder="Search programs..." class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-border bg-white focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm" />
+					<svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+				</div>
+				<select id="degreeFilter" class="sm:w-48 px-3 py-2 rounded-lg border border-gray-border bg-white focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm">
+					<option value="">All Degrees</option>
+					<option value="bachelor">Bachelor</option>
+					<option value="master">Master</option>
+					<option value="phd">PhD</option>
+					<option value="diploma">Diploma</option>
+				</select>
+				<select id="fieldFilter" class="sm:w-48 px-3 py-2 rounded-lg border border-gray-border bg-white focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm">
+					<option value="">All Fields</option>
+				</select>
+			</div>
+		</div>
+
+		<div id="programsContainer" class="grid gap-6 lg:grid-cols-2 xl:grid-cols-3"></div>
+		<div id="programEmpty" class="hidden py-24 text-center text-gray-500">
+			<p>No programs found.</p>
+		</div>
+
+		<div id="programsLoading" class="flex items-center justify-center py-16 text-gray-500">
+			<svg class="animate-spin h-6 w-6 mr-3 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle class="opacity-25" cx="12" cy="12" r="10" stroke-width="4"></circle><path class="opacity-75" stroke-width="4" d="M4 12a8 8 0 018-8"/></svg>
+			<span>Loading programs...</span>
+		</div>
+
+		<div id="programsPagination" class="hidden mt-10 flex items-center justify-center gap-2 flex-wrap"></div>
+	</main>
+
+	<div id="footerContainer"></div>
+</body>
+<script>
+// API Configuration
+function getToken(){ return localStorage.getItem('access_token'); }
+async function apiCall(endpoint, options = {}){ 
+	const token=getToken(); 
+	const base={ headers:{'Accept':'application/json','Content-Type':'application/json'} }; 
+	if(token) base.headers['Authorization']='Bearer '+token; 
+	const res= await fetch(API_BASE_URL+endpoint,{...base,...options,headers:{...base.headers,...(options.headers||{})}}); 
+	const ct=res.headers.get('content-type')||''; 
+	let data = ct.includes('json')? await res.json(): await res.text(); 
+	if(!res.ok) throw (data||new Error('Request failed')); 
+	return data; 
+}
+
+// Wait for layout to load before initializing page-specific functionality
+function initProgramPage() {
+	const container = document.getElementById('programsContainer');
+	const loading = document.getElementById('programsLoading');
+	const empty = document.getElementById('programEmpty');
+	const searchInput = document.getElementById('programSearch');
+	const degreeFilter = document.getElementById('degreeFilter');
+	const fieldFilter = document.getElementById('fieldFilter');
+	
+	let page=1; 
+	const perPage=12; 
+	let currentQuery=''; 
+	let currentDegree='';
+	let currentField='';
+	let currentUniversityId=null;
+
+	// Get URL parameters
+	const urlParams = new URLSearchParams(window.location.search);
+	currentUniversityId = urlParams.get('university_id');
+	const universityName = urlParams.get('university_name');
+
+	// Update page title and breadcrumb if we're viewing programs for a specific university
+	if (currentUniversityId && universityName) {
+		document.getElementById('pageTitle').textContent = `Programs at ${universityName}`;
+		document.getElementById('pageDescription').textContent = `Browse programs offered by ${universityName}`;
+		document.getElementById('universityName').textContent = universityName;
+	}
+
+	async function fetchPrograms(){
+		try{
+			loading.classList.remove('hidden');
+			empty.classList.add('hidden');
+			container.innerHTML='';
+
+			let endpoint;
+			let params = new URLSearchParams({ page:String(page), per_page:String(perPage) });
+			
+			if (currentUniversityId) {
+				// Fetch programs for specific university
+				endpoint = `/universities/${currentUniversityId}/programs`;
+			} else {
+				// Fetch all programs
+				endpoint = `/programs`;
+				params.append('active_only', 'true');
+			}
+
+			let list = await apiCall(`${endpoint}${currentUniversityId ? '' : '?' + params.toString()}`);
+			
+			// Apply client-side filtering
+			if(currentQuery || currentDegree || currentField) {
+				const q = currentQuery.toLowerCase();
+				list = list.filter(p => {
+					const nameMatch = !currentQuery || (p.name||'').toLowerCase().includes(q);
+					const degreeMatch = !currentDegree || (p.degree_level||'').toLowerCase() === currentDegree;
+					const fieldMatch = !currentField || (p.field_of_study||'').toLowerCase().includes(currentField.toLowerCase());
+					return nameMatch && degreeMatch && fieldMatch;
+				});
+			}
+			
+			render(list);
+		} catch(e){ 
+			console.error(e); 
+			showPageMessage('Failed to load programs'); 
+		}
+		finally{ 
+			loading.classList.add('hidden'); 
+		}
+	}
+
+	function render(list){
+		if(!list.length){ 
+			empty.classList.remove('hidden'); 
+			return; 
+		}
+		empty.classList.add('hidden');
+		container.innerHTML = list.map(createProgramCard).join('');
+	}
+
+	function createProgramCard(program) {
+		const degreeLevel = program.degree_level || 'Unknown';
+		const field = program.field_of_study || 'General';
+		const duration = program.duration_years ? `${program.duration_years} year${program.duration_years > 1 ? 's' : ''}` : '';
+		const tuition = program.tuition_fee && program.currency ? `${program.currency} ${Number(program.tuition_fee).toLocaleString()}` : '';
+		const deadline = program.application_deadline ? new Date(program.application_deadline).toLocaleDateString() : '';
+
+		return `
+		<div class="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition flex flex-col">
+			<div class="p-6 flex-1">
+				<div class="flex items-start justify-between mb-3">
+					<div class="flex-1">
+						<h3 class="font-semibold text-gray-900 text-lg mb-1 line-clamp-2" title="${program.name||''}">${program.name||'Unknown Program'}</h3>
+						<p class="text-sm text-gray-500">${degreeLevel} in ${field}</p>
+					</div>
+					<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 ml-3 flex-shrink-0">
+						${degreeLevel}
+					</span>
+				</div>
+				
+				${program.university_name ? `<p class="text-sm text-primary font-medium mb-3">${program.university_name}</p>` : ''}
+				
+				<div class="text-sm text-gray-600 mb-4 line-clamp-3">
+					${program.description || 'No description available.'}
+				</div>
+				
+				<div class="space-y-2 text-xs text-gray-500">
+					${duration ? `<div class="flex items-center"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Duration: ${duration}</div>` : ''}
+					${program.language ? `<div class="flex items-center"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>Language: ${program.language}</div>` : ''}
+					${tuition ? `<div class="flex items-center"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/></svg>Tuition: ${tuition}</div>` : ''}
+					${deadline ? `<div class="flex items-center"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>Deadline: ${deadline}</div>` : ''}
+				</div>
+			</div>
+			
+			<div class="px-6 py-4 bg-gray-50 rounded-b-xl">
+				<div class="flex items-center justify-between">
+					<button class="text-sm font-medium text-primary hover:text-blue-600 transition" onclick="viewProgram(${program.id})">
+						View Details
+					</button>
+					<button class="px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-blue-600 rounded-lg transition" onclick="applyToProgram(${program.id})">
+						Apply Now
+					</button>
+				</div>
+			</div>
+		</div>`;
+	}
+
+	function showPageMessage(msg){ 
+		empty.querySelector('p')?.replaceChildren(document.createTextNode(msg)); 
+		empty.classList.remove('hidden'); 
+	}
+
+	// Search & filter event listeners
+	if(searchInput) searchInput.addEventListener('input', debounce(e=>{ 
+		currentQuery=e.target.value.trim(); 
+		page=1; 
+		fetchPrograms(); 
+	}, 300));
+	
+	if(degreeFilter) degreeFilter.addEventListener('change', e=>{ 
+		currentDegree=e.target.value; 
+		page=1; 
+		fetchPrograms(); 
+	});
+	
+	if(fieldFilter) fieldFilter.addEventListener('change', e=>{ 
+		currentField=e.target.value; 
+		page=1; 
+		fetchPrograms(); 
+	});
+
+	async function loadFields() { 
+		try { 
+			// This would ideally come from an API endpoint that returns unique fields
+			const commonFields = [
+				'Computer Science', 'Engineering', 'Business', 'Medicine', 'Law', 
+				'Psychology', 'Biology', 'Chemistry', 'Physics', 'Mathematics',
+				'Economics', 'Literature', 'History', 'Art', 'Music'
+			];
+			
+			fieldFilter.innerHTML = '<option value="">All Fields</option>' + 
+				commonFields.map(field => `<option value="${field}">${field}</option>`).join('');
+		} catch(_) { 
+			/* ignore */ 
+		} 
+	}
+
+	// Initialize page
+	loadFields();
+	fetchPrograms();
+}
+
+// Program action functions
+function viewProgram(programId) {
+	// Navigate to program details page
+	console.log('View program:', programId);
+	window.location.href = `/program-detail?id=${programId}`;
+}
+
+function applyToProgram(programId) {
+	// Navigate to application page (you can implement this later)
+	console.log('Apply to program:', programId);
+	// window.location.href = `/apply/${programId}`;
+}
+
+// Initialize program page after DOM and layout are ready
+document.addEventListener('DOMContentLoaded', () => {
+	// Wait for layout to load, then initialize
+	function checkAndInit() {
+		// Check if layout elements are loaded
+		const navbar = document.querySelector('nav[data-role="main-nav"]');
+		const footer = document.querySelector('footer[data-role="main-footer"]');
+		
+		if (navbar && footer) {
+			initProgramPage();
+		} else {
+			// Wait a bit more and try again
+			setTimeout(checkAndInit, 100);
+		}
+	}
+	
+	checkAndInit();
+});
+
+function debounce(fn,wait){ 
+	let t; 
+	return (...a)=>{ 
+		clearTimeout(t); 
+		t=setTimeout(()=>fn(...a),wait); 
+	}; 
+}
+</script>
+</html>

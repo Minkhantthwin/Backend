@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>UniRecommend - Find Your University</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: '#3B82F6',
+        accent: '#F59E0B',
+        'light-blue': '#EFF6FF',
+        'lighter-blue': '#DBEAFE',
+        'gray-border': '#E5E7EB',
+        'gray-medium': '#6B7280',
+        'dark-bg': '#1F2937',
+        'dark-nav': '#374151',
+        'dark-text': '#F3F4F6',
+        'muted-text': '#D1D5DB'
+      }
+    }
+  }
+}
+</script>
+<link rel="stylesheet" href="/css/style.css">
+<!-- Added layout loader config + index.js -->
+<script>
+  window.__LAYOUT_PATHS__ = [
+    'user/partials/layout.html',
+    'view/user/partials/layout.html',
+    '/view/user/partials/layout.html'
+  ];
+</script>
+<script defer src="/js/index.js"></script>
+</head>
+<body class="bg-white text-gray-800 flex flex-col min-h-screen">
+
+<!-- REPLACED full navbar with placeholder -->
+<div id="navbarContainer"></div>
+
+<!-- Hero -->
+<section class="relative overflow-hidden">
+  <div class="absolute inset-0 bg-gradient-to-br from-light-blue via-white to-lighter-blue"></div>
+  <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(circle at 20% 30%, #3B82F6 0, transparent 60%), radial-gradient(circle at 80% 70%, #F59E0B 0, transparent 55%);"></div>
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+    <div class="max-w-3xl">
+      <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight text-gray-900">
+        Find the Right <span class="text-primary">University</span> for Your Future
+      </h1>
+      <p class="mt-4 text-lg text-gray-600">Personalized recommendations based on your goals and interests.</p>
+    </div>
+    <!-- Search Bar -->
+    <form id="searchForm" class="mt-8 bg-white rounded-2xl shadow-xl p-4 flex flex-col md:flex-row gap-4 md:items-center border border-gray-border">
+      <div class="flex-1 flex flex-col md:flex-row gap-4">
+        <div class="relative md:w-48">
+          <select class="w-full h-full px-4 py-3 rounded-xl border border-gray-border focus:ring-2 focus:ring-primary focus:border-primary bg-white text-sm" name="filter">
+            <option value="program">Program</option>
+            <option value="country">Country</option>
+            <option value="university">University</option>
+          </select>
+        </div>
+        <div class="flex-1">
+          <input type="text" name="q" placeholder="e.g., Computer Science in Canada" class="w-full px-4 py-3 rounded-xl border border-gray-border focus:ring-2 focus:ring-primary focus:border-primary text-sm">
+        </div>
+      </div>
+      <button type="submit" class="px-8 py-3 rounded-xl bg-gradient-to-r from-primary to-blue-600 text-white font-medium shadow hover:opacity-90 transition text-sm">Search</button>
+    </form>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="py-20 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12">
+      <h2 class="text-2xl sm:text-3xl font-bold">Why UniRecommend?</h2>
+      <p class="mt-3 text-gray-600 text-sm sm:text-base">Tools to help you make confident education choices.</p>
+    </div>
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <!-- Card -->
+      <div class="p-6 rounded-2xl border border-gray-border bg-white shadow-sm hover:shadow-md transition">
+        <div class="w-12 h-12 rounded-xl bg-light-blue flex items-center justify-center mb-4">
+          <svg class="w-6 h-6 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 20l9-5-9-5-9 5 9 5z"/><path d="M12 12l9-5-9-5-9 5 9 5z"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2">Personalized Matches</h3>
+        <p class="text-sm text-gray-600">AI-driven recommendations aligned with your profile.</p>
+      </div>
+      <div class="p-6 rounded-2xl border border-gray-border bg-white shadow-sm hover:shadow-md transition">
+        <div class="w-12 h-12 rounded-xl bg-light-blue flex items-center justify-center mb-4">
+          <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2">Easy Comparison</h3>
+        <p class="text-sm text-gray-600">Compare programs side-by-side effortlessly.</p>
+      </div>
+      <div class="p-6 rounded-2xl border border-gray-border bg-white shadow-sm hover:shadow-md transition">
+        <div class="w-12 h-12 rounded-xl bg-light-blue flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M12 3l2.09 6.26H20l-5.17 3.76L16.18 21 12 16.9 7.82 21l1.35-7.98L4 9.26h5.91z"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2">Global Rankings</h3>
+        <p class="text-sm text-gray-600">Stay informed with trusted ranking insights.</p>
+      </div>
+      <div class="p-6 rounded-2xl border border-gray-border bg-white shadow-sm hover:shadow-md transition">
+        <div class="w-12 h-12 rounded-xl bg-light-blue flex items-center justify-center mb-4">
+          <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="10"/></svg>
+        </div>
+        <h3 class="font-semibold mb-2">Career Focused</h3>
+        <p class="text-sm text-gray-600">Programs aligned with emerging job markets.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Recommended Programs -->
+<section class="py-20 bg-light-blue/40">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-10">
+      <div>
+        <h2 class="text-2xl sm:text-3xl font-bold">Recommended Programs</h2>
+        <p class="text-gray-600 mt-2 text-sm">Personalized program recommendations based on your interests and profile.</p>
+      </div>
+      <a href="/programs" class="text-sm font-medium text-primary hover:underline">View All Programs</a>
+    </div>
+    
+    <!-- Loading State -->
+    <div id="loadingState" class="text-center py-8">
+      <div class="inline-flex items-center px-4 py-2 text-sm text-gray-600">
+        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Loading recommendations...
+      </div>
+    </div>
+    
+    <!-- Error State -->
+    <div id="errorState" class="hidden text-center py-8">
+      <div class="text-gray-600">
+        <p class="mb-4">Unable to load recommendations at the moment.</p>
+        <button id="retryButton" class="inline-flex items-center px-4 py-2 text-sm font-medium text-primary border border-primary rounded-lg hover:bg-primary hover:text-white transition">
+          Try Again
+        </button>
+      </div>
+    </div>
+    
+    <!-- Programs Grid -->
+    <div id="programsGrid" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 hidden">
+      <!-- Dynamic program cards will be inserted here -->
+    </div>
+    
+    <!-- No Recommendations State -->
+    <div id="noRecommendationsState" class="hidden text-center py-8">
+      <div class="text-gray-600">
+        <p class="mb-4">No recommendations available yet.</p>
+        <p class="text-sm">Complete your profile to get personalized program recommendations.</p>
+        <a href="/profile" class="inline-flex items-center px-4 py-2 mt-4 text-sm font-medium text-primary border border-primary rounded-lg hover:bg-primary hover:text-white transition">
+          Complete Profile
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Wait a bit for index.js to fully load
+      setTimeout(() => {
+        loadRecommendedPrograms();
+      }, 100);
+    });
+
+    async function loadRecommendedPrograms() {
+      const loadingState = document.getElementById('loadingState');
+      const errorState = document.getElementById('errorState');
+      const programsGrid = document.getElementById('programsGrid');
+      const noRecommendationsState = document.getElementById('noRecommendationsState');
+      const retryButton = document.getElementById('retryButton');
+
+      // Show loading state
+      loadingState.classList.remove('hidden');
+      errorState.classList.add('hidden');
+      programsGrid.classList.add('hidden');
+      noRecommendationsState.classList.add('hidden');
+
+      try {
+        // Check if required functions are available
+        if (typeof getToken !== 'function' || typeof apiCall !== 'function') {
+          console.error('Authentication functions not available. Waiting for index.js to load...');
+          setTimeout(loadRecommendedPrograms, 500);
+          return;
+        }
+
+        // Check if user is authenticated and get current user
+        const token = getToken();
+        if (!token) {
+          // If not authenticated, show login prompt
+          loadingState.classList.add('hidden');
+          showLoginPrompt();
+          return;
+        }
+
+        // Get current user to extract user ID
+        const currentUserResponse = await apiCall('/auth/me');
+        if (!currentUserResponse || !currentUserResponse.id) {
+          throw new Error('Unable to get current user information');
+        }
+
+        const userId = currentUserResponse.id;
+        console.log('Loading recommendations for authenticated user:', userId);
+
+        const response = await fetch(`/api/v1/users/${userId}/recommendations/neo4j-graph?limit=4`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const recommendations = await response.json();
+        
+        loadingState.classList.add('hidden');
+        
+        console.log('Recommendations received:', recommendations); // Debug log
+        
+        if (!recommendations || !Array.isArray(recommendations) || recommendations.length === 0) {
+          noRecommendationsState.classList.remove('hidden');
+          return;
+        }
+        
+        // Display programs
+        programsGrid.innerHTML = '';
+        recommendations.forEach(program => {
+          const programCard = createProgramCard(program);
+          programsGrid.appendChild(programCard);
+        });
+        
+        programsGrid.classList.remove('hidden');
+        
+      } catch (error) {
+        console.error('Error loading recommendations:', error);
+        loadingState.classList.add('hidden');
+        
+        // Check if it's an authentication error
+        if (error.message.includes('401') || error.message.includes('authentication') || error.message.includes('current user')) {
+          showLoginPrompt();
+        } else {
+          errorState.classList.remove('hidden');
+        }
+      }
+
+      // Retry button functionality
+      retryButton.addEventListener('click', loadRecommendedPrograms);
+    }
+
+    function showLoginPrompt() {
+      const container = document.querySelector('.max-w-7xl');
+      container.innerHTML = `
+        <div class="text-center py-16">
+          <div class="mb-6">
+            <svg class="mx-auto h-16 w-16 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-4">Login Required</h3>
+          <p class="text-gray-600 mb-6">Please sign in to view your personalized program recommendations.</p>
+          <div class="space-x-4">
+            <a href="/login" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-primary hover:bg-blue-600 transition">
+              Sign In
+            </a>
+            <a href="/register" class="inline-flex items-center px-6 py-3 border border-primary text-base font-medium rounded-lg text-primary bg-white hover:bg-primary hover:text-white transition">
+              Create Account
+            </a>
+          </div>
+        </div>
+      `;
+    }
+
+    function createProgramCard(program) {
+      const card = document.createElement('div');
+      card.className = 'group bg-white border border-gray-border rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition flex flex-col';
+      
+      // Get degree level badge color
+      const degreeColor = getDegreeColor(program.degree_level);
+      
+      // Handle tuition fee display
+      const tuitionDisplay = program.tuition_fee 
+        ? `${program.currency} ${parseFloat(program.tuition_fee).toLocaleString()}`
+        : 'Tuition info not available';
+      
+      card.innerHTML = `
+        <div class="h-32 bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center relative">
+          <span class="text-2xl">🎓</span>
+          <span class="absolute top-2 right-2 text-xs px-2 py-1 rounded-full bg-white/80 text-gray-700 capitalize">${program.degree_level || 'Program'}</span>
+        </div>
+        <div class="p-5 flex-1 flex flex-col">
+          <h3 class="font-semibold text-gray-900 mb-1 line-clamp-2">${program.program_name || program.name || 'Program'}</h3>
+          <p class="text-xs text-gray-500 mb-2">${program.university_name || 'University'} • ${program.country || 'Location'}</p>
+          <p class="text-sm text-gray-600 line-clamp-2 flex-1 mb-2">${program.field_of_study || 'Field of Study'}</p>
+          <p class="text-xs text-gray-500 mb-2">${program.language || 'Language not specified'}</p>
+          ${program.match_score ? `<div class="text-xs text-primary font-medium mb-2">Match: ${Math.round(program.match_score)}%</div>` : ''}
+          <button class="mt-4 w-full text-sm font-medium px-4 py-2 rounded-lg bg-primary text-white hover:bg-blue-600 transition" onclick="viewProgramDetails(${program.program_id || program.id})">View Details</button>
+        </div>
+      `;
+      
+      return card;
+    }
+
+    function getDegreeColor(degreeLevel) {
+      const colors = {
+        'bachelor': 'bg-green-100 text-green-800',
+        'master': 'bg-blue-100 text-blue-800',
+        'phd': 'bg-purple-100 text-purple-800',
+        'doctorate': 'bg-purple-100 text-purple-800',
+        'certificate': 'bg-yellow-100 text-yellow-800',
+        'diploma': 'bg-orange-100 text-orange-800'
+      };
+      return colors[degreeLevel?.toLowerCase()] || 'bg-gray-100 text-gray-800';
+    }
+
+    function viewProgramDetails(programId) {
+      if (programId) {
+        window.location.href = `/program-detail?id=${programId}`;
+      }
+    }
+  </script>
+</section>
+
+<!-- How It Works -->
+<section class="py-20 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12">
+      <h2 class="text-2xl sm:text-3xl font-bold">How It Works</h2>
+      <p class="mt-3 text-gray-600 text-sm sm:text-base">Three simple steps to your tailored list.</p>
+    </div>
+    <div class="grid gap-10 md:grid-cols-3">
+      <div class="text-center relative">
+        <div class="w-14 h-14 mx-auto rounded-full bg-primary text-white flex items-center justify-center text-lg font-bold mb-5">1</div>
+        <h3 class="font-semibold mb-2">Sign Up</h3>
+        <p class="text-sm text-gray-600 px-4">Create a free account to begin your search journey.</p>
+      </div>
+      <div class="text-center relative">
+        <div class="w-14 h-14 mx-auto rounded-full bg-primary text-white flex items-center justify-center text-lg font-bold mb-5">2</div>
+        <h3 class="font-semibold mb-2">Tell Us Your Preferences</h3>
+        <p class="text-sm text-gray-600 px-4">Share academic goals, interests, and regions.</p>
+      </div>
+      <div class="text-center relative">
+        <div class="w-14 h-14 mx-auto rounded-full bg-primary text-white flex items-center justify-center text-lg font-bold mb-5">3</div>
+        <h3 class="font-semibold mb-2">Get Recommendations</h3>
+        <p class="text-sm text-gray-600 px-4">Receive curated programs & track your progress.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section class="py-20 bg-light-blue/40">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-10 gap-6">
+      <div>
+        <h2 class="text-2xl sm:text-3xl font-bold">What Students Say</h2>
+        <p class="text-gray-600 mt-2 text-sm">Real experiences from successful applicants.</p>
+      </div>
+      <div class="flex gap-2">
+        <button id="prevTestimonial" class="w-10 h-10 rounded-full border border-gray-border flex items-center justify-center bg-white hover:bg-gray-50">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        <button id="nextTestimonial" class="w-10 h-10 rounded-full border border-gray-border flex items-center justify-center bg-white hover:bg-gray-50">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="overflow-hidden relative">
+      <div id="testimonialTrack" class="flex transition-transform duration-500">
+        <!-- Slide -->
+        <div class="min-w-full px-2">
+          <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-border max-w-3xl mx-auto">
+            <div class="flex items-center gap-4 mb-4">
+              <div class="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-accent text-white flex items-center justify-center font-semibold">AL</div>
+              <div>
+                <div class="font-semibold">Alicia Gomez</div>
+                <div class="text-xs text-gray-500">Admitted to Data Science (Canada)</div>
+              </div>
+            </div>
+            <p class="text-sm text-gray-600">UniRecommend narrowed thousands of options into a focused list that matched my goals perfectly.</p>
+          </div>
+        </div>
+        <div class="min-w-full px-2">
+          <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-border max-w-3xl mx-auto">
+            <div class="flex items-center gap-4 mb-4">
+              <div class="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-accent text-white flex items-center justify-center font-semibold">MK</div>
+              <div>
+                <div class="font-semibold">Michael Chen</div>
+                <div class="text-xs text-gray-500">Engineering (Singapore)</div>
+              </div>
+            </div>
+            <p class="text-sm text-gray-600">The recommendation accuracy saved me weeks of research. Highly recommended.</p>
+          </div>
+        </div>
+        <div class="min-w-full px-2">
+          <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-border max-w-3xl mx-auto">
+            <div class="flex items-center gap-4 mb-4">
+              <div class="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-accent text-white flex items-center justify-center font-semibold">SR</div>
+              <div>
+                <div class="font-semibold">Sara Rahman</div>
+                <div class="text-xs text-gray-500">Health Sciences (UK)</div>
+              </div>
+            </div>
+            <p class="text-sm text-gray-600">A clean interface and smart suggestions made the process stress-free.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="py-20 relative">
+  <div class="absolute inset-0 bg-gradient-to-r from-primary to-blue-600"></div>
+  <div class="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
+    <h2 class="text-2xl sm:text-3xl font-bold">Start your journey today!</h2>
+    <p class="mt-4 text-sm sm:text-base text-white/90">Create your profile and unlock tailored university recommendations.</p>
+    <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+      <a href="/register" class="px-8 py-3 rounded-xl bg-white text-primary font-medium text-sm shadow hover:shadow-md transition">Get Recommendations</a>
+      <a href="/login" class="px-8 py-3 rounded-xl border border-white/40 text-sm font-medium hover:bg-white/10 transition">I already have an account</a>
+    </div>
+  </div>
+</section>
+
+<!-- REPLACED footer with placeholder -->
+<div id="footerContainer"></div>
+
+<!-- Page-specific scripts -->
+<script>
+(function () {
+  if (window.__HOMEPAGE_INIT__) return; // guard to prevent double init
+  window.__HOMEPAGE_INIT__ = true;
+
+  // Testimonials slider (scoped)
+  const track = document.getElementById('testimonialTrack');
+  if (track) {
+    const slides = Array.from(track.children);
+    let index = 0;
+    function go(i) {
+      index = (i + slides.length) % slides.length;
+      track.style.transform = 'translateX(' + (-index * 100) + '%)';
+    }
+    document.getElementById('nextTestimonial')?.addEventListener('click', () => go(index + 1));
+    document.getElementById('prevTestimonial')?.addEventListener('click', () => go(index - 1));
+    setInterval(() => go(index + 1), 7000);
+  }
+
+  // Search handler
+  const searchForm = document.getElementById('searchForm');
+  if (searchForm) {
+    searchForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const data = new FormData(e.target);
+      console.log('Search:', Object.fromEntries(data.entries()));
+    });
+  }
+})();
+</script>
+</body>
+</html>

@@ -13,11 +13,13 @@ from app.routes import (
     university,
     recommendation,
     auth,
+    frontend,
 )
 import logging
 from app.util.log import get_logger
 from app.util.env_config import Settings
 from app.database import get_database_manager
+from app.routes.frontend import setup_frontend_routes
 
 logging.basicConfig(level=logging.INFO)
 logger = get_logger(__name__)
@@ -92,6 +94,12 @@ app.include_router(
     auth.router, prefix=f"/api/{settings.API_V1_STR}", tags=["Authentication"]
 )
 app.include_router(health.router, tags=["Health"])
+app.include_router(
+    frontend.router, prefix=f"/api/{settings.API_V1_STR}", tags=["Frontend"]
+)
+
+# Set up frontend routes and static file serving
+setup_frontend_routes(app)
 
 
 def main():

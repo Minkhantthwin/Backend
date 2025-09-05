@@ -1,0 +1,50 @@
+<!-- Shared Admin Layout: Navbar + Footer -->
+<header id="adminNavbar" class="bg-white border-b border-gray-border">
+	<div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+		<div class="flex items-center gap-3">
+			<a href="/admin/dashboard" class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold">UR</a>
+			<div>
+				<h1 class="text-lg font-semibold text-gray-800">Admin Portal</h1>
+				<p class="text-xs text-gray-500">UniRecommend Control Panel</p>
+			</div>
+		</div>
+		<nav class="hidden md:flex items-center gap-6 text-sm" id="adminNavLinks">
+			<a data-link="dashboard" href="/admin/dashboard" class="text-gray-600 hover:text-gray-800">Overview</a>
+			<a data-link="users" href="/admin/users" class="text-gray-600 hover:text-gray-800">Users</a>
+			<a data-link="universities" href="/admin/universities" class="text-gray-600 hover:text-gray-800">Universities</a>
+			<a data-link="programs" href="/admin/programs" class="text-gray-600 hover:text-gray-800">Programs</a>
+			<a data-link="regions" href="/admin/regions" class="text-gray-600 hover:text-gray-800">Regions</a>
+			<a data-link="applications" href="/admin/applications" class="text-gray-600 hover:text-gray-800">Applications</a>
+		</nav>
+		<div class="flex items-center gap-3">
+			<button id="mobileNavToggle"
+				class="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-md border border-gray-border hover:bg-gray-100 transition"
+				aria-label="Toggle navigation" aria-expanded="false">
+				<span class="sr-only">Toggle menu</span>
+				<div class="space-y-1.5">
+					<span class="block w-5 h-0.5 bg-gray-800 transition-all"></span>
+					<span class="block w-5 h-0.5 bg-gray-800 transition-all"></span>
+					<span class="block w-5 h-0.5 bg-gray-800 transition-all"></span>
+				</div>
+			</button>
+			<a id="newAdminBtn" href="/admin/register" class="hidden sm:inline-block text-sm bg-primary text-white px-3 py-1.5 rounded-md hover:bg-blue-600">New Admin</a>
+			<button id="logoutBtn" class="hidden md:inline-block text-sm bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-md">Logout</button>
+		</div>
+	</div>
+	<!-- Mobile menu -->
+	<div id="mobileNav" class="md:hidden hidden px-4 pb-4 border-t border-gray-100 bg-white">
+		<div class="flex flex-col gap-2 text-sm">
+			<a data-link="dashboard" class="py-2 text-gray-700 hover:text-primary border-b border-gray-100" href="/admin/dashboard">Overview</a>
+			<a data-link="users" class="py-2 text-gray-700 hover:text-primary border-b border-gray-100" href="/admin/users">Users</a>
+			<a data-link="universities" class="py-2 text-gray-700 hover:text-primary border-b border-gray-100" href="/admin/universities">Universities</a>
+			<a data-link="programs" class="py-2 text-gray-700 hover:text-primary border-b border-gray-100" href="/admin/programs">Programs</a>
+			<a data-link="regions" class="py-2 text-gray-700 hover:text-primary border-b border-gray-100" href="/admin/regions">Regions</a>
+			<a data-link="applications" class="py-2 text-gray-700 hover:text-primary border-b border-gray-100" href="#">Applications</a>
+			<button id="mobileLogoutBtn" class="mt-2 text-left bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-md text-gray-800">Logout</button>
+		</div>
+	</div>
+</header>
+
+<footer id="adminFooter" class="mt-16 py-8 text-center text-xs text-gray-500">
+	&copy; <span data-year></span> UniRecommend Admin Suite. All rights reserved.
+</footer>

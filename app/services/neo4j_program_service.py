@@ -47,21 +47,19 @@ class Neo4jProgramService:
         """Create university node and relationships in Neo4j"""
         try:
             with self.db_manager.neo4j.get_db_session() as session:
-                # Create university node
+                # Create university node - only use university_id for MERGE, then SET all properties
                 query = """
-                MERGE (u:University {
-                    university_id: $university_id,
-                    name: $name,
-                    city: $city,
-                    established_year: $established_year,
-                    type: $type,
-                    website: $website,
-                    description: $description,
-                    ranking_world: $ranking_world,
-                    ranking_national: $ranking_national,
-                    created_at: $created_at
-                })
-                SET u.updated_at = $updated_at
+                MERGE (u:University {university_id: $university_id})
+                SET u.name = $name,
+                    u.city = $city,
+                    u.established_year = $established_year,
+                    u.type = $type,
+                    u.website = $website,
+                    u.description = $description,
+                    u.ranking_world = $ranking_world,
+                    u.ranking_national = $ranking_national,
+                    u.created_at = $created_at,
+                    u.updated_at = $updated_at
                 
                 // Create relationship with region
                 WITH u
@@ -104,23 +102,21 @@ class Neo4jProgramService:
         """Create program node and relationships in Neo4j"""
         try:
             with self.db_manager.neo4j.get_db_session() as session:
-                # Create program node
+                # Create program node - only use program_id for MERGE, then SET all properties
                 query = """
-                MERGE (p:Program {
-                    program_id: $program_id,
-                    name: $name,
-                    degree_level: $degree_level,
-                    field_of_study: $field_of_study,
-                    duration_years: $duration_years,
-                    language: $language,
-                    tuition_fee: $tuition_fee,
-                    currency: $currency,
-                    application_deadline: $application_deadline,
-                    start_date: $start_date,
-                    description: $description,
-                    is_active: $is_active
-                })
-                SET p.updated_at = $updated_at
+                MERGE (p:Program {program_id: $program_id})
+                SET p.name = $name,
+                    p.degree_level = $degree_level,
+                    p.field_of_study = $field_of_study,
+                    p.duration_years = $duration_years,
+                    p.language = $language,
+                    p.tuition_fee = $tuition_fee,
+                    p.currency = $currency,
+                    p.application_deadline = $application_deadline,
+                    p.start_date = $start_date,
+                    p.description = $description,
+                    p.is_active = $is_active,
+                    p.updated_at = $updated_at
                 
                 // Create relationships
                 WITH p
@@ -192,14 +188,12 @@ class Neo4jProgramService:
         for requirement in program.requirements:
             req_query = """
             MATCH (p:Program {program_id: $program_id})
-            MERGE (req:Requirement {
-                requirement_id: $requirement_id,
-                requirement_type: $requirement_type,
-                requirement_value: $requirement_value,
-                test_type: $test_type,
-                is_mandatory: $is_mandatory,
-                description: $description
-            })
+            MERGE (req:Requirement {requirement_id: $requirement_id})
+            SET req.requirement_type = $requirement_type,
+                req.requirement_value = $requirement_value,
+                req.test_type = $test_type,
+                req.is_mandatory = $is_mandatory,
+                req.description = $description
             MERGE (p)-[:HAS_REQUIREMENT]->(req)
             
             // Create requirement type node

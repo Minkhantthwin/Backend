@@ -100,20 +100,13 @@ async def get_optional_current_user(
 def require_admin(current_user: User = Depends(get_current_user)) -> User:
     """
     Dependency to require admin privileges.
-
-    Note: This is a placeholder. You would need to add an 'is_admin' or 'role'
-    field to your User model to implement proper role-based access control.
     """
-    # Placeholder implementation - you can extend this based on your user model
-    # if not current_user.is_admin:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_403_FORBIDDEN,
-    #         detail="Not enough permissions"
-    #     )
-
-    # For now, all authenticated users are considered to have admin access
-    # You should implement proper role-based access control
-    logger.warning("Admin check bypassed - implement proper RBAC")
+    if not current_user.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not enough permissions - admin access required"
+        )
+    
     return current_user
 
 
@@ -133,6 +126,13 @@ def require_user_or_admin(
 
     # Check if user is admin (placeholder implementation)
     # if current_user.is_admin:
+    #     return current_user
+
+    # For now, only allow users to access their own data
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="Not enough permissions to access this resource",
+    )
     #     return current_user
 
     # For now, only allow users to access their own data

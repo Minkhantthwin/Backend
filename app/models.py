@@ -56,6 +56,7 @@ class User(Base):
     date_of_birth = Column(Date)
     nationality = Column(String(100))
     phone = Column(String(20))
+    is_admin = Column(Boolean, default=False, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

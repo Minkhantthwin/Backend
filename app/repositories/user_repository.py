@@ -39,6 +39,8 @@ class UserRepository:
                 exclude={"password", "qualifications", "interests", "test_scores"}
             )
             user_dict["password_hash"] = hashed_password
+            # Security: prevent privilege escalation during open registration
+            user_dict["is_admin"] = False
 
             db_user = User(**user_dict)
             self.db.add(db_user)
@@ -80,6 +82,42 @@ class UserRepository:
         except Exception as e:
             self.db.rollback()
             logger.error(f"Failed to create user: {e}")
+            raise
+
+    def create_admin_user(self, user_data: UserCreate) -> User:
+        """Create a new admin user - allows is_admin to be set to True"""
+        try:
+            # Hash password
+            hashed_password = self._hash_password(user_data.password)
+
+            # Create user object without nested data
+            user_dict = user_data.model_dump(
+                exclude={"password", "qualifications", "interests", "test_scores"}
+            )
+            user_dict["password_hash"] = hashed_password
+            # Allow admin creation for this method
+            user_dict["is_admin"] = True
+
+            db_user = User(**user_dict)
+            self.db.add(db_user)
+            self.db.flush()  # Get user ID without committing
+
+            # Admin users typically don't need interests or test scores
+            # Only add if explicitly provided
+
+            self.db.commit()
+            self.db.refresh(db_user)
+
+            logger.info(f"Admin user created successfully: {db_user.email}")
+            return db_user
+
+        except IntegrityError as e:
+            self.db.rollback()
+            logger.error(f"Failed to create admin user due to integrity constraint: {e}")
+            raise ValueError("Admin user with this email already exists")
+        except Exception as e:
+            self.db.rollback()
+            logger.error(f"Failed to create admin user: {e}")
             raise
 
     def get_user_by_id(self, user_id: int) -> Optional[User]:

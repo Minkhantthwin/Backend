@@ -12,6 +12,7 @@ from app.schemas import (
     MessageResponse,
 )
 from app.util.log import get_logger
+from app.dependencies.auth import require_admin
 
 logger = get_logger(__name__)
 router = APIRouter()
@@ -58,6 +59,25 @@ async def create_application(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal server error occurred while creating application",
+        )
+
+
+@router.get(
+    "/applications/stats",
+    summary="Application statistics",
+    description="Get counts of applications by status (admin only)",
+)
+async def application_stats(
+    application_repo: ApplicationRepository = Depends(get_application_repository),
+    current_admin=Depends(require_admin),
+):
+    try:
+        return application_repo.get_status_counts()
+    except Exception as e:
+        logger.error(f"Unexpected error retrieving application stats: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error retrieving application stats",
         )
 
 

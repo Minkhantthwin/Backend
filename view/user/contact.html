@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+	<title>Contact Us - UniRecommend</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script>
+	tailwind.config = {
+	  theme: {
+	    extend: {
+	      colors: {
+	        primary: '#3B82F6',
+	        accent: '#F59E0B',
+	        'light-blue': '#EFF6FF',
+	        'lighter-blue': '#DBEAFE',
+	        'gray-border': '#E5E7EB',
+	        'gray-medium': '#6B7280',
+	        'dark-bg': '#1F2937',
+	        'dark-nav': '#374151',
+	        'dark-text': '#F3F4F6',
+	        'muted-text': '#D1D5DB'
+	      }
+	    }
+	  }
+	}
+	</script>
+	<link rel="stylesheet" href="/css/style.css" />
+	<script>
+		window.__LAYOUT_PATHS__ = [
+			'user/partials/layout.html',
+			'view/user/partials/layout.html',
+			'/view/user/partials/layout.html'
+		];
+	</script>
+	<script defer src="/js/index.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+	<div id="navbarContainer"></div>
+
+	<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+		<!-- Header -->
+		<div class="text-center mb-12">
+			<h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Contact Us</h1>
+			<p class="text-lg text-gray-600 max-w-2xl mx-auto">
+				Have questions about university recommendations? We're here to help you find the perfect educational path.
+			</p>
+		</div>
+
+		<div class="grid gap-8 lg:grid-cols-2">
+			<!-- Contact Form -->
+			<div class="bg-white rounded-2xl shadow-sm border border-gray-border p-8">
+				<h2 class="text-2xl font-semibold text-gray-900 mb-6">Send us a Message</h2>
+				
+				<form id="contactForm" class="space-y-6">
+					<div class="grid gap-6 sm:grid-cols-2">
+						<div>
+							<label for="firstName" class="block text-sm font-medium text-gray-700 mb-2">First Name *</label>
+							<input type="text" id="firstName" name="firstName" required 
+								class="w-full px-4 py-3 rounded-lg border border-gray-border focus:ring-2 focus:ring-primary/30 focus:border-primary transition">
+						</div>
+						<div>
+							<label for="lastName" class="block text-sm font-medium text-gray-700 mb-2">Last Name *</label>
+							<input type="text" id="lastName" name="lastName" required 
+								class="w-full px-4 py-3 rounded-lg border border-gray-border focus:ring-2 focus:ring-primary/30 focus:border-primary transition">
+						</div>
+					</div>
+
+					<div>
+						<label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
+						<input type="email" id="email" name="email" required 
+							class="w-full px-4 py-3 rounded-lg border border-gray-border focus:ring-2 focus:ring-primary/30 focus:border-primary transition">
+					</div>
+
+					<div>
+						<label for="phone" class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+						<input type="tel" id="phone" name="phone" 
+							class="w-full px-4 py-3 rounded-lg border border-gray-border focus:ring-2 focus:ring-primary/30 focus:border-primary transition">
+					</div>
+
+					<div>
+						<label for="subject" class="block text-sm font-medium text-gray-700 mb-2">Subject *</label>
+						<select id="subject" name="subject" required 
+							class="w-full px-4 py-3 rounded-lg border border-gray-border focus:ring-2 focus:ring-primary/30 focus:border-primary transition">
+							<option value="">Choose a subject</option>
+							<option value="general">General Inquiry</option>
+							<option value="recommendations">University Recommendations</option>
+							<option value="technical">Technical Support</option>
+							<option value="account">Account Issues</option>
+							<option value="partnership">Partnership Opportunities</option>
+							<option value="feedback">Feedback & Suggestions</option>
+						</select>
+					</div>
+
+					<div>
+						<label for="message" class="block text-sm font-medium text-gray-700 mb-2">Message *</label>
+						<textarea id="message" name="message" rows="5" required 
+							class="w-full px-4 py-3 rounded-lg border border-gray-border focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+							placeholder="Tell us how we can help you..."></textarea>
+					</div>
+
+					<div class="flex items-start">
+						<input type="checkbox" id="newsletter" name="newsletter" 
+							class="mt-1 h-4 w-4 text-primary focus:ring-primary border-gray-border rounded">
+						<label for="newsletter" class="ml-2 text-sm text-gray-600">
+							I would like to receive updates about new features and university opportunities
+						</label>
+					</div>
+
+					<button type="submit" 
+						class="w-full bg-gradient-to-r from-primary to-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:opacity-90 transition flex items-center justify-center">
+						<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+						</svg>
+						Send Message
+					</button>
+				</form>
+
+				<!-- Success/Error Messages -->
+				<div id="formSuccess" class="hidden mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+					<div class="flex">
+						<svg class="w-5 h-5 text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+							<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+						</svg>
+						<p class="text-green-700 text-sm font-medium">Thank you! Your message has been sent successfully. We'll get back to you soon.</p>
+					</div>
+				</div>
+
+				<div id="formError" class="hidden mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+					<div class="flex">
+						<svg class="w-5 h-5 text-red-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+							<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+						</svg>
+						<p class="text-red-700 text-sm font-medium">Sorry, there was an error sending your message. Please try again or contact us directly.</p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Contact Information -->
+			<div class="space-y-8">
+				<!-- Quick Contact -->
+				<div class="bg-white rounded-2xl shadow-sm border border-gray-border p-8">
+					<h2 class="text-2xl font-semibold text-gray-900 mb-6">Get in Touch</h2>
+					
+					<div class="space-y-6">
+						<div class="flex items-start">
+							<div class="flex-shrink-0 w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+								<svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+								</svg>
+							</div>
+							<div class="ml-4">
+								<h3 class="text-lg font-medium text-gray-900">Email</h3>
+								<p class="text-gray-600">support@unirecommend.com</p>
+								<p class="text-gray-600">info@unirecommend.com</p>
+							</div>
+						</div>
+
+						<div class="flex items-start">
+							<div class="flex-shrink-0 w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+								<svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+								</svg>
+							</div>
+							<div class="ml-4">
+								<h3 class="text-lg font-medium text-gray-900">Phone</h3>
+								<p class="text-gray-600">+1 (555) 123-4567</p>
+								<p class="text-gray-600 text-sm">Mon-Fri 9AM-6PM EST</p>
+							</div>
+						</div>
+
+						<div class="flex items-start">
+							<div class="flex-shrink-0 w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+								<svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+								</svg>
+							</div>
+							<div class="ml-4">
+								<h3 class="text-lg font-medium text-gray-900">Office</h3>
+								<p class="text-gray-600">123 Education Street</p>
+								<p class="text-gray-600">Academic District, ED 12345</p>
+								<p class="text-gray-600">United States</p>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- FAQ Quick Links -->
+				<div class="bg-white rounded-2xl shadow-sm border border-gray-border p-8">
+					<h2 class="text-2xl font-semibold text-gray-900 mb-6">Frequently Asked Questions</h2>
+					
+					<div class="space-y-4">
+						<div>
+							<h3 class="font-medium text-gray-900 mb-2">How does UniRecommend work?</h3>
+							<p class="text-gray-600 text-sm">Our AI-powered system analyzes your academic profile, interests, and goals to recommend universities that best match your preferences.</p>
+						</div>
+
+						<div>
+							<h3 class="font-medium text-gray-900 mb-2">Is UniRecommend free to use?</h3>
+							<p class="text-gray-600 text-sm">Yes! Creating an account and getting basic recommendations is completely free. Premium features may be available for advanced matching.</p>
+						</div>
+
+						<div>
+							<h3 class="font-medium text-gray-900 mb-2">How accurate are the recommendations?</h3>
+							<p class="text-gray-600 text-sm">Our recommendations are based on comprehensive data analysis and machine learning algorithms, with high accuracy rates validated by successful student placements.</p>
+						</div>
+
+						<div>
+							<h3 class="font-medium text-gray-900 mb-2">Can I apply through UniRecommend?</h3>
+							<p class="text-gray-600 text-sm">We provide guidance and resources for applications, but you'll typically need to apply directly through university websites or application portals.</p>
+						</div>
+					</div>
+
+					<div class="mt-6 pt-6 border-t border-gray-200">
+						<p class="text-sm text-gray-600">
+							Have more questions? 
+							<a href="mailto:support@unirecommend.com" class="text-primary hover:underline font-medium">Contact our support team</a>
+						</p>
+					</div>
+				</div>
+
+				<!-- Social Media -->
+				<div class="bg-white rounded-2xl shadow-sm border border-gray-border p-8">
+					<h2 class="text-2xl font-semibold text-gray-900 mb-6">Follow Us</h2>
+					
+					<div class="flex space-x-4">
+						<a href="#" aria-label="Facebook" class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center text-primary hover:bg-primary hover:text-white transition">
+							<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M22 12.07C22 6.48 17.5 2 11.93 2 6.35 2 1.86 6.48 1.86 12.07c0 4.99 3.66 9.13 8.44 9.93v-7.03H7.9v-2.9h2.4V9.41c0-2.37 1.4-3.68 3.55-3.68 1.03 0 2.1.18 2.1.18v2.32h-1.18c-1.16 0-1.52.72-1.52 1.46v1.76h2.59l-.41 2.9h-2.18v7.02c4.78-.8 8.44-4.94 8.44-9.93Z"/>
+							</svg>
+						</a>
+						<a href="#" aria-label="Twitter" class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center text-primary hover:bg-primary hover:text-white transition">
+							<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M22.16 5.66a8.4 8.4 0 0 1-2.38.65 4.16 4.16 0 0 0 1.8-2.29 8.3 8.3 0 0 1-2.63 1 4.15 4.15 0 0 0-7.07 2.83c0 .32.04.64.1.94A11.75 11.75 0 0 1 3.15 5.15a4.13 4.13 0 0 0 .56 5.52 4.1 4.1 0 0 1-1.87-.52v.05c0 2.02 1.44 3.7 3.35 4.09a4.21 4.21 0 0 1-1.86.07 4.15 4.15 0 0 0 3.87 2.88A8.3 8.3 0 0 1 2 19.54a11.73 11.73 0 0 0 6.29 1.84c7.55 0 11.68-6.16 11.68-11.49 0-.17 0-.35-.01-.52a8.2 8.2 0 0 0 2.2-2.13Z"/>
+							</svg>
+						</a>
+						<a href="#" aria-label="Instagram" class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center text-primary hover:bg-primary hover:text-white transition">
+							<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M7.5 2h9A5.5 5.5 0 0 1 22 7.5v9a5.5 5.5 0 0 1-5.5 5.5h-9A5.5 5.5 0 0 1 2 16.5v-9A5.5 5.5 0 0 1 7.5 2Zm0 2A3.5 3.5 0 0 0 4 7.5v9A3.5 3.5 0 0 0 7.5 20h9a3.5 3.5 0 0 0 3.5-3.5v-9A3.5 3.5 0 0 0 16.5 4h-9ZM12 7.25A4.75 4.75 0 1 1 7.25 12 4.75 4.75 0 0 1 12 7.25Zm0 2A2.75 2.75 0 1 0 14.75 12 2.75 2.75 0 0 0 12 9.25ZM17.75 6.5a1 1 0 1 1-1 1 1 1 0 0 1 1-1Z"/>
+							</svg>
+						</a>
+						<a href="#" aria-label="LinkedIn" class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center text-primary hover:bg-primary hover:text-white transition">
+							<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+							</svg>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</main>
+
+	<div id="footerContainer"></div>
+</body>
+
+<script>
+// Wait for layout to load before initializing page-specific functionality
+function initContactPage() {
+	const form = document.getElementById('contactForm');
+	const successMessage = document.getElementById('formSuccess');
+	const errorMessage = document.getElementById('formError');
+
+	if (form) {
+		form.addEventListener('submit', async function(e) {
+			e.preventDefault();
+			
+			// Hide previous messages
+			successMessage.classList.add('hidden');
+			errorMessage.classList.add('hidden');
+			
+			// Get form data
+			const formData = new FormData(form);
+			const data = Object.fromEntries(formData.entries());
+			
+			// Simulate form submission (replace with actual API call)
+			try {
+				// Show loading state
+				const submitBtn = form.querySelector('button[type="submit"]');
+				const originalText = submitBtn.innerHTML;
+				submitBtn.innerHTML = `
+					<svg class="animate-spin w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24">
+						<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+						<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+					</svg>
+					Sending...
+				`;
+				submitBtn.disabled = true;
+				
+				// Simulate API delay
+				await new Promise(resolve => setTimeout(resolve, 1500));
+				
+				// For demo purposes, always show success
+				// In a real implementation, you would send data to your backend
+				console.log('Contact form data:', data);
+				
+				// Show success message
+				successMessage.classList.remove('hidden');
+				form.reset();
+				
+				// Restore button
+				submitBtn.innerHTML = originalText;
+				submitBtn.disabled = false;
+				
+			} catch (error) {
+				console.error('Form submission error:', error);
+				errorMessage.classList.remove('hidden');
+				
+				// Restore button
+				const submitBtn = form.querySelector('button[type="submit"]');
+				submitBtn.innerHTML = originalText;
+				submitBtn.disabled = false;
+			}
+		});
+	}
+}
+
+// Initialize contact page after DOM and layout are ready
+document.addEventListener('DOMContentLoaded', () => {
+	// Wait for layout to load, then initialize
+	function checkAndInit() {
+		// Check if layout elements are loaded
+		const navbar = document.querySelector('nav[data-role="main-nav"]');
+		const footer = document.querySelector('footer[data-role="main-footer"]');
+		
+		if (navbar && footer) {
+			initContactPage();
+		} else {
+			// Wait a bit more and try again
+			setTimeout(checkAndInit, 100);
+		}
+	}
+	
+	checkAndInit();
+});
+</script>
+
+</html>

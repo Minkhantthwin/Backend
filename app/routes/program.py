@@ -7,6 +7,7 @@ from app.database import get_mysql_session
 from app.repositories.program import ProgramRepository
 from app.schemas import ProgramCreate, ProgramResponse, MessageResponse
 from app.util.log import get_logger
+from app.dependencies.auth import require_admin
 
 logger = get_logger(__name__)
 router = APIRouter()
@@ -59,6 +60,27 @@ async def create_program(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal server error occurred while creating program",
+        )
+
+
+@router.get(
+    "/programs/count",
+    summary="Program counts",
+    description="Get total and active program counts (admin only)",
+)
+async def program_counts(
+    program_repo: ProgramRepository = Depends(get_program_repository),
+    current_admin=Depends(require_admin),
+):
+    try:
+        active = program_repo.count_programs(active_only=True)
+        total = program_repo.count_programs(active_only=False)
+        return {"total": total, "active": active}
+    except Exception as e:
+        logger.error(f"Unexpected error retrieving program counts: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error retrieving program counts",
         )
 
 
@@ -219,4 +241,49 @@ async def delete_program(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal server error occurred while deleting program",
+        )
+
+
+@router.put(
+    "/programs/{program_id}",
+    response_model=ProgramResponse,
+    summary="Update program",
+    description="Update program details and replace requirements",
+)
+async def update_program(
+    program_id: int,
+    program_data: ProgramCreate,
+    program_repo: ProgramRepository = Depends(get_program_repository),
+):
+    """
+    Update an existing program with the following information:
+
+    - **name**: Name of the program
+    - **degree_level**: Level of degree (bachelor, master, phd, etc.)
+    - **field_of_study**: Field of study
+    - **duration_years**: Duration in years
+    - **language**: Language of instruction
+    - **tuition_fee**: Tuition fee amount
+    - **currency**: Currency of tuition fee
+    - **application_deadline**: Application deadline date
+    - **start_date**: Program start date
+    - **description**: Program description
+    - **requirements**: List of program requirements
+    """
+    try:
+        program = program_repo.update_program(program_id, program_data)
+        if not program:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Program not found")
+        logger.info(f"Program updated successfully: {program.name}")
+        return program
+    except ValueError as e:
+        logger.warning(f"Program update failed: {e}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected error updating program {program_id}: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error occurred while updating program",
         )
