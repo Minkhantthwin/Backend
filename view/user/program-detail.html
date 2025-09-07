@@ -593,10 +593,10 @@
 
         if (applyBtn) {
             applyBtn.addEventListener('click', function() {
-                if (currentProgram && currentProgram.university && currentProgram.university.website) {
-                    window.open(currentProgram.university.website, '_blank');
+                if (currentProgram) {
+                    window.location.href = `/application?program_id=${currentProgram.id}`;
                 } else {
-                    alert('Please contact the university directly for application information.');
+                    alert('Unable to apply: Program information not loaded.');
                 }
             });
         }

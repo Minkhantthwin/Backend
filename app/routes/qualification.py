@@ -89,23 +89,32 @@ async def get_user_qualifications_summary(
 @router.post(
     "/users/{user_id}/qualifications/check-all",
     response_model=List[dict],
-    summary="Check user qualification against all programs",
+    summary="Check user qualification against all programs and update Neo4j",
 )
 async def check_user_against_all_programs(
     user_id: int,
     qualification_service: QualificationService = Depends(get_qualification_service),
 ):
     """
-    Check user's qualification against all active programs.
+    Check user's qualification against all active programs and update Neo4j.
 
-    This is useful for generating recommendations based on qualification match.
+    This endpoint:
+    - Checks user qualifications against all active programs
+    - Saves qualification status to MySQL database
+    - Updates qualification relationships in Neo4j graph database
+    - Returns detailed qualification results for all programs
+    
+    This is useful for generating recommendations based on qualification match
+    and ensuring data consistency between MySQL and Neo4j.
     """
     try:
+        logger.info(f"Starting qualification check for user {user_id} against all programs")
         results = qualification_service.check_user_against_all_programs(user_id)
+        logger.info(f"Qualification check completed for user {user_id}: {len(results)} programs processed")
         return results
 
     except Exception as e:
-        logger.error(f"Error checking user against all programs: {e}")
+        logger.error(f"Error checking user {user_id} against all programs: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal server error",

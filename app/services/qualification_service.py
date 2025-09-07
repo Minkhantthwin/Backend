@@ -9,7 +9,6 @@ from app.models import (
     UserQualificationStatus,
 )
 from app.schemas import QualificationCheckResponse, QualificationSummaryResponse
-from app.services.neo4j_user_service import Neo4jUserService
 from datetime import datetime, date
 import logging
 
@@ -21,7 +20,6 @@ class QualificationService:
 
     def __init__(self, db: Session):
         self.db = db
-        self.neo4j_service = Neo4jUserService()
 
     def check_user_qualification(self, user_id: int, program_id: int) -> Dict:
         """Check if user meets all requirements for a specific program"""
@@ -332,7 +330,7 @@ class QualificationService:
         requirements_met: int = 0,
         total_requirements: int = 0,
     ):
-        """Save or update qualification status in both MySQL and Neo4j"""
+        """Save or update qualification status in MySQL"""
         try:
             # Check if status already exists
             existing_status = (
@@ -363,26 +361,7 @@ class QualificationService:
                 self.db.add(status)
 
             self.db.commit()
-
-            # Also save to Neo4j
-            qualification_data = {
-                "is_qualified": is_qualified,
-                "qualification_score": qualification_score,
-                "requirements_met": requirements_met,
-                "total_requirements": total_requirements,
-                "missing_requirements": missing_requirements,
-                "checked_at": checked_at,
-            }
-
-            # Try to save to Neo4j, but don't fail if it doesn't work
-            try:
-                self.neo4j_service.create_qualification_status_relationship(
-                    user_id, program_id, qualification_data
-                )
-            except Exception as neo4j_error:
-                logger.warning(
-                    f"Failed to save qualification status to Neo4j: {neo4j_error}"
-                )
+            logger.debug(f"Successfully updated qualification status for user {user_id}, program {program_id}")
 
         except Exception as e:
             self.db.rollback()
@@ -439,17 +418,22 @@ class QualificationService:
             programs = self.db.query(Program).filter(Program.is_active == True).all()
 
             results = []
+            total_programs = len(programs)
+
+            logger.info(f"Checking user {user_id} against {total_programs} active programs")
 
             for program in programs:
                 try:
                     result = self.check_user_qualification(user_id, program.id)
                     results.append(result)
+                    logger.debug(f"Updated qualification status for user {user_id}, program {program.id}")
                 except Exception as e:
                     logger.error(
                         f"Error checking program {program.id} for user {user_id}: {e}"
                     )
                     continue
 
+            logger.info(f"Completed qualification check for user {user_id}: {len(results)} programs checked")
             return results
 
         except Exception as e:
@@ -459,96 +443,43 @@ class QualificationService:
     def get_program_recommendations_by_qualification(
         self, user_id: int, limit: int = 10
     ) -> List[Dict]:
-        """Get program recommendations based on qualification status from Neo4j"""
+        """Get program recommendations based on qualification status"""
         try:
-            # Get recommendations from Neo4j
-            neo4j_recommendations = (
-                self.neo4j_service.get_qualified_programs_recommendations(
-                    user_id, limit
+            # Get qualified and highly matched programs
+            statuses = (
+                self.db.query(UserQualificationStatus)
+                .join(Program)
+                .join(Program.university)
+                .filter(UserQualificationStatus.user_id == user_id)
+                .filter(
+                    (UserQualificationStatus.is_qualified == True)
+                    | (UserQualificationStatus.qualification_score >= 75)
                 )
+                .order_by(UserQualificationStatus.qualification_score.desc())
+                .limit(limit)
+                .all()
             )
 
-            # Enrich with program details from MySQL
-            enriched_recommendations = []
-            for rec in neo4j_recommendations:
-                program = (
-                    self.db.query(Program)
-                    .filter(Program.id == rec["program_id"])
-                    .first()
-                )
-                if program:
-                    enriched_recommendations.append(
-                        {
-                            "program_id": rec["program_id"],
-                            "program_name": program.name,
-                            "university_name": (
-                                program.university.name if program.university else None
-                            ),
-                            "field_of_study": program.field_of_study,
-                            "degree_level": program.degree_level,
-                            "qualification_score": rec["qualification_score"],
-                            "is_qualified": rec["is_qualified"],
-                            "recommendation_reason": rec["recommendation_reason"],
-                            "checked_at": rec["checked_at"],
-                        }
-                    )
+            recommendations = []
+            for status in statuses:
+                program = status.program
+                recommendations.append({
+                    "program_id": status.program_id,
+                    "program_name": program.name,
+                    "university_name": program.university.name if program.university else None,
+                    "field_of_study": program.field_of_study,
+                    "degree_level": program.degree_level.value,
+                    "qualification_score": float(status.qualification_score),
+                    "is_qualified": status.is_qualified,
+                    "recommendation_reason": (
+                        "You meet all requirements" if status.is_qualified 
+                        else f"High qualification match ({status.qualification_score}%)"
+                    ),
+                    "checked_at": status.last_checked,
+                })
 
-            return enriched_recommendations
+            return recommendations
 
         except Exception as e:
             logger.error(f"Error getting program recommendations by qualification: {e}")
             return []
-
-    def get_qualification_status_from_neo4j(
-        self, user_id: int, program_id: int = None
-    ) -> List[Dict]:
-        """Get qualification status from Neo4j with optional program filtering"""
-        try:
-            return self.neo4j_service.get_user_qualification_status_from_neo4j(
-                user_id, program_id
-            )
-        except Exception as e:
-            logger.error(f"Error getting qualification status from Neo4j: {e}")
-            return []
-
-    def sync_qualification_status_to_neo4j(self, user_id: int) -> bool:
-        """Sync all qualification statuses from MySQL to Neo4j"""
-        try:
-            # Get all qualification statuses from MySQL
-            statuses = (
-                self.db.query(UserQualificationStatus)
-                .filter(UserQualificationStatus.user_id == user_id)
-                .all()
-            )
-
-            success_count = 0
-            for status in statuses:
-                qualification_data = {
-                    "is_qualified": status.is_qualified,
-                    "qualification_score": status.qualification_score,
-                    "requirements_met": 0,  # This would need to be calculated
-                    "total_requirements": 0,  # This would need to be calculated
-                    "missing_requirements": status.missing_requirements or [],
-                    "checked_at": status.last_checked,
-                }
-
-                try:
-                    success = (
-                        self.neo4j_service.create_qualification_status_relationship(
-                            user_id, status.program_id, qualification_data
-                        )
-                    )
-                    if success:
-                        success_count += 1
-                except Exception as e:
-                    logger.warning(f"Failed to sync qualification status to Neo4j: {e}")
-                    continue
-
-            logger.info(
-                f"Synced {success_count}/{len(statuses)} qualification statuses to Neo4j"
-            )
-            return success_count == len(statuses)
-
-        except Exception as e:
-            logger.error(f"Error syncing qualification status to Neo4j: {e}")
-            return False

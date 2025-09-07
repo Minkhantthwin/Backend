@@ -10,8 +10,8 @@ from app.util.log import get_logger
 
 logger = get_logger(__name__)
 
-# Security scheme for Bearer token
-security = HTTPBearer()
+# Security scheme for Bearer token - make it optional by default
+security = HTTPBearer(auto_error=False)
 
 
 def get_auth_service(db: Session = Depends(get_mysql_session)) -> AuthenticationService:
@@ -20,7 +20,7 @@ def get_auth_service(db: Session = Depends(get_mysql_session)) -> Authentication
 
 
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
     auth_service: AuthenticationService = Depends(get_auth_service),
 ) -> User:
     """
@@ -31,9 +31,13 @@ async def get_current_user(
     """
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
+        detail="Not authenticated",
         headers={"WWW-Authenticate": "Bearer"},
     )
+
+    if not credentials:
+        logger.warning("No credentials provided")
+        raise credentials_exception
 
     try:
         # Extract token from credentials
@@ -124,18 +128,11 @@ def require_user_or_admin(
     if current_user.id == target_user_id:
         return current_user
 
-    # Check if user is admin (placeholder implementation)
-    # if current_user.is_admin:
-    #     return current_user
+    # Check if user is admin
+    if current_user.is_admin:
+        return current_user
 
-    # For now, only allow users to access their own data
-    raise HTTPException(
-        status_code=status.HTTP_403_FORBIDDEN,
-        detail="Not enough permissions to access this resource",
-    )
-    #     return current_user
-
-    # For now, only allow users to access their own data
+    # User is not accessing their own data and is not admin
     raise HTTPException(
         status_code=status.HTTP_403_FORBIDDEN,
         detail="Not enough permissions to access this resource",

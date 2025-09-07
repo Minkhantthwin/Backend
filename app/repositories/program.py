@@ -3,7 +3,6 @@ from sqlalchemy.exc import IntegrityError
 from typing import Optional, List
 from app.models import Program, ProgramRequirement
 from app.schemas import ProgramCreate
-from app.services.neo4j_program_service import Neo4jProgramService
 import logging
 
 logger = logging.getLogger(__name__)
@@ -14,7 +13,6 @@ class ProgramRepository:
 
     def __init__(self, db: Session):
         self.db = db
-        self.neo4j_service = Neo4jProgramService()
 
     def create_program(self, program_data: ProgramCreate) -> Program:
         """Create a new program with requirements"""
@@ -35,13 +33,6 @@ class ProgramRepository:
 
             self.db.commit()
             self.db.refresh(db_program)
-
-            # Create program node in Neo4j
-            try:
-                self.neo4j_service.create_program_node(db_program)
-            except Exception as neo4j_error:
-                logger.warning(f"Failed to create program in Neo4j: {neo4j_error}")
-                # Don't fail the entire operation if Neo4j fails
 
             logger.info(f"Program created successfully: {db_program.name}")
             return db_program
@@ -133,13 +124,6 @@ class ProgramRepository:
             program.is_active = False
             self.db.commit()
 
-            # Update program node in Neo4j
-            try:
-                self.neo4j_service.delete_program_node(program_id)
-            except Exception as neo4j_error:
-                logger.warning(f"Failed to delete program in Neo4j: {neo4j_error}")
-                # Don't fail the entire operation if Neo4j fails
-
             logger.info(f"Program soft deleted: {program.name}")
             return True
         except Exception as e:
@@ -150,14 +134,97 @@ class ProgramRepository:
     def get_program_recommendations_by_field(
         self, field_of_study: str, limit: int = 10
     ) -> List[dict]:
-        """Get program recommendations by field of study from Neo4j"""
+        """Get program recommendations by field of study"""
         try:
-            return self.neo4j_service.get_program_recommendations_by_field(
-                field_of_study, limit
+            programs = (
+                self.db.query(Program)
+                .join(Program.university)
+                .filter(
+                    Program.field_of_study.ilike(f"%{field_of_study}%"),
+                    Program.is_active == True,
+                )
+                .limit(limit)
+                .all()
             )
+
+            recommendations = []
+            for program in programs:
+                recommendations.append(
+                    {
+                        "program_id": program.id,
+                        "program_name": program.name,
+                        "university_name": program.university.name,
+                        "field_of_study": program.field_of_study,
+                        "degree_level": program.degree_level.value,
+                        "match_score": 80.0,  # Base score for field match
+                        "recommendation_reason": f"Matches field: {field_of_study}",
+                    }
+                )
+
+            return recommendations
         except Exception as e:
             logger.error(
                 f"Failed to get program recommendations for field {field_of_study}: {e}"
+            )
+            return []
+
+    def get_programs_from_top_ranked_universities(
+        self, top_n_universities: int = 10, limit_per_university: int = 5
+    ) -> List[dict]:
+        """
+        Get programs offered by the highest world-ranked universities.
+
+        Args:
+            top_n_universities: How many top universities (by ranking_world ascending) to include
+            limit_per_university: Max programs to return per university
+
+        Returns:
+            List of dict program summaries including university ranking metadata.
+        """
+        try:
+            from app.models import University, Region
+
+            # Select top N universities with a ranking_world value
+            top_unis = (
+                self.db.query(University)
+                .filter(University.ranking_world.isnot(None))
+                .order_by(University.ranking_world.asc())
+                .limit(top_n_universities)
+                .all()
+            )
+
+            results: List[dict] = []
+            for uni in top_unis:
+                programs = (
+                    self.db.query(Program)
+                    .join(Program.university)
+                    .filter(Program.university_id == uni.id, Program.is_active == True)
+                    .limit(limit_per_university)
+                    .all()
+                )
+                for prog in programs:
+                    results.append(
+                        {
+                            "program_id": prog.id,
+                            "program_name": prog.name,
+                            "degree_level": prog.degree_level.value if prog.degree_level else None,
+                            "field_of_study": prog.field_of_study,
+                            "language": prog.language,
+                            "tuition_fee": float(prog.tuition_fee) if prog.tuition_fee is not None else None,
+                            "currency": prog.currency,
+                            "university_id": uni.id,
+                            "university_name": uni.name,
+                            "university_ranking_world": uni.ranking_world,
+                            "university_ranking_national": uni.ranking_national,
+                        }
+                    )
+
+            # Sort overall by university ranking then maybe future scoring
+            results.sort(key=lambda r: (r["university_ranking_world"] or 1_000_000))
+            return results
+        except Exception as e:
+            logger.error(
+                f"Failed to get programs from top ranked universities: {e}"
             )
             return []
 
@@ -186,12 +253,6 @@ class ProgramRepository:
 
             self.db.commit()
             self.db.refresh(program)
-
-            # Update Neo4j node
-            try:
-                self.neo4j_service.update_program_node(program)
-            except Exception as neo4j_error:
-                logger.warning(f"Failed to update program in Neo4j: {neo4j_error}")
 
             logger.info(f"Program updated successfully: {program.name}")
             return program

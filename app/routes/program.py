@@ -85,6 +85,34 @@ async def program_counts(
 
 
 @router.get(
+    "/programs/top-ranked",
+    summary="Programs from highest ranking universities",
+    description="List programs offered by the top N world-ranked universities (public)",
+)
+async def get_programs_from_top_ranked_unis(
+    top_universities: int = Query(10, ge=1, le=100, description="Number of top universities to include"),
+    per_university: int = Query(5, ge=1, le=50, description="Max programs per university"),
+    program_repo: ProgramRepository = Depends(get_program_repository),
+):
+    """Return programs offered by top ranked universities (static route placed before /programs/{program_id} to avoid 422)."""
+    try:
+        data = program_repo.get_programs_from_top_ranked_universities(
+            top_n_universities=top_universities, limit_per_university=per_university
+        )
+        return {
+            "top_universities": top_universities,
+            "per_university": per_university,
+            "total_programs": len(data),
+            "programs": data,
+        }
+    except Exception as e:
+        logger.error(f"Unexpected error retrieving top-ranked university programs: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error occurred while retrieving top ranked programs",
+        )
+
+@router.get(
     "/programs/{program_id}",
     response_model=ProgramResponse,
     summary="Get program by ID",

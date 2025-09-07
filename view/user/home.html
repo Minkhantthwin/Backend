@@ -208,35 +208,45 @@ tailwind.config = {
         const userId = currentUserResponse.id;
         console.log('Loading recommendations for authenticated user:', userId);
 
-        const response = await fetch(`/api/v1/users/${userId}/recommendations/neo4j-graph?limit=4`, {
+        const response = await fetch(`/api/v1/users/${userId}/recommendations?limit=12`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
         });
-        
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
-        const recommendations = await response.json();
-        
+
+        const data = await response.json();
         loadingState.classList.add('hidden');
-        
-        console.log('Recommendations received:', recommendations); // Debug log
-        
-        if (!recommendations || !Array.isArray(recommendations) || recommendations.length === 0) {
+
+        // New API returns an object with recommendations array
+        const rawList = Array.isArray(data) ? data : (data.recommendations || []);
+        console.log('Raw recommendations received:', rawList);
+
+        // Normalize score field and filter by final score >= 50
+        const normalized = rawList.map(r => ({
+          ...r,
+          __final: Number(r.final_score ?? r.match_score ?? r.score ?? 0)
+        }))
+        .filter(r => r.__final >= 50)
+        .sort((a,b) => b.__final - a.__final)
+        .slice(0,4); // show top 4
+
+        if (normalized.length === 0) {
           noRecommendationsState.classList.remove('hidden');
           return;
         }
-        
+
         // Display programs
         programsGrid.innerHTML = '';
-        recommendations.forEach(program => {
+        normalized.forEach(program => {
           const programCard = createProgramCard(program);
           programsGrid.appendChild(programCard);
         });
-        
+
         programsGrid.classList.remove('hidden');
         
       } catch (error) {
@@ -289,6 +299,9 @@ tailwind.config = {
       const tuitionDisplay = program.tuition_fee 
         ? `${program.currency} ${parseFloat(program.tuition_fee).toLocaleString()}`
         : 'Tuition info not available';
+
+      const score = Math.round(program.__final ?? program.final_score ?? program.match_score ?? program.score ?? 0);
+      const scoreBadge = score >= 85 ? 'bg-green-100 text-green-800' : score >= 70 ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800';
       
       card.innerHTML = `
         <div class="h-32 bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center relative">
@@ -300,8 +313,17 @@ tailwind.config = {
           <p class="text-xs text-gray-500 mb-2">${program.university_name || 'University'} • ${program.country || 'Location'}</p>
           <p class="text-sm text-gray-600 line-clamp-2 flex-1 mb-2">${program.field_of_study || 'Field of Study'}</p>
           <p class="text-xs text-gray-500 mb-2">${program.language || 'Language not specified'}</p>
-          ${program.match_score ? `<div class="text-xs text-primary font-medium mb-2">Match: ${Math.round(program.match_score)}%</div>` : ''}
-          <button class="mt-4 w-full text-sm font-medium px-4 py-2 rounded-lg bg-primary text-white hover:bg-blue-600 transition" onclick="viewProgramDetails(${program.program_id || program.id})">View Details</button>
+          <div class="flex items-center justify-between mb-3">
+            <div class="text-xs text-primary font-medium">Score: ${score}%</div>
+            <span class="text-[10px] px-2 py-1 rounded-full ${scoreBadge}">${score >= 85 ? 'Top Match' : score >= 70 ? 'Strong Match' : 'Match'}</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-1.5 mb-3 overflow-hidden">
+            <div class="h-1.5 bg-gradient-to-r from-primary to-accent" style="width:${Math.min(score,100)}%"></div>
+          </div>
+          <div class="flex gap-2 mt-4">
+            <button class="flex-1 text-sm font-medium px-4 py-2 rounded-lg border border-primary text-primary hover:bg-blue-50 transition" onclick="viewProgramDetails(${program.program_id || program.id})">View Details</button>
+            <button class="flex-1 text-sm font-medium px-4 py-2 rounded-lg bg-primary text-white hover:bg-blue-600 transition" onclick="applyToProgram(${program.program_id || program.id})">Apply</button>
+          </div>
         </div>
       `;
       
@@ -323,6 +345,12 @@ tailwind.config = {
     function viewProgramDetails(programId) {
       if (programId) {
         window.location.href = `/program-detail?id=${programId}`;
+      }
+    }
+
+    function applyToProgram(programId) {
+      if (programId) {
+        window.location.href = `/application?program_id=${programId}`;
       }
     }
   </script>

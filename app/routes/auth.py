@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
+import asyncio
 
 from app.database import get_mysql_session
 from app.services.auth_service import AuthenticationService
+from app.services.qualification_service import QualificationService
 from app.schemas import UserLogin, Token, UserResponse, UserCreate
 from app.dependencies.auth import get_current_user
 from app.models import User
@@ -20,11 +22,34 @@ def get_auth_service(db: Session = Depends(get_mysql_session)) -> Authentication
     return AuthenticationService(db)
 
 
+def get_qualification_service(db: Session = Depends(get_mysql_session)) -> QualificationService:
+    """Dependency to get qualification service"""
+    return QualificationService(db)
+
+
+async def update_user_qualifications_background(user_id: int, user_email: str):
+    """Background task to update user qualifications after login"""
+    try:
+        # Create a new database session for the background task
+        from app.database import get_database_manager
+        db_manager = get_database_manager()
+        
+        with db_manager.mysql.get_db_session() as db:
+            qualification_service = QualificationService(db)
+            logger.info(f"Starting background qualification check for user {user_id} ({user_email})")
+            
+            qualification_results = qualification_service.check_user_against_all_programs(user_id)
+            logger.info(f"Background qualification check completed for user {user_id}: {len(qualification_results)} programs processed")
+            
+    except Exception as e:
+        logger.error(f"Error in background qualification update for user {user_id}: {e}")
+
+
 @router.post(
     "/auth/login",
     response_model=Token,
     summary="User login",
-    description="Authenticate user and return access token",
+    description="Authenticate user, return access token, and update qualification status",
 )
 async def login(
     login_data: UserLogin,
@@ -32,40 +57,18 @@ async def login(
 ):
     """
     Authenticate a user and return an access token.
-
-    **Parameters:**
-    - **email**: User's email address
-    - **password**: User's password
-
-    **Returns:**
-    - **access_token**: JWT access token
-    - **token_type**: Token type (bearer)
-    - **expires_in**: Token expiration time in seconds
-    - **user_id**: ID of the authenticated user
-    - **email**: Email of the authenticated user
-
-    **Example Request:**
-    ```json
-    {
-        "email": "john.doe@example.com",
-        "password": "StrongPassword123!"
-    }
-    ```
-
-    **Example Response:**
-    ```json
-    {
-        "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-        "token_type": "bearer",
-        "expires_in": 1800,
-        "user_id": 1,
-        "email": "john.doe@example.com"
-    }
-    ```
+    
+    This endpoint also automatically updates the user's qualification status
+    against all programs to ensure recommendations are based on current data.
     """
     try:
         token = auth_service.login(login_data)
-        logger.info(f"User login successful: {login_data.email}")
+        logger.info(f"User login successful: {login_data.email}, token generated for user_id: {token.user_id}")
+        
+        # Start background task to update user qualifications
+        asyncio.create_task(update_user_qualifications_background(token.user_id, token.email))
+        logger.info(f"Started background qualification update for user {token.user_id}")
+        
         return token
 
     except HTTPException:
@@ -221,28 +224,14 @@ async def logout(current_user: User = Depends(get_current_user)):
 async def verify_token(current_user: User = Depends(get_current_user)):
     """
     Verify if the current access token is valid.
-
-    **Headers:**
-    - **Authorization**: Bearer {your_access_token}
-
-    **Returns:**
-    - Token validity status and basic user information
-
-    **Example Response:**
-    ```json
-    {
-        "valid": true,
-        "user_id": 1,
-        "email": "john.doe@example.com",
-        "message": "Token is valid"
-    }
-    ```
     """
     try:
+        logger.info(f"Token verification successful for user: {current_user.email}")
         return {
             "valid": True,
             "user_id": current_user.id,
             "email": current_user.email,
+            "is_admin": current_user.is_admin,
             "message": "Token is valid",
         }
 

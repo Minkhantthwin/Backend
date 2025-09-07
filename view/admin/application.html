@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="UTF-8"/>
@@ -59,7 +60,7 @@
 		</section>
 
 		<section class="text-xs text-gray-500">
-			Accepting sets status to ACCEPTED; Declining sets status to REJECTED. No other edits are allowed.
+			Accepting sets status to accepted; Declining sets status to rejected. Use Manage to set any allowed status.
 		</section>
 	</main>
 
@@ -78,40 +79,49 @@
 		</div>
 	</div>
 
+	<!-- Manage Status Modal -->
+	<div id="manageStatusModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+		<div class="bg-white rounded-xl p-6 w-full max-w-md space-y-5">
+			<h3 class="text-lg font-semibold text-gray-800">Manage Application Status</h3>
+			<p class="text-sm text-gray-600" id="manageStatusInfo">Application #</p>
+			<div>
+				<label class="block text-xs font-medium text-gray-500 mb-1">Select New Status</label>
+				<select id="newStatusSelect" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+					<option value="submitted">Submitted</option>
+					<option value="under_review">Under Review</option>
+					<option value="accepted">Accepted</option>
+					<option value="rejected">Rejected</option>
+					<option value="waitlisted">Waitlisted</option>
+				</select>
+			</div>
+			<div class="flex justify-end gap-3 pt-2">
+				<button id="cancelManageStatus" class="px-4 py-2 text-sm bg-gray-100 rounded-lg hover:bg-gray-200">Cancel</button>
+				<button id="applyManageStatus" class="px-4 py-2 text-sm bg-primary text-white rounded-lg hover:bg-blue-600">Update</button>
+			</div>
+		</div>
+	</div>
+
 	<script src="../js/admin.js"></script>
 	<script>
-		// Initialize page when DOM is loaded
 		document.addEventListener('DOMContentLoaded', async () => {
-			// Use admin.js layout injection and admin authentication
 			await injectAdminLayout('applications');
-			
-			// Initialize page-specific functionality
 			initApplicationPage();
 		});
 
-		// Page-specific initialization
 		async function initApplicationPage(){
-			// Ensure admin authentication before loading data
 			const me = await adminRequireAuth();
-			if (me) {
-				loadApplications();
-			}
-			
-			// Bind event listeners
+			if (me) loadApplications();
 			document.getElementById('searchBtn').addEventListener('click', applySearch);
-			document.getElementById('clearSearchBtn').addEventListener('click', ()=>{
-				document.getElementById('searchInput').value=''; applySearch();
-			});
-			document.getElementById('searchInput').addEventListener('keydown', e=>{
-				if(e.key==='Enter'){ e.preventDefault(); applySearch(); }
-			});
+			document.getElementById('clearSearchBtn').addEventListener('click', ()=>{document.getElementById('searchInput').value=''; applySearch();});
+			document.getElementById('searchInput').addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); applySearch(); }});
 			document.getElementById('prevPage').addEventListener('click', ()=>{ if(currentPage>1){ currentPage--; renderApplications(); }});
 			document.getElementById('nextPage').addEventListener('click', ()=>{ if(currentPage*pageSize<filtered.length){ currentPage++; renderApplications(); }});
 			document.getElementById('cancelDecision').addEventListener('click', closeDecision);
 			document.getElementById('confirmDecision').addEventListener('click', applyDecision);
+			document.getElementById('cancelManageStatus').addEventListener('click', closeManageStatus);
+			document.getElementById('applyManageStatus').addEventListener('click', applyManageStatus);
 		}
 
-		// State
 		let applications = [];
 		let filtered = [];
 		let currentPage = 1;
@@ -132,14 +142,7 @@
 		}
 
 		function statusBadge(status){
-			const map = {
-				draft:'bg-gray-200 text-gray-700',
-				submitted:'bg-blue-100 text-primary',
-				under_review:'bg-amber-100 text-accent',
-				accepted:'bg-green-100 text-success',
-				rejected:'bg-red-100 text-danger',
-				waitlisted:'bg-purple-100 text-purple-700'
-			};
+			const map = {draft:'bg-gray-200 text-gray-700',submitted:'bg-blue-100 text-primary',under_review:'bg-amber-100 text-accent',accepted:'bg-green-100 text-success',rejected:'bg-red-100 text-danger',waitlisted:'bg-purple-100 text-purple-700'};
 			const cls = map[status?.toLowerCase()] || 'bg-gray-100 text-gray-700';
 			return `<span class="px-2 py-1 text-xs rounded ${cls} font-medium capitalize">${status.replace('_',' ')}</span>`;
 		}
@@ -147,8 +150,7 @@
 		function renderApplications(){
 			const tbody=document.getElementById('applicationsTableBody');
 			if(!filtered.length){
-				tbody.innerHTML='<tr><td colspan="7" class="px-4 py-6 text-center text-gray-500">No applications found</td></tr>';
-				updatePagination(); return;
+				tbody.innerHTML='<tr><td colspan="7" class="px-4 py-6 text-center text-gray-500">No applications found</td></tr>'; updatePagination(); return;
 			}
 			const slice=paginate(filtered);
 			tbody.innerHTML='';
@@ -165,100 +167,68 @@
 					<td class="px-4 py-3 text-right space-x-2">
 						${a.status.toLowerCase()==='submitted'||a.status.toLowerCase()==='under_review'
 							? `<button data-acc="${a.id}" class="text-success hover:underline text-xs font-medium">Accept</button>
-							   <button data-rej="${a.id}" class="text-danger hover:underline text-xs font-medium">Decline</button>`
+								 <button data-rej="${a.id}" class="text-danger hover:underline text-xs font-medium">Decline</button>`
 							: '<span class="text-xs text-gray-400">—</span>'}
+						<button data-manage="${a.id}" class="ml-1 text-xs px-2 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-700">Manage</button>
 					</td>`;
 				tbody.appendChild(tr);
 			});
-			tbody.querySelectorAll('[data-acc]').forEach(b=>b.addEventListener('click',()=>openDecision(b.getAttribute('data-acc'),'ACCEPTED')));
-			tbody.querySelectorAll('[data-rej]').forEach(b=>b.addEventListener('click',()=>openDecision(b.getAttribute('data-rej'),'REJECTED')));
+			tbody.querySelectorAll('[data-acc]').forEach(b=>b.addEventListener('click',()=>openDecision(b.getAttribute('data-acc'),'accepted')));
+			tbody.querySelectorAll('[data-rej]').forEach(b=>b.addEventListener('click',()=>openDecision(b.getAttribute('data-rej'),'rejected')));
+			tbody.querySelectorAll('[data-manage]').forEach(b=>b.addEventListener('click',()=>openManageStatus(b.getAttribute('data-manage'))));
 			updatePagination();
 		}
 
-		function formatDate(dt){
-			if(!dt) return '—';
-			try{ return new Date(dt).toLocaleDateString(); }catch{ return dt; }
-		}
+		function formatDate(dt){ if(!dt) return '—'; try{ return new Date(dt).toLocaleDateString(); }catch{ return dt; } }
 
 		function applySearch(){
 			const q=document.getElementById('searchInput').value.trim().toLowerCase();
-			if(!q){
-				filtered=[...applications];
-			}else{
-				filtered=applications.filter(a=>{
-					return (a.user?.email||'').toLowerCase().includes(q)
-						|| (a.program?.name||'').toLowerCase().includes(q)
-						|| (a.status||'').toLowerCase().includes(q);
-				});
-			}
-			currentPage=1;
-			renderApplications();
+			if(!q){ filtered=[...applications]; }
+			else { filtered=applications.filter(a=> (a.user?.email||'').toLowerCase().includes(q) || (a.program?.name||'').toLowerCase().includes(q) || (a.status||'').toLowerCase().includes(q)); }
+			currentPage=1; renderApplications();
 		}
 
 		async function loadApplications(){
 			try{
 				const data = await adminApi('/applications?page=1&per_page=100');
-				// Expect list (no pagination metadata)
-				applications = Array.isArray(data)?data:[];
-				filtered=[...applications];
-				fullLoaded = applications.length < 100;
-				currentPage=1;
-				renderApplications();
-				// Optionally fetch full user/program details if not embedded (if missing user or program)
-				await hydrateMissing();
-			}catch(e){
-				document.getElementById('applicationsTableBody').innerHTML=`<tr><td colspan="7" class="px-4 py-6 text-center text-red-600">Failed to load applications: ${e.message||e}</td></tr>`;
-			}
+				applications = Array.isArray(data)?data:[]; filtered=[...applications]; fullLoaded = applications.length < 100; currentPage=1; renderApplications(); await hydrateMissing();
+			}catch(e){ document.getElementById('applicationsTableBody').innerHTML=`<tr><td colspan="7" class="px-4 py-6 text-center text-red-600">Failed to load applications: ${e.message||e}</td></tr>`; }
 		}
 
 		async function hydrateMissing(){
-			// If some items missing program or user fetch individually (best effort)
-			const fetches=[];
-			applications.forEach(a=>{
-				if(!a.program){
-					fetches.push(adminApi(`/programs/${a.program_id}`).then(p=>a.program=p).catch(()=>{}));
-				}
-				if(!a.user){
-					fetches.push(adminApi(`/users/${a.user_id}`).then(u=>a.user=u).catch(()=>{}));
-				}
-			});
-			if(fetches.length){
-				await Promise.all(fetches);
-				renderApplications();
-			}
+			const fetches=[]; applications.forEach(a=>{ if(!a.program){ fetches.push(adminApi(`/programs/${a.program_id}`).then(p=>a.program=p).catch(()=>{})); } if(!a.user){ fetches.push(adminApi(`/users/${a.user_id}`).then(u=>a.user=u).catch(()=>{})); } });
+			if(fetches.length){ await Promise.all(fetches); renderApplications(); }
 		}
 
 		function openDecision(id, action){
-			decisionId = id;
-			decisionAction = action;
-			document.getElementById('decisionTitle').textContent = action === 'ACCEPTED' ? 'Accept Application' : 'Decline Application';
+			decisionId = id; decisionAction = action;
+			document.getElementById('decisionTitle').textContent = action === 'accepted' ? 'Accept Application' : 'Decline Application';
 			document.getElementById('decisionMessage').textContent = `Are you sure you want to mark application #${id} as ${action}?`;
 			document.getElementById('decisionModal').classList.remove('hidden');
 			const btn = document.getElementById('confirmDecision');
-			btn.className = 'px-4 py-2 text-sm rounded-lg text-white ' + (action==='ACCEPTED' ? 'bg-success hover:bg-green-600' : 'bg-danger hover:bg-red-600');
+			btn.className = 'px-4 py-2 text-sm rounded-lg text-white ' + (action==='accepted' ? 'bg-success hover:bg-green-600' : 'bg-danger hover:bg-red-600');
 		}
-		function closeDecision(){
-			decisionId = null;
-			decisionAction = null;
-			document.getElementById('decisionModal').classList.add('hidden');
-		}
+		function closeDecision(){ decisionId = null; decisionAction = null; document.getElementById('decisionModal').classList.add('hidden'); }
 
 		async function applyDecision(){
 			if(!decisionId || !decisionAction) return;
 			try{
-				await adminApi(`/applications/${decisionId}`, {
-					method:'PUT',
-					body: JSON.stringify({ status: decisionAction })
-				});
-				// reflect local
-				const app = applications.find(a=>String(a.id)===String(decisionId));
-				if(app) app.status = decisionAction;
-				closeDecision();
-				renderApplications();
-			}catch(e){
-				alert('Failed to update status: '+(e.message||e));
-			}
+				await adminApi(`/applications/${decisionId}`, { method:'PUT', body: JSON.stringify({ status: decisionAction }) });
+				const app = applications.find(a=>String(a.id)===String(decisionId)); if(app) app.status = decisionAction;
+				closeDecision(); renderApplications();
+			}catch(e){ alert('Failed to update status: '+(e.message||e)); }
 		}
+
+		let manageId = null;
+		function openManageStatus(id){
+			manageId = id; const app = applications.find(a=>String(a.id)===String(id)); const current = app?.status || '';
+			document.getElementById('manageStatusInfo').textContent = `Application #${id} (Current: ${current})`;
+			const select = document.getElementById('newStatusSelect'); if(select){ select.value = current; }
+			document.getElementById('manageStatusModal').classList.remove('hidden');
+		}
+		function closeManageStatus(){ manageId = null; document.getElementById('manageStatusModal').classList.add('hidden'); }
+		async function applyManageStatus(){ if(!manageId) return; const newStatus = document.getElementById('newStatusSelect').value; try { await adminApi(`/applications/${manageId}`, { method:'PUT', body: JSON.stringify({ status: newStatus }) }); const app = applications.find(a=>String(a.id)===String(manageId)); if(app) app.status = newStatus; closeManageStatus(); renderApplications(); } catch(e){ alert('Failed to update: ' + (e.message||e)); } }
 	</script>
 </body>
 </html>
+

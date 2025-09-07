@@ -3,7 +3,6 @@ from sqlalchemy.exc import IntegrityError
 from typing import Optional, List
 from app.models import UserInterest
 from app.schemas import UserInterestCreate
-from app.services.neo4j_user_service import Neo4jUserService
 import logging
 
 logger = logging.getLogger(__name__)
@@ -14,7 +13,6 @@ class UserInterestRepository:
 
     def __init__(self, db: Session):
         self.db = db
-        self.neo4j_service = Neo4jUserService()
 
     def create_interest(
         self, user_id: int, interest_data: UserInterestCreate
@@ -28,13 +26,6 @@ class UserInterestRepository:
             self.db.add(db_interest)
             self.db.commit()
             self.db.refresh(db_interest)
-
-            # Create interest relationship in Neo4j
-            try:
-                self.neo4j_service.create_interest_relationship(user_id, db_interest)
-            except Exception as neo4j_error:
-                logger.warning(f"Failed to create interest in Neo4j: {neo4j_error}")
-                # Don't fail the entire operation if Neo4j fails
 
             logger.info(f"User interest created successfully for user {user_id}")
             return db_interest
@@ -84,27 +75,12 @@ class UserInterestRepository:
             self.db.delete(interest)
             self.db.commit()
 
-            # Delete interest relationship from Neo4j
-            try:
-                self.neo4j_service.delete_interest_relationship(interest_id)
-            except Exception as neo4j_error:
-                logger.warning(f"Failed to delete interest from Neo4j: {neo4j_error}")
-                # Don't fail the entire operation if Neo4j fails
-
             logger.info(f"Interest deleted: {interest_id}")
             return True
         except Exception as e:
             self.db.rollback()
             logger.error(f"Failed to delete interest {interest_id}: {e}")
             raise
-
-    def get_interests_by_user_neo4j(self, user_id: int) -> List[dict]:
-        """Get user interests from Neo4j"""
-        try:
-            return self.neo4j_service.get_user_interests_from_neo4j(user_id)
-        except Exception as e:
-            logger.error(f"Failed to get interests from Neo4j for user {user_id}: {e}")
-            return []
 
     def update_interest(
         self, interest_id: int, interest_data: UserInterestCreate
@@ -121,15 +97,6 @@ class UserInterestRepository:
 
             self.db.commit()
             self.db.refresh(interest)
-
-            # Update Neo4j
-            try:
-                self.neo4j_service.update_interest_relationship(
-                    interest.user_id, interest
-                )
-            except Exception as neo4j_error:
-                logger.warning(f"Failed to update interest in Neo4j: {neo4j_error}")
-                # Don't fail the entire operation if Neo4j fails
 
             logger.info(f"Interest updated successfully: {interest_id}")
             return interest

@@ -564,74 +564,92 @@ async function loadRecommendations() {
                 </div>
             `;
         }
-        
-        // Get current user first
+
+        // Get current user
         const userResponse = await apiCall('/auth/me');
         const userId = userResponse.id;
-        
-        // Get recommendations for this user
-        const response = await apiCall(`/users/${userId}/recommendations`);
-        
+
+        // Fetch new recommendation API (returns object)
+        const apiData = await apiCall(`/users/${userId}/recommendations?limit=50`);
+        const allRecs = (apiData && Array.isArray(apiData.recommendations)) ? apiData.recommendations : [];
+
+        // Normalize score field: backend uses final_score (0-100). Filter out < 50.
+        const processed = allRecs
+            .map(r => ({
+                ...r,
+                final_score: typeof r.final_score === 'number' ? r.final_score : (typeof r.score === 'number' ? r.score : 0)
+            }))
+            .filter(r => r.final_score >= 50)
+            .sort((a,b) => b.final_score - a.final_score);
+
         if (recommendationsDiv) {
-            if (response.length > 0) {
-                const recommendationsHtml = response.map((rec, index) => `
-                    <div class="bg-gradient-to-r from-light-blue to-lighter-blue border border-gray-border rounded-xl p-6 hover:shadow-lg transition-all duration-200 transform hover:scale-[1.02]">
+            if (processed.length > 0) {
+                const metaBadges = apiData?.recommendation_sources ? `
+                    <div class="flex flex-wrap gap-2 justify-center mb-4">
+                        <span class="px-2 py-1 bg-primary bg-opacity-10 text-primary rounded text-xs">Interest: ${apiData.recommendation_sources.interest_based || apiData.recommendation_sources.interest_based_count || 0}</span>
+                        <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">Qualification: ${apiData.recommendation_sources.qualification_based || apiData.recommendation_sources.qualification_based_count || 0}</span>
+                        <span class="px-2 py-1 bg-indigo-100 text-indigo-700 rounded text-xs">Test Score: ${apiData.recommendation_sources.test_score_based || apiData.recommendation_sources.test_score_based_count || 0}</span>
+                        <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">Shown: ${processed.length}</span>
+                    </div>` : '';
+
+                const recommendationsHtml = processed.map((rec, index) => {
+                    const pct = rec.final_score ?? 0;
+                    const badge = pct >= 85 ? '<span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">Top Match</span>' : pct >= 70 ? '<span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">Strong Match</span>' : '<span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">Match</span>';
+                    const reasons = rec.match_reasons || rec.factors || [];
+                    const reasonHtml = reasons.length ? `<ul class="list-disc pl-5 space-y-1 text-gray-600">${reasons.slice(0,5).map(r=>`<li>${r}</li>`).join('')}</ul>` : `<p class="text-gray-600">${rec.reason || 'Based on your profile and preferences.'}</p>`;
+                    return `
+                    <div class="bg-gradient-to-r from-light-blue to-lighter-blue border border-gray-border rounded-xl p-6 hover:shadow-lg transition-all duration-200">
                         <div class="flex items-start justify-between mb-4">
                             <div class="flex items-center space-x-3">
-                                <div class="w-8 h-8 bg-gradient-to-r from-primary to-accent rounded-lg flex items-center justify-center text-white font-bold text-sm">
-                                    ${index + 1}
-                                </div>
+                                <div class="w-8 h-8 bg-gradient-to-r from-primary to-accent rounded-lg flex items-center justify-center text-white font-bold text-sm">${index + 1}</div>
                                 <div>
-                                    <h4 class="text-lg font-semibold text-gray-900">${rec.program_name || 'Unknown Program'}</h4>
-                                    <p class="text-gray-600">${rec.university_name || 'Unknown University'}</p>
+                                    <h4 class="text-lg font-semibold text-gray-900">${rec.program_name || rec.name || 'Unknown Program'}</h4>
+                                    <p class="text-gray-600">${rec.university_name || rec.university || 'Unknown University'}</p>
                                 </div>
                             </div>
                             <div class="text-right">
-                                <div class="text-2xl font-bold text-primary">${rec.score ? rec.score.toFixed(1) : 'N/A'}</div>
-                                <div class="text-sm text-gray-500">Match Score</div>
+                                <div class="text-2xl font-bold text-primary">${pct.toFixed(1)}</div>
+                                <div class="text-sm text-gray-500">Final Score</div>
                             </div>
                         </div>
                         <div class="bg-white rounded-lg p-4">
                             <div class="text-sm font-medium text-gray-700 mb-2">Why this is a good match:</div>
-                            <p class="text-gray-600">${rec.reason || 'Based on your profile and preferences, this program aligns well with your academic goals and interests.'}</p>
+                            ${reasonHtml}
                         </div>
                         <div class="flex justify-between items-center mt-4">
-                            <div class="flex space-x-2">
-                                <span class="px-3 py-1 bg-primary bg-opacity-20 text-primary rounded-full text-sm font-medium">Recommended</span>
-                                ${rec.score > 0.8 ? '<span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">Top Match</span>' : ''}
-                            </div>
-                            <button class="bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors font-medium">
-                                Learn More
-                            </button>
+                            <div class="flex flex-wrap gap-2">${badge}</div>
+                            <button class="bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors font-medium" data-program-id="${rec.program_id || rec.id || ''}">Learn More</button>
                         </div>
-                    </div>
-                `).join('');
-                
+                        <div class="mt-4">
+                            <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                                <div class="h-2 bg-gradient-to-r from-primary to-accent" style="width:${Math.min(100, pct)}%"></div>
+                            </div>
+                        </div>
+                    </div>`;
+                }).join('');
+
                 recommendationsDiv.innerHTML = `
                     <div class="space-y-6">
-                        <div class="text-center mb-6">
+                        <div class="text-center mb-2">
                             <h3 class="text-xl font-semibold text-gray-900 mb-2">Your Personalized Recommendations</h3>
-                            <p class="text-gray-600">Based on your profile, interests, and qualifications</p>
+                            <p class="text-gray-600 mb-2">Filtered to show programs with final score ≥ 50.</p>
+                            ${metaBadges}
                         </div>
-                        <div class="space-y-4">
-                            ${recommendationsHtml}
-                        </div>
-                    </div>
-                `;
+                        <div class="space-y-4">${recommendationsHtml}</div>
+                    </div>`;
             } else {
                 recommendationsDiv.innerHTML = `
                     <div class="text-center py-12">
                         <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
                         </svg>
-                        <h3 class="text-lg font-semibold text-gray-900 mb-2">No Recommendations Yet</h3>
-                        <p class="text-gray-500">Complete your profile with interests and qualifications to get personalized recommendations.</p>
-                    </div>
-                `;
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">No High-Score Recommendations</h3>
+                        <p class="text-gray-500">We didn't find programs with a final score ≥ 50. Add more interests, test scores, or qualifications to improve matches.</p>
+                    </div>`;
             }
         }
-        
-        return response;
+
+        return processed;
     } catch (error) {
         const recommendationsDiv = document.getElementById('recommendationsContent');
         if (recommendationsDiv) {
@@ -641,8 +659,7 @@ async function loadRecommendations() {
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                     <p class="text-red-600">Failed to load recommendations: ${error.message}</p>
-                </div>
-            `;
+                </div>`;
         }
         showError(`Failed to load recommendations: ${error.message}`);
         throw error;
@@ -1259,3 +1276,112 @@ function computeProfileCompletion(user){
         tipsContainer.innerHTML = tips.length? tips.slice(0,3).map(t=>`<div class="flex items-center space-x-2"><div class="w-1.5 h-1.5 bg-accent rounded-full"></div><span>${t}</span></div>`).join('') : '<span class="text-green-600">Profile complete!</span>';
     }
 }
+
+// ---------------- Dynamic Quick Actions -----------------
+async function initQuickActions(){
+    const recBtn = document.getElementById('getRecommendationsBtn');
+    const appsBtn = document.getElementById('viewApplicationsBtn');
+    const searchBtn = document.getElementById('searchProgramsBtn');
+    const content = document.getElementById('quickActionsContent');
+    if(!recBtn || !appsBtn || !content) return; // not on a page with quick actions
+
+    let cached = { recs: [], apps: [] };
+    let state = { open: null };
+
+    async function refreshCounts(){
+        try {
+            const me = await apiCall('/auth/me');
+            const uid = me.id;
+            const recResp = await apiCall(`/users/${uid}/recommendations?limit=30`);
+            const recommendations = Array.isArray(recResp.recommendations)? recResp.recommendations: [];
+            const filtered = recommendations.filter(r=> (r.final_score ?? r.score ?? 0) >= 50);
+            cached.recs = filtered.sort((a,b)=>(b.final_score||b.score||0)-(a.final_score||a.score||0));
+
+            // Attempt to fetch applications (if endpoint exists)
+            let apps = [];
+            try {
+                const appsResp = await apiCall(`/applications?user_id=${uid}`);
+                apps = Array.isArray(appsResp)? appsResp: (appsResp.items||[]);
+            } catch(e){
+                console.warn('[quick-actions] applications fetch failed:', e.message);
+            }
+            cached.apps = apps;
+
+            const recLabel = document.getElementById('recBtnLabel');
+            const appsLabel = document.getElementById('appsBtnLabel');
+            if (recLabel) recLabel.textContent = `Recommendations (${cached.recs.length})`;
+            if (appsLabel) appsLabel.textContent = `View Applications (${cached.apps.length})`;
+            const meta = document.getElementById('quickActionsMeta');
+            if (meta) {
+                meta.classList.remove('hidden');
+                meta.textContent = `${cached.recs.length} recs • ${cached.apps.length} apps`;
+            }
+        } catch(e){
+            console.warn('[quick-actions] refreshCounts failed', e);
+        }
+    }
+
+    function renderList(type){
+        if(!content) return;
+        let html='';
+        if(type==='recs'){
+            if(!cached.recs.length){
+                html = `<div class="text-sm text-gray-500 py-4 text-center">No recommendations ≥ 50 yet. Add interests, test scores or qualifications.</div>`;
+            } else {
+                const items = cached.recs.slice(0,3).map(r=>{
+                    const score = (r.final_score ?? r.score ?? 0).toFixed(1);
+                    return `<div class="flex items-start justify-between p-3 bg-gray-50 rounded-lg mb-2">
+                        <div>
+                            <div class="font-medium text-gray-900 truncate max-w-[180px]">${r.program_name || r.name || 'Program'}</div>
+                            <div class="text-xs text-gray-500">${r.university_name || r.university || ''}</div>
+                        </div>
+                        <div class="text-primary text-sm font-semibold ml-2">${score}</div>
+                    </div>`;
+                }).join('');
+                html = `<div class="mb-3 text-sm font-medium text-gray-700">Top Matches</div>${items}<a href="/program" class="block mt-2 text-xs text-primary hover:underline">See all recommendations →</a>`;
+            }
+        } else if(type==='apps'){
+            if(!cached.apps.length){
+                html = `<div class="text-sm text-gray-500 py-4 text-center">You haven't started any applications yet.</div>`;
+            } else {
+                const items = cached.apps.slice(0,3).map(a=>{
+                    return `<div class="flex items-start justify-between p-3 bg-gray-50 rounded-lg mb-2">
+                        <div>
+                            <div class="font-medium text-gray-900 truncate max-w-[180px]">${a.program_name || a.program?.name || 'Application'}</div>
+                            <div class="text-xs text-gray-500 capitalize">Status: ${a.status || a.application_status || 'pending'}</div>
+                        </div>
+                        <span class="ml-2 text-xs px-2 py-1 rounded bg-light-blue text-primary">${a.status || a.application_status || 'pending'}</span>
+                    </div>`;
+                }).join('');
+                html = `<div class="mb-3 text-sm font-medium text-gray-700">Recent Applications</div>${items}<a href="/application" class="block mt-2 text-xs text-primary hover:underline">Manage applications →</a>`;
+            }
+        }
+        content.innerHTML = html;
+        content.classList.remove('hidden');
+    }
+
+    function toggle(type){
+        if(state.open === type){
+            // close
+            state.open = null;
+            content.classList.add('hidden');
+            content.innerHTML='';
+            return;
+        }
+        state.open = type;
+        renderList(type);
+    }
+
+    recBtn.addEventListener('click', ()=> toggle('recs'));
+    appsBtn.addEventListener('click', ()=> toggle('apps'));
+    if(searchBtn){
+        searchBtn.addEventListener('click', ()=>{ window.location.href='/program'; });
+    }
+
+    await refreshCounts();
+}
+
+// Initialize quick actions after DOM + layout
+window.addEventListener('DOMContentLoaded', ()=>{
+    setTimeout(()=>{ initQuickActions(); }, 600); // slight delay to allow layout & token
+});

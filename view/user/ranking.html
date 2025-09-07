@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<title>Top Ranked Programs | UniRecommend</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script>
+		tailwind.config = { theme: { extend: { colors: { primary: '#3B82F6', accent: '#F59E0B', 'light-blue':'#EFF6FF','lighter-blue':'#DBEAFE','gray-border':'#E5E7EB'} } } }
+	</script>
+	<link rel="stylesheet" href="/css/style.css" />
+	<script>
+		window.__LAYOUT_PATHS__ = [
+			'user/partials/layout.html',
+			'view/user/partials/layout.html',
+			'/view/user/partials/layout.html'
+		];
+	</script>
+	<script defer src="/js/index.js"></script>
+</head>
+<body class="bg-white text-gray-800 min-h-screen flex flex-col">
+	<div id="navbarContainer"></div>
+
+	<main class="flex-1">
+		<section class="relative overflow-hidden border-b border-gray-border bg-gradient-to-br from-light-blue via-white to-lighter-blue">
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+				<h1 class="text-3xl sm:text-4xl font-bold mb-4">Top Ranked University Programs</h1>
+				<p class="text-gray-600 max-w-2xl text-sm sm:text-base">Explore programs offered by the highest globally ranked universities. Adjust the controls to refine how many universities are included and how many programs per university you see.</p>
+				<div class="mt-8 grid gap-4 md:grid-cols-4">
+					<div class="md:col-span-1">
+						<label class="block text-xs font-medium text-gray-500 mb-1">Top Universities</label>
+						<input id="topUniversities" type="number" min="1" max="100" value="10" class="w-full border border-gray-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary" />
+					</div>
+					<div class="md:col-span-1">
+						<label class="block text-xs font-medium text-gray-500 mb-1">Programs / University</label>
+						<input id="perUniversity" type="number" min="1" max="50" value="5" class="w-full border border-gray-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary" />
+					</div>
+					<div class="md:col-span-1">
+						<label class="block text-xs font-medium text-gray-500 mb-1">Field Filter (contains)</label>
+						<input id="fieldFilter" type="text" placeholder="e.g. Computer" class="w-full border border-gray-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary" />
+					</div>
+					<div class="md:col-span-1 flex items-end gap-2">
+						<button id="loadBtn" class="flex-1 bg-primary hover:bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg shadow transition">Load</button>
+						<button id="resetBtn" class="text-sm px-4 py-2 rounded-lg border border-gray-border hover:bg-gray-50">Reset</button>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section class="py-12">
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+				<div id="statusBar" class="text-xs text-gray-600 mb-4"></div>
+				<div id="loadingState" class="py-12 text-center hidden">
+					<div class="inline-flex items-center px-4 py-2 text-sm text-gray-600">
+						<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+							<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+							<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+						</svg>
+						Loading top ranked programs...
+					</div>
+				</div>
+				<div id="errorState" class="hidden py-12 text-center">
+					<p class="text-sm text-red-600 mb-4">Failed to load programs. Please try again.</p>
+					<button id="retryBtn" class="px-4 py-2 text-sm font-medium rounded-lg border border-primary text-primary hover:bg-primary hover:text-white transition">Retry</button>
+				</div>
+				<div id="emptyState" class="hidden py-12 text-center text-gray-600 text-sm">No programs match your filters.</div>
+				<div id="programsGrid" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"></div>
+			</div>
+		</section>
+	</main>
+
+	<div id="footerContainer"></div>
+
+	<script>
+		document.addEventListener('DOMContentLoaded', () => {
+			// Wait for layout + index.js
+			setTimeout(() => initRankingPage(), 120);
+		});
+
+		async function fetchTopPrograms(topUniversities, perUniversity) {
+			const url = `/api/v1/programs/top-ranked?top_universities=${encodeURIComponent(topUniversities)}&per_university=${encodeURIComponent(perUniversity)}`;
+			const res = await fetch(url, { headers: { 'Accept':'application/json' }});
+			if(!res.ok) throw new Error('HTTP ' + res.status);
+			return res.json();
+		}
+
+		function renderPrograms(list, fieldFilter) {
+			const grid = document.getElementById('programsGrid');
+			const empty = document.getElementById('emptyState');
+			grid.innerHTML='';
+			let filtered = list;
+			if(fieldFilter) {
+				const ff = fieldFilter.toLowerCase();
+				filtered = list.filter(p => (p.field_of_study||'').toLowerCase().includes(ff));
+			}
+			if(filtered.length === 0) {
+				empty.classList.remove('hidden');
+				return;
+			} else empty.classList.add('hidden');
+
+			filtered.forEach(p => {
+				const card = document.createElement('div');
+				card.className = 'group bg-white border border-gray-border rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition flex flex-col';
+				const ranking = p.university_ranking_world ?? '—';
+				card.innerHTML = `
+					<div class="h-28 bg-gradient-to-br from-primary/15 to-accent/15 flex items-center justify-between px-4">
+						<div class="flex flex-col">
+							<span class="text-xs text-gray-500">World Rank</span>
+							<span class="text-lg font-semibold text-primary">${ranking}</span>
+						</div>
+						<span class="text-xs px-2 py-1 rounded-full bg-white/80 text-gray-700 capitalize">${p.degree_level || ''}</span>
+					</div>
+					<div class="p-4 flex-1 flex flex-col">
+						<h3 class="font-semibold text-gray-900 mb-1 line-clamp-2">${p.program_name}</h3>
+						<p class="text-xs text-gray-500 mb-2">${p.university_name}</p>
+						<p class="text-xs text-gray-600 mb-3 line-clamp-2">${p.field_of_study || ''}</p>
+						${p.tuition_fee ? `<p class='text-xs text-gray-500 mb-2'>Tuition: ${p.currency} ${p.tuition_fee.toLocaleString()}</p>` : ''}
+						<div class="mt-auto flex gap-2">
+							<button class="flex-1 text-xs font-medium px-3 py-2 rounded-lg border border-primary text-primary hover:bg-blue-50 transition" onclick="viewProgram(${p.program_id})">Details</button>
+							<button class="flex-1 text-xs font-medium px-3 py-2 rounded-lg bg-primary text-white hover:bg-blue-600 transition" onclick="applyProgram(${p.program_id})">Apply</button>
+						</div>
+					</div>`;
+				grid.appendChild(card);
+			});
+		}
+
+		function setStatus(msg) {
+			const el = document.getElementById('statusBar');
+			if(el) el.textContent = msg;
+		}
+
+		function toggleLoading(show) {
+			document.getElementById('loadingState').classList.toggle('hidden', !show);
+		}
+
+		async function loadData() {
+			const topUniversities = document.getElementById('topUniversities').value || 10;
+			const perUniversity = document.getElementById('perUniversity').value || 5;
+			const fieldFilter = document.getElementById('fieldFilter').value.trim();
+			const grid = document.getElementById('programsGrid');
+			const errorState = document.getElementById('errorState');
+			const emptyState = document.getElementById('emptyState');
+			errorState.classList.add('hidden');
+			emptyState.classList.add('hidden');
+			grid.innerHTML='';
+			toggleLoading(true);
+			setStatus('Fetching data...');
+			try {
+				const data = await fetchTopPrograms(topUniversities, perUniversity);
+				setStatus(`Showing programs from top ${data.top_universities} universities (max ${data.per_university} each) • Total programs: ${data.total_programs}`);
+				renderPrograms(data.programs, fieldFilter);
+			} catch (e) {
+				console.error(e);
+				errorState.classList.remove('hidden');
+				setStatus('Failed to load data.');
+			} finally {
+				toggleLoading(false);
+			}
+		}
+
+		function initRankingPage() {
+			document.getElementById('loadBtn').addEventListener('click', loadData);
+			document.getElementById('resetBtn').addEventListener('click', () => {
+				document.getElementById('topUniversities').value = 10;
+				document.getElementById('perUniversity').value = 5;
+				document.getElementById('fieldFilter').value = '';
+				loadData();
+			});
+			document.getElementById('retryBtn').addEventListener('click', loadData);
+			loadData();
+		}
+
+		// simple navigation helpers
+		window.viewProgram = (id) => window.location.href = `/program-detail?id=${id}`;
+		window.applyProgram = (id) => window.location.href = `/application?program_id=${id}`;
+	</script>
+</body>
+</html>

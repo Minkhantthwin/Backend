@@ -100,7 +100,8 @@ class AuthenticationService:
             user_id_str: str = payload.get("sub")
             email: str = payload.get("email")
 
-            if user_id_str is None or email is None:
+            if user_id_str is None:
+                logger.warning("Token missing 'sub' field")
                 return None
 
             # Convert string back to integer
@@ -124,6 +125,7 @@ class AuthenticationService:
         try:
             token_data = self.verify_token(token)
             if token_data is None:
+                logger.warning("Token verification failed")
                 return None
 
             # Get user from database
@@ -132,6 +134,7 @@ class AuthenticationService:
                 logger.warning(f"User not found for token: {token_data.user_id}")
                 return None
 
+            logger.debug(f"Successfully authenticated user: {user.email}")
             return user
 
         except Exception as e:

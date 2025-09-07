@@ -179,6 +179,15 @@ def _add_frontend_routes(app: FastAPI, static_dir: str) -> None:
         logger.error(f"Contact file not found: {contact_file}")
         return {"error": "Contact page not found"}
 
+    @app.get("/rankings")
+    async def rankings_page():
+        """Serve the rankings (top ranked programs) page."""
+        ranking_file = os.path.join(static_dir, "user", "ranking.html")
+        if os.path.exists(ranking_file):
+            return FileResponse(ranking_file)
+        logger.error(f"Ranking file not found: {ranking_file}")
+        return {"error": "Rankings page not found"}
+
     @app.get("/program-detail")
     async def program_detail_page():
         """Serve the program detail page."""
@@ -187,6 +196,15 @@ def _add_frontend_routes(app: FastAPI, static_dir: str) -> None:
             return FileResponse(program_detail_file)
         logger.error(f"Program detail file not found: {program_detail_file}")
         return {"error": "Program detail page not found"}
+
+    @app.get("/application")
+    async def application_page():
+        """Serve the application form page."""
+        application_file = os.path.join(static_dir, "user", "application.html")
+        if os.path.exists(application_file):
+            return FileResponse(application_file)
+        logger.error(f"Application file not found: {application_file}")
+        return {"error": "Application page not found"}
     
     # Add .html extensions as well for direct access
     @app.get("/login.html")
@@ -217,9 +235,17 @@ def _add_frontend_routes(app: FastAPI, static_dir: str) -> None:
     async def contact_html():
         return await contact_page()
 
+    @app.get("/rankings.html")
+    async def rankings_html():
+        return await rankings_page()
+
     @app.get("/program-detail.html")
     async def program_detail_html():
         return await program_detail_page()
+
+    @app.get("/application.html")
+    async def application_html():
+        return await application_page()
 
     # Admin specific pages
     @app.get("/admin/login")
