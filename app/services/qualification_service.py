@@ -94,6 +94,8 @@ class QualificationService:
                 is_qualified,
                 qualification_score,
                 missing_requirements,
+                met_requirements,
+                total_requirements,
             )
 
             return {
@@ -325,8 +327,10 @@ class QualificationService:
         is_qualified: bool,
         qualification_score: float,
         missing_requirements: List[Dict],
+        requirements_met: int = 0,
+        total_requirements: int = 0,
     ):
-        """Save or update qualification status"""
+        """Save or update qualification status in MySQL"""
         try:
             # Check if status already exists
             existing_status = (
@@ -338,11 +342,13 @@ class QualificationService:
                 .first()
             )
 
+            checked_at = datetime.utcnow()
+
             if existing_status:
                 existing_status.is_qualified = is_qualified
                 existing_status.qualification_score = qualification_score
                 existing_status.missing_requirements = missing_requirements
-                existing_status.last_checked = datetime.utcnow()
+                existing_status.last_checked = checked_at
             else:
                 status = UserQualificationStatus(
                     user_id=user_id,
@@ -350,11 +356,14 @@ class QualificationService:
                     is_qualified=is_qualified,
                     qualification_score=qualification_score,
                     missing_requirements=missing_requirements,
-                    last_checked=datetime.utcnow(),
+                    last_checked=checked_at,
                 )
                 self.db.add(status)
 
             self.db.commit()
+            logger.debug(
+                f"Successfully updated qualification status for user {user_id}, program {program_id}"
+            )
 
         except Exception as e:
             self.db.rollback()
@@ -411,19 +420,79 @@ class QualificationService:
             programs = self.db.query(Program).filter(Program.is_active == True).all()
 
             results = []
+            total_programs = len(programs)
+
+            logger.info(
+                f"Checking user {user_id} against {total_programs} active programs"
+            )
 
             for program in programs:
                 try:
                     result = self.check_user_qualification(user_id, program.id)
                     results.append(result)
+                    logger.debug(
+                        f"Updated qualification status for user {user_id}, program {program.id}"
+                    )
                 except Exception as e:
                     logger.error(
                         f"Error checking program {program.id} for user {user_id}: {e}"
                     )
                     continue
 
+            logger.info(
+                f"Completed qualification check for user {user_id}: {len(results)} programs checked"
+            )
             return results
 
         except Exception as e:
             logger.error(f"Error checking user {user_id} against all programs: {e}")
             raise
+
+    def get_program_recommendations_by_qualification(
+        self, user_id: int, limit: int = 10
+    ) -> List[Dict]:
+        """Get program recommendations based on qualification status"""
+        try:
+            # Get qualified and highly matched programs
+            statuses = (
+                self.db.query(UserQualificationStatus)
+                .join(Program)
+                .join(Program.university)
+                .filter(UserQualificationStatus.user_id == user_id)
+                .filter(
+                    (UserQualificationStatus.is_qualified == True)
+                    | (UserQualificationStatus.qualification_score >= 75)
+                )
+                .order_by(UserQualificationStatus.qualification_score.desc())
+                .limit(limit)
+                .all()
+            )
+
+            recommendations = []
+            for status in statuses:
+                program = status.program
+                recommendations.append(
+                    {
+                        "program_id": status.program_id,
+                        "program_name": program.name,
+                        "university_name": (
+                            program.university.name if program.university else None
+                        ),
+                        "field_of_study": program.field_of_study,
+                        "degree_level": program.degree_level.value,
+                        "qualification_score": float(status.qualification_score),
+                        "is_qualified": status.is_qualified,
+                        "recommendation_reason": (
+                            "You meet all requirements"
+                            if status.is_qualified
+                            else f"High qualification match ({status.qualification_score}%)"
+                        ),
+                        "checked_at": status.last_checked,
+                    }
+                )
+
+            return recommendations
+
+        except Exception as e:
+            logger.error(f"Error getting program recommendations by qualification: {e}")
+            return []

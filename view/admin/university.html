@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8"/>
+	<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+	<title>Admin - University Management</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script>
+		tailwind.config = { theme:{ extend:{ colors:{ primary:'#3B82F6', accent:'#F59E0B', danger:'#DC2626', success:'#059669', grayBorder:'#E5E7EB' }}}}
+	</script>
+	<link rel="stylesheet" href="../css/style.css"/>
+</head>
+<body class="min-h-screen bg-gray-50">
+	<div id="navbarMount"></div>
+
+	<main class="max-w-7xl mx-auto px-4 py-8 space-y-8">
+		<section class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+			<div>
+				<h2 class="text-2xl font-semibold text-gray-800">Universities</h2>
+				<p class="text-sm text-gray-600">Manage universities (create, edit, remove)</p>
+			</div>
+			<div class="flex flex-col sm:flex-row gap-3">
+				<div class="flex items-center bg-white rounded-lg border border-grayBorder px-3">
+					<svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-4.35-4.35M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16z"/></svg>
+					<input id="searchUniversity" type="text" placeholder="Search name" class="px-2 py-2 outline-none text-sm w-56">
+				</div>
+				<button id="searchBtn" class="bg-primary text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-600">Search</button>
+				<button id="clearSearchBtn" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-300">Clear</button>
+				<button id="newUniversityBtn" class="bg-accent text-white px-4 py-2 rounded-lg text-sm hover:bg-yellow-600">New University</button>
+			</div>
+		</section>
+
+		<section class="bg-white border border-grayBorder rounded-xl shadow-sm overflow-hidden">
+			<div class="overflow-x-auto">
+				<table class="min-w-full text-left text-sm">
+					<thead class="bg-gray-100 text-gray-700">
+						<tr>
+							<th class="px-4 py-3 font-medium">ID</th>
+							<th class="px-4 py-3 font-medium">Name</th>
+							<th class="px-4 py-3 font-medium">Region</th>
+							<th class="px-4 py-3 font-medium">City</th>
+							<th class="px-4 py-3 font-medium">Type</th>
+							<th class="px-4 py-3 font-medium">World Rank</th>
+							<th class="px-4 py-3 font-medium text-right">Actions</th>
+						</tr>
+					</thead>
+					<tbody id="universitiesTableBody">
+						<tr><td colspan="7" class="px-4 py-6 text-center text-gray-500">Loading universities...</td></tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="flex items-center justify-between p-4 border-t border-gray-100">
+				<div class="text-xs text-gray-500" id="uniInfo">--</div>
+				<div class="flex gap-2">
+					<button id="prevPage" class="px-3 py-1.5 text-sm bg-gray-100 rounded disabled:opacity-40">Prev</button>
+					<span id="currentPage" class="text-sm font-medium text-gray-700">1</span>
+					<button id="nextPage" class="px-3 py-1.5 text-sm bg-gray-100 rounded disabled:opacity-40">Next</button>
+				</div>
+			</div>
+		</section>
+
+		<section class="text-xs text-gray-500">
+			Note: Editing rankings or region may impact recommendation logic. Pagination size: 20.
+		</section>
+	</main>
+
+	<div id="footerMount"></div>
+
+	<!-- Create/Edit Modal -->
+	<div id="universityModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+		<div class="bg-white rounded-xl p-6 w-full max-w-xl space-y-5 max-h-[90vh] overflow-y-auto">
+			<h3 id="universityModalTitle" class="text-lg font-semibold text-gray-800">New University</h3>
+			<div class="grid md:grid-cols-2 gap-4">
+				<div class="md:col-span-2">
+					<label class="block text-xs font-medium text-gray-600 mb-1">Name *</label>
+					<input id="uniName" type="text" class="w-full px-3 py-2 border border-grayBorder rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sm"/>
+				</div>
+				<div>
+					<label class="block text-xs font-medium text-gray-600 mb-1">Region *</label>
+					<select id="uniRegion" class="w-full px-3 py-2 border border-grayBorder rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sm"></select>
+				</div>
+				<div>
+					<label class="block text-xs font-medium text-gray-600 mb-1">City</label>
+					<input id="uniCity" type="text" class="w-full px-3 py-2 border border-grayBorder rounded-lg text-sm"/>
+				</div>
+				<div>
+					<label class="block text-xs font-medium text-gray-600 mb-1">Type</label>
+					<input id="uniType" type="text" placeholder="public/private" class="w-full px-3 py-2 border border-grayBorder rounded-lg text-sm"/>
+				</div>
+				<div>
+					<label class="block text-xs font-medium text-gray-600 mb-1">Established Year</label>
+					<input id="uniYear" type="number" min="1000" max="2100" class="w-full px-3 py-2 border border-grayBorder rounded-lg text-sm"/>
+				</div>
+				<div>
+					<label class="block text-xs font-medium text-gray-600 mb-1">World Rank</label>
+					<input id="uniRankWorld" type="number" min="1" class="w-full px-3 py-2 border border-grayBorder rounded-lg text-sm"/>
+				</div>
+				<div>
+					<label class="block text-xs font-medium text-gray-600 mb-1">National Rank</label>
+					<input id="uniRankNat" type="number" min="1" class="w-full px-3 py-2 border border-grayBorder rounded-lg text-sm"/>
+				</div>
+				<div class="md:col-span-2">
+					<label class="block text-xs font-medium text-gray-600 mb-1">Website</label>
+					<input id="uniWebsite" type="url" class="w-full px-3 py-2 border border-grayBorder rounded-lg text-sm" placeholder="https://..."/>
+				</div>
+				<div class="md:col-span-2">
+					<label class="block text-xs font-medium text-gray-600 mb-1">Description</label>
+					<textarea id="uniDesc" rows="3" class="w-full px-3 py-2 border border-grayBorder rounded-lg text-sm resize-y"></textarea>
+				</div>
+			</div>
+			<p id="uniModalError" class="hidden text-xs text-danger"></p>
+			<div class="flex justify-end gap-3">
+				<button id="cancelUniversityBtn" class="px-4 py-2 text-sm bg-gray-100 rounded-lg hover:bg-gray-200">Cancel</button>
+				<button id="saveUniversityBtn" class="px-4 py-2 text-sm bg-primary text-white rounded-lg hover:bg-blue-600">Save</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- Delete Confirm Modal -->
+	<div id="deleteUniversityModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+		<div class="bg-white rounded-xl p-6 w-full max-w-sm space-y-4">
+			<h3 class="text-lg font-semibold text-gray-800">Delete University</h3>
+			<p class="text-sm text-gray-600">Are you sure you want to delete <span id="deleteUniversityName" class="font-medium text-gray-800"></span>? This action cannot be undone.</p>
+			<div class="flex justify-end gap-3 pt-2">
+				<button id="cancelDeleteUniversity" class="px-4 py-2 text-sm bg-gray-100 rounded-lg hover:bg-gray-200">Cancel</button>
+				<button id="confirmDeleteUniversity" class="px-4 py-2 text-sm bg-danger text-white rounded-lg hover:bg-red-600">Delete</button>
+			</div>
+		</div>
+	</div>
+
+	<script src="../js/admin.js"></script>
+	<script>
+		// Initialize page when DOM is loaded
+		document.addEventListener('DOMContentLoaded', async () => {
+			// Use admin.js layout injection and admin authentication
+			await injectAdminLayout('universities');
+			
+			// Initialize page-specific functionality
+			initUniversityPage();
+		});
+
+		// Page-specific initialization
+		async function initUniversityPage(){
+			// Ensure admin authentication before loading data
+			const me = await adminRequireAuth();
+			if (me) {
+				loadRegions().then(loadUniversities);
+			}
+			
+			// Bind event listeners
+			document.getElementById('searchBtn').addEventListener('click', performSearch);
+			document.getElementById('clearSearchBtn').addEventListener('click', ()=>{
+				loadUniversities();
+			});
+			document.getElementById('searchUniversity').addEventListener('keydown', e=>{
+				if(e.key==='Enter'){ e.preventDefault(); performSearch(); }
+			});
+			document.getElementById('newUniversityBtn').addEventListener('click', openCreate);
+			document.getElementById('cancelUniversityBtn').addEventListener('click', closeUniversityModal);
+			document.getElementById('saveUniversityBtn').addEventListener('click', saveUniversity);
+			document.getElementById('cancelDeleteUniversity').addEventListener('click', closeDeleteModal);
+			document.getElementById('confirmDeleteUniversity').addEventListener('click', deleteUniversity);
+			document.getElementById('prevPage').addEventListener('click', ()=>{ if(currentPage>1){ currentPage--; renderUniversities(); }});
+			document.getElementById('nextPage').addEventListener('click', ()=>{ if(currentPage*pageSize<universities.length){ currentPage++; renderUniversities(); }});
+		}
+
+		// State
+		let universities = [];
+		let regions = [];
+		let currentPage = 1;
+		const pageSize = 20;
+		const MAX_FETCH_PER_PAGE = 100; // backend limit (le=100)
+		let editingUniversityId = null;
+		let deletingUniversityId = null;
+		let fullLoaded = false;
+
+		function paginate(list){
+			const start=(currentPage-1)*pageSize;
+			return list.slice(start,start+pageSize);
+		}
+
+		function updatePaginationInfo(){
+			const total = universities.length;
+			const totalPages = Math.max(1, Math.ceil(total / pageSize));
+			if(currentPage>totalPages){ currentPage=totalPages; }
+			document.getElementById('currentPage').textContent = currentPage;
+			document.getElementById('prevPage').disabled = currentPage<=1;
+			document.getElementById('nextPage').disabled = currentPage>=totalPages;
+			const info = total ? `Showing ${(currentPage-1)*pageSize+1}-${Math.min(currentPage*pageSize,total)} of ${total}${fullLoaded? '' : ' (partial list)'}` : 'No universities';
+			document.getElementById('uniInfo').textContent = info;
+		}
+
+		function regionName(id){
+			const r = regions.find(x=>x.id===id); return r ? r.name : '—';
+		}
+
+		function renderUniversities(){
+			const tbody = document.getElementById('universitiesTableBody');
+			if(!universities.length){
+				tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-6 text-center text-gray-500">No universities found</td></tr>';
+				updatePaginationInfo();
+				return;
+			}
+			const slice = paginate(universities);
+			tbody.innerHTML = '';
+			slice.forEach(u=>{
+				const tr=document.createElement('tr');
+				tr.className='border-t border-gray-100 hover:bg-gray-50';
+				tr.innerHTML = `
+					<td class="px-4 py-3 text-gray-700">${u.id}</td>
+					<td class="px-4 py-3 text-gray-800">${u.name}</td>
+					<td class="px-4 py-3 text-gray-700">${regionName(u.region_id)}</td>
+					<td class="px-4 py-3 text-gray-700">${u.city||'—'}</td>
+					<td class="px-4 py-3 text-gray-700">${u.type||'—'}</td>
+					<td class="px-4 py-3 text-gray-700">${u.ranking_world||'—'}</td>
+					<td class="px-4 py-3 text-right space-x-3">
+						<button data-edit="${u.id}" class="text-primary hover:underline text-sm">Edit</button>
+						<button data-del="${u.id}" class="text-danger hover:underline text-sm">Delete</button>
+					</td>`;
+				tbody.appendChild(tr);
+			});
+			tbody.querySelectorAll('[data-edit]').forEach(btn=>{
+				btn.addEventListener('click', ()=>openEdit(btn.getAttribute('data-edit')));
+			});
+			tbody.querySelectorAll('[data-del]').forEach(btn=>{
+				btn.addEventListener('click', ()=>openDelete(btn.getAttribute('data-del')));
+			});
+			updatePaginationInfo();
+		}
+
+		async function loadRegions(){
+			try{
+				const data = await adminApi('/regions?page=1&per_page=100');
+				regions = data;
+				const sel = document.getElementById('uniRegion');
+				sel.innerHTML = '<option value="">Select region</option>' + regions.map(r=>`<option value="${r.id}">${r.name}</option>`).join('');
+			}catch(e){
+				console.warn('Failed to load regions', e);
+			}
+		}
+
+		async function loadUniversities(){
+			try{
+				const data = await adminApi(`/universities?page=1&per_page=${MAX_FETCH_PER_PAGE}`);
+				// If API returns paginated shape, adapt
+				if(Array.isArray(data)){
+					universities = data;
+					fullLoaded = universities.length < MAX_FETCH_PER_PAGE;
+				}else if(data.universities){
+					universities = data.universities;
+					fullLoaded = data.universities.length < (data.per_page || MAX_FETCH_PER_PAGE);
+				}else{
+					universities = [];
+				}
+				currentPage=1;
+				renderUniversities();
+			}catch(e){
+				const msg = extractError(e, 'Failed to load universities');
+				document.getElementById('universitiesTableBody').innerHTML =
+					`<tr><td colspan="7" class="px-4 py-6 text-center text-red-600">${msg}</td></tr>`;
+			}
+		}
+
+		async function performSearch(){
+			const q = document.getElementById('searchUniversity').value.trim();
+			if(!q){
+				await loadUniversities();
+				return;
+			}
+			document.getElementById('universitiesTableBody').innerHTML =
+				'<tr><td colspan="7" class="px-4 py-6 text-center text-gray-500">Searching...</td></tr>';
+			try{
+				let res;
+				try{
+					res = await adminApi(`/universities/search?name=${encodeURIComponent(q)}`);
+					if(!Array.isArray(res)) res = res.universities || [];
+				}catch{
+					res = universities.filter(u=>u.name.toLowerCase().includes(q.toLowerCase()));
+				}
+				universities = res;
+				currentPage=1; fullLoaded=true;
+				renderUniversities();
+			}catch(e){
+				const msg = extractError(e, 'Search failed');
+				document.getElementById('universitiesTableBody').innerHTML =
+					`<tr><td colspan="7" class="px-4 py-6 text-center text-red-600">${msg}</td></tr>`;
+			}
+		}
+
+		function extractError(err, prefix){
+			if(!err) return prefix;
+			if(typeof err === 'string') return `${prefix}: ${err}`;
+			if(err.message && typeof err.message === 'string' && err.message !== '[object Object]') return `${prefix}: ${err.message}`;
+			// If apiCall returns structured error
+			if(err.detail) {
+				if(Array.isArray(err.detail)){
+					// FastAPI validation error array
+					return `${prefix}: ${err.detail.map(d=>d.msg || JSON.stringify(d)).join('; ')}`;
+				}
+				if(typeof err.detail === 'string') return `${prefix}: ${err.detail}`;
+			}
+			try { return `${prefix}: ${JSON.stringify(err)}`; } catch { return prefix; }
+		}
+
+		function openCreate(){
+			editingUniversityId = null;
+			document.getElementById('universityModalTitle').textContent = 'New University';
+			clearUniversityForm();
+			showUniversityModal();
+		}
+		function openEdit(id){
+			const u = universities.find(x=>String(x.id)===String(id));
+			if(!u) return;
+			editingUniversityId = u.id;
+			document.getElementById('universityModalTitle').textContent = 'Edit University';
+			document.getElementById('uniName').value = u.name || '';
+			document.getElementById('uniRegion').value = u.region_id || '';
+			document.getElementById('uniCity').value = u.city || '';
+			document.getElementById('uniType').value = u.type || '';
+			document.getElementById('uniYear').value = u.established_year || '';
+			document.getElementById('uniRankWorld').value = u.ranking_world || '';
+			document.getElementById('uniRankNat').value = u.ranking_national || '';
+			document.getElementById('uniWebsite').value = u.website || '';
+			document.getElementById('uniDesc').value = u.description || '';
+			document.getElementById('uniModalError').classList.add('hidden');
+			showUniversityModal();
+		}
+		function clearUniversityForm(){
+			['uniName','uniRegion','uniCity','uniType','uniYear','uniRankWorld','uniRankNat','uniWebsite','uniDesc'].forEach(id=>{
+				const el=document.getElementById(id);
+				if(el.tagName==='SELECT') el.value='';
+				else el.value='';
+			});
+			document.getElementById('uniModalError').classList.add('hidden');
+		}
+		function showUniversityModal(){ document.getElementById('universityModal').classList.remove('hidden'); }
+		function closeUniversityModal(){ document.getElementById('universityModal').classList.add('hidden'); }
+		function openDelete(id){
+			const u=universities.find(x=>String(x.id)===String(id));
+			if(!u) return;
+			deletingUniversityId = u.id;
+			document.getElementById('deleteUniversityName').textContent = u.name;
+			document.getElementById('deleteUniversityModal').classList.remove('hidden');
+		}
+		function closeDeleteModal(){
+			deletingUniversityId=null;
+			document.getElementById('deleteUniversityModal').classList.add('hidden');
+		}
+
+		async function saveUniversity(){
+			const name = document.getElementById('uniName').value.trim();
+			const region_id = document.getElementById('uniRegion').value;
+			const city = document.getElementById('uniCity').value.trim() || null;
+			const type = document.getElementById('uniType').value.trim() || null;
+			const established_year = document.getElementById('uniYear').value ? parseInt(document.getElementById('uniYear').value) : null;
+			const ranking_world = document.getElementById('uniRankWorld').value ? parseInt(document.getElementById('uniRankWorld').value) : null;
+			const ranking_national = document.getElementById('uniRankNat').value ? parseInt(document.getElementById('uniRankNat').value) : null;
+			const website = document.getElementById('uniWebsite').value.trim() || null;
+			const description = document.getElementById('uniDesc').value.trim() || null;
+			const errEl = document.getElementById('uniModalError');
+
+			if(!name || !region_id){
+				errEl.textContent = 'Name and Region are required';
+				errEl.classList.remove('hidden');
+				return;
+			}
+			errEl.classList.add('hidden');
+
+			const payload = { name, region_id: parseInt(region_id), city, type, established_year, ranking_world, ranking_national, website, description };
+
+			try{
+				if(editingUniversityId){
+					await adminApi(`/universities/${editingUniversityId}`, { method:'PUT', body: JSON.stringify(payload) });
+				}else{
+					await adminApi('/universities', { method:'POST', body: JSON.stringify(payload) });
+				}
+				closeUniversityModal();
+				await loadUniversities();
+			}catch(e){
+				errEl.textContent = e.message || 'Save failed';
+				errEl.classList.remove('hidden');
+			}
+		}
+
+		async function deleteUniversity(){
+			if(!deletingUniversityId) return;
+			try{
+				await adminApi(`/universities/${deletingUniversityId}`, { method:'DELETE' });
+				closeDeleteModal();
+				await loadUniversities();
+			}catch(e){
+				alert('Delete failed: ' + e.message);
+			}
+		}
+	</script>
+</body>
+</html>

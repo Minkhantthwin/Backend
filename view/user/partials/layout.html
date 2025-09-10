@@ -1,0 +1,279 @@
+<nav data-role="main-nav" class="border-b border-gray-border bg-white/90 backdrop-blur sticky top-0 z-40">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-accent flex items-center justify-center text-white font-bold text-lg">UR</div>
+      <a href="/home" class="font-semibold text-lg">UniRecommend</a>
+    </div>
+    <nav class="hidden md:flex items-center gap-8 text-sm font-medium">
+      <a href="/home" class="text-primary">Home</a>
+      <a href="/universities" class="hover:text-primary transition">Universities</a>
+      <a href="/programs" class="hover:text-primary transition">Programs</a>
+      <a href="/rankings" class="hover:text-primary transition">Rankings</a>
+      <a href="/contact" class="hover:text-primary transition">Contact</a>
+    </nav>
+    
+    <!-- Authentication-aware navigation -->
+    <div id="auth-section" class="hidden md:flex items-center gap-3">
+      <!-- Unauthenticated state -->
+      <div id="unauthenticated-nav" class="flex items-center gap-3">
+        <a href="/login" class="px-4 py-2 rounded-lg border border-gray-border text-sm font-medium hover:bg-light-blue transition">Login</a>
+        <a href="/register" class="px-4 py-2 rounded-lg bg-gradient-to-r from-primary to-blue-600 text-white text-sm font-medium shadow hover:opacity-90 transition">Sign Up</a>
+      </div>
+      
+      <!-- Authenticated state (simplified: Profile + Logout) -->
+      <div id="authenticated-nav" class="hidden flex items-center gap-3">
+        <a href="/my-applications" class="px-4 py-2 rounded-lg border border-gray-border text-sm font-medium hover:bg-light-blue transition">My Applications</a>
+        <a href="/profile" class="px-4 py-2 rounded-lg border border-gray-border text-sm font-medium hover:bg-light-blue transition">Profile</a>
+        <button id="logout-btn" class="px-4 py-2 rounded-lg border border-red-200 text-sm font-medium text-red-600 hover:bg-red-50 transition">Logout</button>
+      </div>
+    </div>
+    
+    <button id="mobileMenuBtn" class="md:hidden p-2 rounded-lg border border-gray-border text-gray-600 hover:bg-gray-50">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+  </div>
+  
+  <!-- Mobile menu -->
+  <div id="mobileMenu" class="md:hidden hidden border-t border-gray-border bg-white">
+    <nav class="px-4 py-4 flex flex-col gap-4 text-sm font-medium">
+      <a href="/home" class="text-primary">Home</a>
+      <a href="/universities">Universities</a>
+      <a href="/programs">Programs</a>
+      <a href="/rankings">Rankings</a>
+      <a href="/contact">Contact</a>
+      
+      <!-- Mobile auth section -->
+      <div id="mobile-auth-section" class="pt-2">
+        <!-- Unauthenticated mobile -->
+        <div id="mobile-unauthenticated" class="flex gap-3">
+          <a href="/login" class="flex-1 text-center px-4 py-2 rounded-lg border border-gray-border hover:bg-light-blue">Login</a>
+          <a href="/register" class="flex-1 text-center px-4 py-2 rounded-lg bg-primary text-white">Sign Up</a>
+        </div>
+        
+        <!-- Authenticated mobile (simplified) -->
+        <div id="mobile-authenticated" class="hidden flex flex-col gap-2">
+          <a href="/my-applications" class="px-4 py-2 rounded-lg border border-gray-border hover:bg-light-blue">My Applications</a>
+          <a href="/profile" class="px-4 py-2 rounded-lg border border-gray-border hover:bg-light-blue">Profile</a>
+          <button id="mobile-logout-btn" class="text-left px-4 py-2 rounded-lg border border-red-200 text-red-600 hover:bg-red-50">Logout</button>
+        </div>
+      </div>
+    </nav>
+  </div>
+</nav>
+
+<footer data-role="main-footer" class="relative bg-dark-bg text-dark-text">
+  <!-- Decorative top gradient line -->
+    <!-- Quick Links -->
+
+
+  <!-- Bottom Bar -->
+  <div class="border-t border-white/10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col lg:flex-row gap-6 items-center justify-between">
+      <div class="text-xs text-muted-text flex flex-col sm:flex-row sm:items-center gap-2">
+        <span>&copy; <span id="year"></span> UniRecommend. All rights reserved.</span>
+        <span class="hidden sm:inline text-white/20">|</span>
+        <span class="flex gap-4">
+          <a href="/terms" class="hover:text-white transition">Terms</a>
+          <a href="/privacy" class="hover:text-white transition">Privacy</a>
+          <a href="/contact" class="hover:text-white transition">Contact</a>
+        </span>
+      </div>
+
+      <div class="flex gap-3">
+        <a href="#" aria-label="Facebook" class="w-9 h-9 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-muted-text hover:text-white transition">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12.07C22 6.48 17.5 2 11.93 2 6.35 2 1.86 6.48 1.86 12.07c0 4.99 3.66 9.13 8.44 9.93v-7.03H7.9v-2.9h2.4V9.41c0-2.37 1.4-3.68 3.55-3.68 1.03 0 2.1.18 2.1.18v2.32h-1.18c-1.16 0-1.52.72-1.52 1.46v1.76h2.59l-.41 2.9h-2.18v7.02c4.78-.8 8.44-4.94 8.44-9.93Z"/></svg>
+        </a>
+        <a href="#" aria-label="Instagram" class="w-9 h-9 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-muted-text hover:text-white transition">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M7.5 2h9A5.5 5.5 0 0 1 22 7.5v9a5.5 5.5 0 0 1-5.5 5.5h-9A5.5 5.5 0 0 1 2 16.5v-9A5.5 5.5 0 0 1 7.5 2Zm0 2A3.5 3.5 0 0 0 4 7.5v9A3.5 3.5 0 0 0 7.5 20h9a3.5 3.5 0 0 0 3.5-3.5v-9A3.5 3.5 0 0 0 16.5 4h-9ZM12 7.25A4.75 4.75 0 1 1 7.25 12 4.75 4.75 0 0 1 12 7.25Zm0 2A2.75 2.75 0 1 0 14.75 12 2.75 2.75 0 0 0 12 9.25ZM17.75 6.5a1 1 0 1 1-1 1 1 1 0 0 1 1-1Z"/></svg>
+        </a>
+        <a href="#" aria-label="Twitter" class="w-9 h-9 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-muted-text hover:text-white transition">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M22.16 5.66a8.4 8.4 0 0 1-2.38.65 4.16 4.16 0 0 0 1.8-2.29 8.3 8.3 0 0 1-2.63 1 4.15 4.15 0 0 0-7.07 2.83c0 .32.04.64.1.94A11.75 11.75 0 0 1 3.15 5.15a4.13 4.13 0 0 0 .56 5.52 4.1 4.1 0 0 1-1.87-.52v.05c0 2.02 1.44 3.7 3.35 4.09a4.21 4.21 0 0 1-1.86.07 4.15 4.15 0 0 0 3.87 2.88A8.3 8.3 0 0 1 2 19.54a11.73 11.73 0 0 0 6.29 1.84c7.55 0 11.68-6.16 11.68-11.49 0-.17 0-.35-.01-.52a8.2 8.2 0 0 0 2.2-2.13Z"/></svg>
+        </a>
+        <a href="mailto:support@unirecommend.com" aria-label="Email" class="w-9 h-9 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-muted-text hover:text-white transition">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M2 6.5A2.5 2.5 0 0 1 4.5 4h15A2.5 2.5 0 0 1 22 6.5v11a2.5 2.5 0 0 1-2.5 2.5h-15A2.5 2.5 0 0 1 2 17.5v-11Zm2.5-.5a.5.5 0 0 0-.5.5v.38l8 4.62 8-4.62V6.5a.5.5 0 0 0-.5-.5h-15Zm15.5 3.62-6.97 4.02a1.5 1.5 0 0 1-1.46 0L4.5 9.62V17.5a.5.5 0 0 0 .5.5h15a.5.5 0 0 0 .5-.5V9.62Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Authentication management
+  class AuthManager {
+    constructor() {
+      this.apiBase = '/api/v1';
+      this.init();
+    }
+
+    async init() {
+      await this.checkAuthStatus();
+      this.setupEventListeners();
+    }
+
+    getToken() {
+      return localStorage.getItem('access_token');
+    }
+
+    setToken(token) {
+      localStorage.setItem('access_token', token);
+    }
+
+    removeToken() {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('user_data');
+    }
+
+    async checkAuthStatus() {
+      const token = this.getToken();
+      
+      if (!token) {
+        this.showUnauthenticatedState();
+        return;
+      }
+
+      try {
+        const response = await fetch(`${this.apiBase}/auth/me`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const userData = await response.json();
+          this.showAuthenticatedState(userData);
+        } else {
+          // Token is invalid
+          this.removeToken();
+          this.showUnauthenticatedState();
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        this.showUnauthenticatedState();
+      }
+    }
+
+    showUnauthenticatedState() {
+      // Desktop
+      document.getElementById('unauthenticated-nav').classList.remove('hidden');
+      document.getElementById('authenticated-nav').classList.add('hidden');
+      
+      // Mobile
+      document.getElementById('mobile-unauthenticated').classList.remove('hidden');
+      document.getElementById('mobile-authenticated').classList.add('hidden');
+    }
+
+    showAuthenticatedState(userData) {
+      // Desktop
+      document.getElementById('unauthenticated-nav').classList.add('hidden');
+      document.getElementById('authenticated-nav').classList.remove('hidden');
+      
+      // Mobile
+      document.getElementById('mobile-unauthenticated').classList.add('hidden');
+      document.getElementById('mobile-authenticated').classList.remove('hidden');
+
+      // Update user info
+      this.updateUserInfo(userData);
+    }
+
+    updateUserInfo(userData) {
+      const initials = this.getInitials(userData.first_name, userData.last_name);
+      const fullName = `${userData.first_name} ${userData.last_name}`;
+
+      // Only update if elements still exist (dropdown removed)
+      const avatar = document.getElementById('user-avatar');
+      if (avatar) avatar.textContent = initials;
+      const nameEl = document.getElementById('user-name');
+      if (nameEl) nameEl.textContent = fullName;
+
+      const mAvatar = document.getElementById('mobile-user-avatar');
+      if (mAvatar) mAvatar.textContent = initials;
+      const mName = document.getElementById('mobile-user-name');
+      if (mName) mName.textContent = fullName;
+
+      localStorage.setItem('user_data', JSON.stringify(userData));
+    }
+
+    getInitials(firstName, lastName) {
+      const first = firstName ? firstName.charAt(0).toUpperCase() : '';
+      const last = lastName ? lastName.charAt(0).toUpperCase() : '';
+      return first + last || 'U';
+    }
+
+    async logout() {
+      const token = this.getToken();
+      
+      if (token) {
+        try {
+          await fetch(`${this.apiBase}/auth/logout`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          });
+        } catch (error) {
+          console.error('Logout API call failed:', error);
+        }
+      }
+
+      this.removeToken();
+      this.showUnauthenticatedState();
+      
+      // Redirect to home page
+      window.location.href = '/home';
+    }
+
+    setupEventListeners() {
+      // User menu dropdown toggle
+      const userMenuBtn = document.getElementById('user-menu-btn');
+      const userDropdown = document.getElementById('user-dropdown');
+      
+      if (userMenuBtn && userDropdown) {
+        userMenuBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          userDropdown.classList.toggle('hidden');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', () => {
+          userDropdown.classList.add('hidden');
+        });
+      }
+
+      // Logout buttons
+      const logoutBtn = document.getElementById('logout-btn');
+      const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
+      
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => this.logout());
+      }
+      
+      if (mobileLogoutBtn) {
+        mobileLogoutBtn.addEventListener('click', () => this.logout());
+      }
+
+      // Mobile menu toggle
+      const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+      const mobileMenu = document.getElementById('mobileMenu');
+      
+      if (mobileMenuBtn && mobileMenu) {
+        mobileMenuBtn.addEventListener('click', () => {
+          mobileMenu.classList.toggle('hidden');
+        });
+      }
+    }
+  }
+
+  // Initialize authentication manager
+  new AuthManager();
+
+  // Update footer year
+  const yearElement = document.getElementById('year');
+  if (yearElement) {
+    yearElement.textContent = new Date().getFullYear();
+  }
+});
+</script>
+      

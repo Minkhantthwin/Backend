@@ -86,6 +86,7 @@ class UserBase(BaseModel):
     phone: Optional[str] = Field(None, max_length=20)
     date_of_birth: Optional[date] = None
     nationality: Optional[str] = Field(None, max_length=100)
+    is_admin: bool = False  # Exposed for responses; creation will enforce safety
 
     @field_validator("phone")
     @classmethod
@@ -111,9 +112,10 @@ class UserCreate(UserBase):
     """Schema for creating a new user"""
 
     password: str = Field(..., min_length=8, max_length=100)
-    qualifications: Optional[List[UserQualificationCreate]] = []
     interests: Optional[List[UserInterestCreate]] = []
     test_scores: Optional[List[UserTestScoreCreate]] = []
+    # Allow client to attempt to set but server will enforce False unless elevated context
+    is_admin: bool = False
 
     @field_validator("password")
     @classmethod
@@ -137,6 +139,9 @@ class UserUpdate(BaseModel):
     phone: Optional[str] = Field(None, max_length=20)
     date_of_birth: Optional[date] = None
     nationality: Optional[str] = Field(None, max_length=100)
+    is_admin: Optional[bool] = (
+        None  # Only processed if requester is admin (enforced in route/service layer)
+    )
 
     @field_validator("phone")
     @classmethod
@@ -228,6 +233,31 @@ class MessageResponse(BaseModel):
     """Schema for simple message responses"""
 
     message: str
+
+
+# Authentication schemas
+class UserLogin(BaseModel):
+    """Schema for user login"""
+
+    email: EmailStr
+    password: str
+
+
+class Token(BaseModel):
+    """Schema for authentication token response"""
+
+    access_token: str
+    token_type: str
+    expires_in: int
+    user_id: int
+    email: str
+
+
+class TokenData(BaseModel):
+    """Schema for token data"""
+
+    user_id: Optional[int] = None
+    email: Optional[str] = None
 
 
 # University and Program related schemas
@@ -345,6 +375,19 @@ class ProgramBase(BaseModel):
     description: Optional[str] = None
     is_active: bool = True
 
+    @field_validator("degree_level", mode="before")
+    @classmethod
+    def normalize_degree_level(cls, v):
+        if isinstance(v, str):
+            v_lower = v.lower()
+            try:
+                return DegreeLevel(v_lower)
+            except ValueError:
+                raise ValueError(
+                    "Invalid degree_level. Valid: bachelor, master, phd, diploma, certificate"
+                )
+        return v
+
 
 class ProgramCreate(ProgramBase):
     """Schema for creating a program"""
@@ -372,6 +415,8 @@ class ApplicationBase(BaseModel):
     program_id: int
     personal_statement: Optional[str] = None
     additional_documents: Optional[dict] = None
+    # New: metadata for files saved on disk
+    supporting_documents: Optional[list] = None
 
 
 class ApplicationCreate(ApplicationBase):
@@ -386,6 +431,7 @@ class ApplicationUpdate(BaseModel):
     status: Optional[ApplicationStatus] = None
     personal_statement: Optional[str] = None
     additional_documents: Optional[dict] = None
+    supporting_documents: Optional[list] = None
     decision_date: Optional[datetime] = None
 
 
@@ -425,6 +471,19 @@ class RecommendationResponse(BaseModel):
 
 class RecommendationListResponse(BaseModel):
     """Schema for recommendation list response"""
+
+    user_id: int
+    recommendations: List[dict]
+    total_recommendations: int
+
+
+class UserRecommendationResponse(BaseModel):
+    """Schema for user recommendation response"""
+
+    program_id: int
+    program_name: str
+    degree_level: str
+    match_score: int
 
     recommendations: List[RecommendationResponse]
     total: int

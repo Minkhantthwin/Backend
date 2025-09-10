@@ -147,3 +147,41 @@ async def delete_interest(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal server error occurred while deleting interest",
         )
+
+
+@router.put(
+    "/interests/{interest_id}",
+    response_model=UserInterestResponse,
+    summary="Update interest",
+    description="Update a specific interest",
+)
+async def update_interest(
+    interest_id: int,
+    interest_data: UserInterestCreate,
+    interest_repo: UserInterestRepository = Depends(get_interest_repository),
+):
+    """
+    Update a specific interest.
+
+    - **interest_id**: The ID of the interest to update
+    - **field_of_study**: Updated field of study
+    - **interest_level**: Updated interest level (low, medium, high)
+    """
+    try:
+        interest = interest_repo.update_interest(interest_id, interest_data)
+        if not interest:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Interest not found"
+            )
+
+        logger.info(f"Interest updated successfully: {interest_id}")
+        return interest
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected error updating interest {interest_id}: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error occurred while updating interest",
+        )

@@ -15,6 +15,8 @@ neomodel==5.3.0
 # --- Security ---
 passlib[bcrypt]==1.7.4
 cryptography
+python-jose[cryptography]==3.3.0
+python-multipart==0.0.20
 
 # --- ORM / Data Validation ---
 pydantic==2.10.4
@@ -23,8 +25,6 @@ pydantic-settings==2.7.1
 
 # --- Utilities ---
 python-dotenv==1.0.1
-python-multipart==0.0.20
-PyYAML==6.0.2
 packaging==24.2
 typing_extensions==4.12.2
 certifi==2024.12.14

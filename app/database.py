@@ -102,6 +102,39 @@ class MySQLDatabase:
             from app.models import Base
 
             Base.metadata.create_all(bind=self.engine)
+            # Ensure new columns exist (lightweight migration)
+            try:
+                from sqlalchemy import text
+
+                with self.engine.connect() as conn:
+                    # Check if supporting_documents column exists
+                    check_sql = text(
+                        """
+                        SELECT COUNT(*) AS cnt FROM information_schema.COLUMNS
+                        WHERE TABLE_SCHEMA = DATABASE()
+                          AND TABLE_NAME = 'applications'
+                          AND COLUMN_NAME = 'supporting_documents'
+                        """
+                    )
+                    result = conn.execute(check_sql).fetchone()
+                    exists = bool(result[0]) if result is not None else False
+                    if not exists:
+                        # Add the column
+                        try:
+                            conn.execute(
+                                text(
+                                    "ALTER TABLE applications ADD COLUMN supporting_documents JSON NULL"
+                                )
+                            )
+                            logger.info(
+                                "Added missing column 'supporting_documents' to applications table"
+                            )
+                        except Exception as e:
+                            logger.error(
+                                f"Failed to add 'supporting_documents' column: {e}"
+                            )
+            except Exception as e:
+                logger.warning(f"Column verification step failed: {e}")
             logger.info("MySQL tables created successfully")
         except Exception as e:
             logger.error(f"Failed to create MySQL tables: {e}")

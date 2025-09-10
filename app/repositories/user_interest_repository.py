@@ -26,6 +26,7 @@ class UserInterestRepository:
             self.db.add(db_interest)
             self.db.commit()
             self.db.refresh(db_interest)
+
             logger.info(f"User interest created successfully for user {user_id}")
             return db_interest
 
@@ -73,9 +74,34 @@ class UserInterestRepository:
 
             self.db.delete(interest)
             self.db.commit()
+
             logger.info(f"Interest deleted: {interest_id}")
             return True
         except Exception as e:
             self.db.rollback()
             logger.error(f"Failed to delete interest {interest_id}: {e}")
+            raise
+
+    def update_interest(
+        self, interest_id: int, interest_data: UserInterestCreate
+    ) -> Optional[UserInterest]:
+        """Update an existing interest"""
+        try:
+            interest = self.get_interest_by_id(interest_id)
+            if not interest:
+                return None
+
+            # Update MySQL
+            for field, value in interest_data.model_dump().items():
+                setattr(interest, field, value)
+
+            self.db.commit()
+            self.db.refresh(interest)
+
+            logger.info(f"Interest updated successfully: {interest_id}")
+            return interest
+
+        except Exception as e:
+            self.db.rollback()
+            logger.error(f"Failed to update interest {interest_id}: {e}")
             raise

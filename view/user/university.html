@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+	<title>Universities - UniRecommend</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script>
+	tailwind.config = {
+	  theme: {
+	    extend: {
+	      colors: {
+	        primary: '#3B82F6',
+	        accent: '#F59E0B',
+	        'light-blue': '#EFF6FF',
+	        'lighter-blue': '#DBEAFE',
+	        'gray-border': '#E5E7EB',
+	        'gray-medium': '#6B7280',
+	        'dark-bg': '#1F2937',
+	        'dark-nav': '#374151',
+	        'dark-text': '#F3F4F6',
+	        'muted-text': '#D1D5DB'
+	      }
+	    }
+	  }
+	}
+	</script>
+	<link rel="stylesheet" href="/css/style.css" />
+	<script>
+		window.__LAYOUT_PATHS__ = [
+			'user/partials/layout.html',
+			'view/user/partials/layout.html',
+			'/view/user/partials/layout.html'
+		];
+	</script>
+	<script defer src="/js/index.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+	<div id="navbarContainer"></div>
+
+	<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+		<div class="mb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+			<div>
+				<h1 class="text-2xl font-bold text-gray-900 mb-2">Universities</h1>
+				<p class="text-gray-600 text-sm">Browse universities available in the system. Use search & filters to narrow down.</p>
+			</div>
+			<div class="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+				<div class="relative flex-1 sm:w-72">
+					<input id="universitySearch" type="text" placeholder="Search universities..." class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-border bg-white focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm" />
+					<svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+				</div>
+				<select id="regionFilter" class="sm:w-48 px-3 py-2 rounded-lg border border-gray-border bg-white focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm">
+					<option value="">All Regions</option>
+				</select>
+			</div>
+		</div>
+
+		<div id="universitiesContainer" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"></div>
+		<div id="universityEmpty" class="hidden py-24 text-center text-gray-500">
+			<p>No universities found.</p>
+		</div>
+
+		<div id="universitiesLoading" class="flex items-center justify-center py-16 text-gray-500">
+			<svg class="animate-spin h-6 w-6 mr-3 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle class="opacity-25" cx="12" cy="12" r="10" stroke-width="4"></circle><path class="opacity-75" stroke-width="4" d="M4 12a8 8 0 018-8"/></svg>
+			<span>Loading universities...</span>
+		</div>
+
+		<div id="universitiesPagination" class="hidden mt-10 flex items-center justify-center gap-2 flex-wrap"></div>
+	</main>
+
+	<div id="footerContainer"></div>
+</body>
+<script>
+// Inline universities fetching logic (moved from index.js per request)
+function getToken(){ return localStorage.getItem('access_token'); }
+async function apiCall(endpoint, options = {}){ const token=getToken(); const base={ headers:{'Accept':'application/json','Content-Type':'application/json'} }; if(token) base.headers['Authorization']='Bearer '+token; const res= await fetch(API_BASE_URL+endpoint,{...base,...options,headers:{...base.headers,...(options.headers||{})}}); const ct=res.headers.get('content-type')||''; let data = ct.includes('json')? await res.json(): await res.text(); if(!res.ok) throw (data||new Error('Request failed')); return data; }
+
+// Wait for layout to load before initializing page-specific functionality
+function initUniversityPage() {
+	const container = document.getElementById('universitiesContainer');
+	const loading = document.getElementById('universitiesLoading');
+	const empty = document.getElementById('universityEmpty');
+	const searchInput = document.getElementById('universitySearch');
+	const regionFilter = document.getElementById('regionFilter');
+	let page=1; const perPage=12; let currentQuery=''; let currentRegion='';
+
+	async function fetchUniversities(){
+		try{
+			loading.classList.remove('hidden');
+			empty.classList.add('hidden');
+			container.innerHTML='';
+			const params = new URLSearchParams({ page:String(page), per_page:String(perPage) });
+			if(currentRegion) params.append('region_id', currentRegion);
+			let list = await apiCall(`/universities?${params.toString()}`);
+			if(currentQuery){ const q=currentQuery.toLowerCase(); list = list.filter(u => (u.name||'').toLowerCase().includes(q)); }
+			render(list);
+		} catch(e){ console.error(e); showPageMessage('Failed to load universities'); }
+		finally{ loading.classList.add('hidden'); }
+	}
+
+	function render(list){
+		if(!list.length){ empty.classList.remove('hidden'); return; }
+		empty.classList.add('hidden');
+		container.innerHTML = list.map(card).join('');
+	}
+
+	function card(u){ const initials=(u.name||'U').split(/\s+/).slice(0,2).map(p=>p[0]).join('').toUpperCase(); return `<div class="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow transition flex flex-col">
+		<div class="h-28 bg-gradient-to-r from-primary to-accent rounded-t-xl flex items-center justify-center text-white text-2xl font-bold">${initials}</div>
+		<div class="p-4 flex-1 flex flex-col">
+			<h3 class="font-semibold text-gray-900 mb-1 line-clamp-1" title="${u.name||''}">${u.name||'Unknown University'}</h3>
+			<p class="text-xs text-gray-500 mb-2">${u.city||''}${u.city && u.region_name?', ':''}${u.region_name||''}</p>
+			<div class="text-xs text-gray-600 flex-1 line-clamp-3 mb-3">${u.description || 'No description provided.'}</div>
+			<div class="mt-auto flex items-center justify-between text-xs text-gray-500">
+				<span>${u.established_year? 'Est. '+u.established_year : ''}</span>
+				<a href="/programs?university_id=${u.id}&university_name=${encodeURIComponent(u.name||'Unknown University')}" class="text-primary font-medium hover:underline">Programs →</a>
+			</div>
+		</div>
+	</div>`; }
+
+	function showPageMessage(msg){ empty.querySelector('p')?.replaceChildren(document.createTextNode(msg)); empty.classList.remove('hidden'); }
+
+	// search & filter
+	if(searchInput) searchInput.addEventListener('input', debounce(e=>{ currentQuery=e.target.value.trim(); page=1; fetchUniversities(); },300));
+	if(regionFilter) regionFilter.addEventListener('change', e=>{ currentRegion=e.target.value; page=1; fetchUniversities(); });
+
+	async function loadRegions(){ try{ const regions = await apiCall('/regions?per_page=100&page=1'); if(Array.isArray(regions)&&regions.length){ regionFilter.innerHTML='<option value="">All Regions</option>'+regions.map(r=>`<option value="${r.id}">${r.name}</option>`).join(''); } }catch(_){ /* ignore */ } }
+
+	debounceCache.fetch || (loadRegions(), fetchUniversities());
+}
+
+// Initialize university page after DOM and layout are ready
+document.addEventListener('DOMContentLoaded', () => {
+	// Wait for layout to load, then initialize
+	function checkAndInit() {
+		// Check if layout elements are loaded
+		const navbar = document.querySelector('nav[data-role="main-nav"]');
+		const footer = document.querySelector('footer[data-role="main-footer"]');
+		
+		if (navbar && footer) {
+			initUniversityPage();
+		} else {
+			// Wait a bit more and try again
+			setTimeout(checkAndInit, 100);
+		}
+	}
+	
+	checkAndInit();
+});
+
+function debounce(fn,wait){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),wait); }; }
+const debounceCache={};
+</script>
+</html>

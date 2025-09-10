@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8"/>
+	<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+	<title>Admin - Application Management</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script>
+		tailwind.config = { theme:{ extend:{ colors:{ primary:'#3B82F6', accent:'#F59E0B', danger:'#DC2626', success:'#059669', grayBorder:'#E5E7EB' }}}};
+	</script>
+	<link rel="stylesheet" href="../css/style.css"/>
+</head>
+<body class="min-h-screen bg-gray-50">
+	<div id="navbarMount"></div>
+
+	<main class="max-w-7xl mx-auto px-4 py-8 space-y-8">
+		<section class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+			<div>
+				<h2 class="text-2xl font-semibold text-gray-800">Applications</h2>
+				<p class="text-sm text-gray-600">Review and decide on user applications</p>
+			</div>
+			<div class="flex flex-col sm:flex-row gap-3">
+				<div class="flex items-center bg-white rounded-lg border border-grayBorder px-3">
+					<svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-4.35-4.35M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16z"/></svg>
+					<input id="searchInput" type="text" placeholder="Search email / program / status" class="px-2 py-2 outline-none text-sm w-64">
+				</div>
+				<button id="searchBtn" class="bg-primary text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-600">Search</button>
+				<button id="clearSearchBtn" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-300">Clear</button>
+			</div>
+		</section>
+
+		<section class="bg-white border border-grayBorder rounded-xl shadow-sm overflow-hidden">
+			<div class="overflow-x-auto">
+				<table class="min-w-full text-left text-sm">
+					<thead class="bg-gray-100 text-gray-700">
+						<tr>
+							<th class="px-4 py-3 font-medium">ID</th>
+							<th class="px-4 py-3 font-medium">User Email</th>
+							<th class="px-4 py-3 font-medium">Program</th>
+							<th class="px-4 py-3 font-medium">Degree</th>
+							<th class="px-4 py-3 font-medium">Status</th>
+							<th class="px-4 py-3 font-medium">Applied</th>
+							<th class="px-4 py-3 font-medium text-right">Actions</th>
+						</tr>
+					</thead>
+					<tbody id="applicationsTableBody">
+						<tr><td colspan="7" class="px-4 py-6 text-center text-gray-500">Loading applications...</td></tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="flex items-center justify-between p-4 border-t border-gray-100">
+				<div class="text-xs text-gray-500" id="appInfo">--</div>
+				<div class="flex gap-2">
+					<button id="prevPage" class="px-3 py-1.5 text-sm bg-gray-100 rounded disabled:opacity-40">Prev</button>
+					<span id="currentPage" class="text-sm font-medium text-gray-700">1</span>
+					<button id="nextPage" class="px-3 py-1.5 text-sm bg-gray-100 rounded disabled:opacity-40">Next</button>
+				</div>
+			</div>
+		</section>
+
+		<section class="text-xs text-gray-500">
+			Accepting sets status to accepted; Declining sets status to rejected. Use Manage to set any allowed status.
+		</section>
+	</main>
+
+	<div id="footerMount"></div>
+
+	<!-- Decision Modal -->
+	<div id="decisionModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+		<div class="bg-white rounded-xl p-6 w-full max-w-sm space-y-5">
+			<h3 id="decisionTitle" class="text-lg font-semibold text-gray-800">Confirm Action</h3>
+			<p id="decisionMessage" class="text-sm text-gray-600"></p>
+			<p class="text-xs text-gray-500">This action will update the application status permanently.</p>
+			<div class="flex justify-end gap-3">
+				<button id="cancelDecision" class="px-4 py-2 text-sm bg-gray-100 rounded-lg hover:bg-gray-200">Cancel</button>
+				<button id="confirmDecision" class="px-4 py-2 text-sm bg-primary text-white rounded-lg hover:bg-blue-600">Confirm</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- Manage Status Modal -->
+	<div id="manageStatusModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+		<div class="bg-white rounded-xl p-6 w-full max-w-md space-y-5">
+			<h3 class="text-lg font-semibold text-gray-800">Manage Application Status</h3>
+			<p class="text-sm text-gray-600" id="manageStatusInfo">Application #</p>
+			<div>
+				<label class="block text-xs font-medium text-gray-500 mb-1">Select New Status</label>
+				<select id="newStatusSelect" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+					<option value="submitted">Submitted</option>
+					<option value="under_review">Under Review</option>
+					<option value="accepted">Accepted</option>
+					<option value="rejected">Rejected</option>
+					<option value="waitlisted">Waitlisted</option>
+				</select>
+			</div>
+			<div class="flex justify-end gap-3 pt-2">
+				<button id="cancelManageStatus" class="px-4 py-2 text-sm bg-gray-100 rounded-lg hover:bg-gray-200">Cancel</button>
+				<button id="applyManageStatus" class="px-4 py-2 text-sm bg-primary text-white rounded-lg hover:bg-blue-600">Update</button>
+			</div>
+		</div>
+	</div>
+
+	<script src="../js/admin.js"></script>
+	<script>
+		document.addEventListener('DOMContentLoaded', async () => {
+			await injectAdminLayout('applications');
+			initApplicationPage();
+		});
+
+		async function initApplicationPage(){
+			const me = await adminRequireAuth();
+			if (me) loadApplications();
+			document.getElementById('searchBtn').addEventListener('click', applySearch);
+			document.getElementById('clearSearchBtn').addEventListener('click', ()=>{document.getElementById('searchInput').value=''; applySearch();});
+			document.getElementById('searchInput').addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); applySearch(); }});
+			document.getElementById('prevPage').addEventListener('click', ()=>{ if(currentPage>1){ currentPage--; renderApplications(); }});
+			document.getElementById('nextPage').addEventListener('click', ()=>{ if(currentPage*pageSize<filtered.length){ currentPage++; renderApplications(); }});
+			document.getElementById('cancelDecision').addEventListener('click', closeDecision);
+			document.getElementById('confirmDecision').addEventListener('click', applyDecision);
+			document.getElementById('cancelManageStatus').addEventListener('click', closeManageStatus);
+			document.getElementById('applyManageStatus').addEventListener('click', applyManageStatus);
+		}
+
+		let applications = [];
+		let filtered = [];
+		let currentPage = 1;
+		const pageSize = 20;
+		let fullLoaded = false;
+		let decisionId = null;
+		let decisionAction = null;
+
+		function paginate(list){ const start=(currentPage-1)*pageSize; return list.slice(start,start+pageSize); }
+		function updatePagination(){
+			const total = filtered.length;
+			const totalPages = Math.max(1, Math.ceil(total / pageSize));
+			if(currentPage>totalPages) currentPage=totalPages;
+			document.getElementById('currentPage').textContent=currentPage;
+			document.getElementById('prevPage').disabled=currentPage<=1;
+			document.getElementById('nextPage').disabled=currentPage>=totalPages;
+			document.getElementById('appInfo').textContent = total ? `Showing ${(currentPage-1)*pageSize+1}-${Math.min(currentPage*pageSize,total)} of ${total}${fullLoaded? '' : ' (partial list)'}` : 'No applications';
+		}
+
+		function statusBadge(status){
+			const map = {draft:'bg-gray-200 text-gray-700',submitted:'bg-blue-100 text-primary',under_review:'bg-amber-100 text-accent',accepted:'bg-green-100 text-success',rejected:'bg-red-100 text-danger',waitlisted:'bg-purple-100 text-purple-700'};
+			const cls = map[status?.toLowerCase()] || 'bg-gray-100 text-gray-700';
+			return `<span class="px-2 py-1 text-xs rounded ${cls} font-medium capitalize">${status.replace('_',' ')}</span>`;
+		}
+
+		function renderApplications(){
+			const tbody=document.getElementById('applicationsTableBody');
+			if(!filtered.length){
+				tbody.innerHTML='<tr><td colspan="7" class="px-4 py-6 text-center text-gray-500">No applications found</td></tr>'; updatePagination(); return;
+			}
+			const slice=paginate(filtered);
+			tbody.innerHTML='';
+			slice.forEach(a=>{
+				const tr=document.createElement('tr');
+				tr.className='border-t border-gray-100 hover:bg-gray-50';
+				tr.innerHTML=`
+					<td class="px-4 py-3 text-gray-700">${a.id}</td>
+					<td class="px-4 py-3 text-gray-700 break-all">${a.user?.email || '—'}</td>
+					<td class="px-4 py-3 text-gray-700">${a.program?.name || '—'}</td>
+					<td class="px-4 py-3 text-gray-700 capitalize">${(a.program?.degree_level||'').toLowerCase()}</td>
+					<td class="px-4 py-3">${statusBadge(a.status)}</td>
+					<td class="px-4 py-3 text-gray-600">${formatDate(a.application_date)}</td>
+					<td class="px-4 py-3 text-right space-x-2">
+						${a.status.toLowerCase()==='submitted'||a.status.toLowerCase()==='under_review'
+							? `<button data-acc="${a.id}" class="text-success hover:underline text-xs font-medium">Accept</button>
+								 <button data-rej="${a.id}" class="text-danger hover:underline text-xs font-medium">Decline</button>`
+							: '<span class="text-xs text-gray-400">—</span>'}
+						<button data-manage="${a.id}" class="ml-1 text-xs px-2 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-700">View</button>
+					</td>`;
+				tbody.appendChild(tr);
+			});
+			tbody.querySelectorAll('[data-acc]').forEach(b=>b.addEventListener('click',()=>openDecision(b.getAttribute('data-acc'),'accepted')));
+			tbody.querySelectorAll('[data-rej]').forEach(b=>b.addEventListener('click',()=>openDecision(b.getAttribute('data-rej'),'rejected')));
+			tbody.querySelectorAll('[data-manage]').forEach(b=>b.addEventListener('click',()=>{ window.location.href = `/admin/user_application?id=${b.getAttribute('data-manage')}`; }));
+			updatePagination();
+		}
+
+		function formatDate(dt){ if(!dt) return '—'; try{ return new Date(dt).toLocaleDateString(); }catch{ return dt; } }
+
+		function applySearch(){
+			const q=document.getElementById('searchInput').value.trim().toLowerCase();
+			if(!q){ filtered=[...applications]; }
+			else { filtered=applications.filter(a=> (a.user?.email||'').toLowerCase().includes(q) || (a.program?.name||'').toLowerCase().includes(q) || (a.status||'').toLowerCase().includes(q)); }
+			currentPage=1; renderApplications();
+		}
+
+		async function loadApplications(){
+			try{
+				const data = await adminApi('/applications?page=1&per_page=100');
+				applications = Array.isArray(data)?data:[]; filtered=[...applications]; fullLoaded = applications.length < 100; currentPage=1; renderApplications(); await hydrateMissing();
+			}catch(e){ document.getElementById('applicationsTableBody').innerHTML=`<tr><td colspan="7" class="px-4 py-6 text-center text-red-600">Failed to load applications: ${e.message||e}</td></tr>`; }
+		}
+
+		async function hydrateMissing(){
+			const fetches=[]; applications.forEach(a=>{ if(!a.program){ fetches.push(adminApi(`/programs/${a.program_id}`).then(p=>a.program=p).catch(()=>{})); } if(!a.user){ fetches.push(adminApi(`/users/${a.user_id}`).then(u=>a.user=u).catch(()=>{})); } });
+			if(fetches.length){ await Promise.all(fetches); renderApplications(); }
+		}
+
+		function openDecision(id, action){
+			decisionId = id; decisionAction = action;
+			document.getElementById('decisionTitle').textContent = action === 'accepted' ? 'Accept Application' : 'Decline Application';
+			document.getElementById('decisionMessage').textContent = `Are you sure you want to mark application #${id} as ${action}?`;
+			document.getElementById('decisionModal').classList.remove('hidden');
+			const btn = document.getElementById('confirmDecision');
+			btn.className = 'px-4 py-2 text-sm rounded-lg text-white ' + (action==='accepted' ? 'bg-success hover:bg-green-600' : 'bg-danger hover:bg-red-600');
+		}
+		function closeDecision(){ decisionId = null; decisionAction = null; document.getElementById('decisionModal').classList.add('hidden'); }
+
+		async function applyDecision(){
+			if(!decisionId || !decisionAction) return;
+			try{
+				await adminApi(`/applications/${decisionId}`, { method:'PUT', body: JSON.stringify({ status: decisionAction }) });
+				const app = applications.find(a=>String(a.id)===String(decisionId)); if(app) app.status = decisionAction;
+				closeDecision(); renderApplications();
+			}catch(e){ alert('Failed to update status: '+(e.message||e)); }
+		}
+
+		let manageId = null;
+		function openManageStatus(id){
+			manageId = id; const app = applications.find(a=>String(a.id)===String(id)); const current = app?.status || '';
+			document.getElementById('manageStatusInfo').textContent = `Application #${id} (Current: ${current})`;
+			const select = document.getElementById('newStatusSelect'); if(select){ select.value = current; }
+			document.getElementById('manageStatusModal').classList.remove('hidden');
+		}
+		function closeManageStatus(){ manageId = null; document.getElementById('manageStatusModal').classList.add('hidden'); }
+		async function applyManageStatus(){ if(!manageId) return; const newStatus = document.getElementById('newStatusSelect').value; try { await adminApi(`/applications/${manageId}`, { method:'PUT', body: JSON.stringify({ status: newStatus }) }); const app = applications.find(a=>String(a.id)===String(manageId)); if(app) app.status = newStatus; closeManageStatus(); renderApplications(); } catch(e){ alert('Failed to update: ' + (e.message||e)); } }
+	</script>
+</body>
+</html>
+

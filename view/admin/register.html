@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>UniRecommend Admin - Registration</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script>
+		tailwind.config = {
+			theme: {
+				extend: {
+					colors: {
+						primary: '#3B82F6',
+						accent: '#F59E0B',
+						'light-blue': '#EFF6FF',
+						'lighter-blue': '#DBEAFE',
+						'gray-border': '#E5E7EB',
+						'gray-medium': '#6B7280',
+						'dark-bg': '#1F2937',
+						'dark-nav': '#374151',
+						'dark-text': '#F3F4F6',
+						'muted-text': '#D1D5DB'
+					}
+				}
+			}
+		}
+	</script>
+	<link rel="stylesheet" href="../css/style.css" />
+</head>
+<body class="min-h-screen bg-gradient-to-br from-light-blue to-white">
+	<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+		<div class="max-w-2xl w-full space-y-8">
+			<!-- Header -->
+			<div class="text-center">
+				<div class="flex justify-center mb-6">
+					<div class="w-16 h-16 bg-gradient-to-r from-primary to-accent rounded-full flex items-center justify-center relative">
+						<svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+							<path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
+						</svg>
+						<span class="absolute -bottom-1 -right-1 bg-accent text-white text-xs font-bold px-2 py-0.5 rounded-full shadow">Admin</span>
+					</div>
+				</div>
+				<h2 class="text-3xl font-bold text-gray-900 mb-2">Admin Registration</h2>
+				<p class="text-gray-600">Create a new administrator account</p>
+			</div>
+
+			<!-- Registration Form -->
+			<div class="bg-white rounded-2xl shadow-xl p-8 border border-gray-border">
+				<form id="adminRegisterForm" class="space-y-6">
+					<!-- Personal Information -->
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+						<div>
+							<label for="first_name" class="block text-sm font-medium text-gray-700 mb-2">First Name *</label>
+							<input type="text" id="first_name" name="first_name" required 
+								class="w-full px-4 py-3 border border-gray-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors placeholder-gray-400" 
+								placeholder="Enter first name" />
+						</div>
+						<div>
+							<label for="last_name" class="block text-sm font-medium text-gray-700 mb-2">Last Name *</label>
+							<input type="text" id="last_name" name="last_name" required 
+								class="w-full px-4 py-3 border border-gray-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors placeholder-gray-400" 
+								placeholder="Enter last name" />
+						</div>
+					</div>
+
+					<div>
+						<label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
+						<input type="email" id="email" name="email" required 
+							class="w-full px-4 py-3 border border-gray-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors placeholder-gray-400" 
+							placeholder="Enter admin email address" />
+					</div>
+
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+						<div>
+							<label for="password" class="block text-sm font-medium text-gray-700 mb-2">Password *</label>
+							<input type="password" id="password" name="password" required 
+								class="w-full px-4 py-3 border border-gray-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors placeholder-gray-400" 
+								placeholder="Create a strong password" />
+							<p class="text-xs text-gray-500 mt-1">Minimum 8 characters with letters and numbers</p>
+						</div>
+						<div>
+							<label for="confirm_password" class="block text-sm font-medium text-gray-700 mb-2">Confirm Password *</label>
+							<input type="password" id="confirm_password" name="confirm_password" required 
+								class="w-full px-4 py-3 border border-gray-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors placeholder-gray-400" 
+								placeholder="Confirm your password" />
+						</div>
+					</div>
+
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+						<div>
+							<label for="phone" class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+							<input type="tel" id="phone" name="phone" 
+								class="w-full px-4 py-3 border border-gray-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors placeholder-gray-400" 
+								placeholder="Enter phone number" />
+						</div>
+						<div>
+							<label for="nationality" class="block text-sm font-medium text-gray-700 mb-2">Nationality</label>
+							<input type="text" id="nationality" name="nationality" 
+								class="w-full px-4 py-3 border border-gray-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors placeholder-gray-400" 
+								placeholder="Enter nationality" />
+						</div>
+					</div>
+
+					<div>
+						<label for="date_of_birth" class="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
+						<input type="date" id="date_of_birth" name="date_of_birth" 
+							class="w-full px-4 py-3 border border-gray-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors" />
+					</div>
+
+					<!-- Admin Notice -->
+					<div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
+						<div class="flex">
+							<svg class="w-5 h-5 text-amber-400 mr-3 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+								<path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+							</svg>
+							<div>
+								<h4 class="text-amber-800 font-medium">Administrator Account</h4>
+								<p class="text-amber-700 text-sm">This account will have administrative privileges and access to system management features.</p>
+							</div>
+						</div>
+					</div>
+
+					<button type="submit" id="adminRegisterBtn" 
+						class="w-full bg-gradient-to-r from-primary to-blue-500 text-white py-3 px-4 rounded-lg font-medium hover:from-blue-600 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all duration-200 transform hover:scale-[1.02]">
+						<span class="btn-text">Create Admin Account</span>
+						<span class="loader hidden">
+							<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+								<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+								<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+							</svg>
+							Creating Account...
+						</span>
+					</button>
+				</form>
+
+				<div id="errorMessage" class="hidden mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+					<div class="flex">
+						<svg class="w-5 h-5 text-red-400 mr-3 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+							<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+						</svg>
+						<span class="text-red-700 text-sm font-medium"></span>
+					</div>
+				</div>
+
+				<div id="successMessage" class="hidden mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+					<div class="flex">
+						<svg class="w-5 h-5 text-green-400 mr-3 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+							<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+						</svg>
+						<span class="text-green-700 text-sm font-medium"></span>
+					</div>
+				</div>
+
+				<div class="mt-6 text-center">
+					<a href="/admin/login" class="text-sm text-gray-600 hover:text-gray-800">Back to admin sign in</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="../js/admin.js"></script>
+	<script>
+		document.addEventListener('DOMContentLoaded', () => {
+			const form = document.getElementById('adminRegisterForm');
+			if(!form) return;
+			
+			form.addEventListener('submit', async (e) => {
+				e.preventDefault();
+				
+				// Get form data
+				const formData = new FormData(form);
+				const password = formData.get('password');
+				const confirmPassword = formData.get('confirm_password');
+				
+				// Validate passwords match
+				if (password !== confirmPassword) {
+					showError('Passwords do not match');
+					return;
+				}
+				
+				// Validate password strength
+				if (password.length < 8) {
+					showError('Password must be at least 8 characters long');
+					return;
+				}
+				
+				const btn = document.getElementById('adminRegisterBtn');
+				const btnText = btn.querySelector('.btn-text');
+				const loader = btn.querySelector('.loader');
+				
+				btn.disabled = true;
+				btnText?.classList.add('hidden');
+				loader?.classList.remove('hidden');
+				
+				try {
+					// Prepare admin registration data
+					const adminData = {
+						email: formData.get('email'),
+						password: password,
+						first_name: formData.get('first_name'),
+						last_name: formData.get('last_name'),
+						phone: formData.get('phone') || null,
+						nationality: formData.get('nationality') || null,
+						date_of_birth: formData.get('date_of_birth') || null,
+						is_admin: true,
+						qualifications: [],
+						interests: [],
+						test_scores: []
+					};
+					
+					// Register admin user
+					const response = await fetch('/auth/admin/register', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify(adminData)
+					});
+					
+					if (!response.ok) {
+						const errorData = await response.json();
+						throw new Error(errorData.detail || 'Registration failed');
+					}
+					
+					showSuccess('Admin account created successfully! Redirecting to login...');
+					setTimeout(() => {
+						window.location.href = '/admin/login';
+					}, 2000);
+					
+				} catch (err) {
+					showError('Registration failed: ' + err.message);
+				} finally {
+					btn.disabled = false;
+					btnText?.classList.remove('hidden');
+					loader?.classList.add('hidden');
+				}
+			});
+		});
+	</script>
+</body>
+</html>

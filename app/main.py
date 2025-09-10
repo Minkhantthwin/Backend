@@ -11,11 +11,15 @@ from app.routes import (
     qualification,
     region,
     university,
+    recommendation,
+    auth,
+    frontend,
 )
 import logging
 from app.util.log import get_logger
 from app.util.env_config import Settings
 from app.database import get_database_manager
+from app.routes.frontend import setup_frontend_routes
 
 logging.basicConfig(level=logging.INFO)
 logger = get_logger(__name__)
@@ -57,11 +61,7 @@ app = FastAPI(
 
 # Include routers
 app.include_router(user.router, prefix=f"/api/{settings.API_V1_STR}", tags=["Users"])
-app.include_router(
-    user_qualification.router,
-    prefix=f"/api/{settings.API_V1_STR}",
-    tags=["User Qualifications"],
-)
+
 app.include_router(
     user_interest.router, prefix=f"/api/{settings.API_V1_STR}", tags=["User Interests"]
 )
@@ -85,7 +85,21 @@ app.include_router(
 app.include_router(
     university.router, prefix=f"/api/{settings.API_V1_STR}", tags=["Universities"]
 )
+app.include_router(
+    recommendation.router,
+    prefix=f"/api/{settings.API_V1_STR}",
+    tags=["Recommendations"],
+)
+app.include_router(
+    auth.router, prefix=f"/api/{settings.API_V1_STR}", tags=["Authentication"]
+)
 app.include_router(health.router, tags=["Health"])
+app.include_router(
+    frontend.router, prefix=f"/api/{settings.API_V1_STR}", tags=["Frontend"]
+)
+
+# Set up frontend routes and static file serving
+setup_frontend_routes(app)
 
 
 def main():

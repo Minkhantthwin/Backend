@@ -120,3 +120,83 @@ Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 7687)) (reas
 2025-07-11 12:13:16 | app.main | ERROR | main.py:36 | lifespan() | Failed to initialize application: Couldn't connect to localhost:7687 (resolved to ()):
 Failed to establish connection to ResolvedIPv6Address(('::1', 7687, 0, 0)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
 Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 7687)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+2025-07-15 20:15:56 | app.database | ERROR | database.py:107 | create_tables() | Failed to create MySQL tables: (pymysql.err.OperationalError) (1049, "Unknown database 'university_recommendation_db'")
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-07-15 20:15:56 | app.main | ERROR | main.py:38 | lifespan() | Failed to initialize application: (pymysql.err.OperationalError) (1049, "Unknown database 'university_recommendation_db'")
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-07-15 20:22:12 | app.database | ERROR | database.py:107 | create_tables() | Failed to create MySQL tables: (pymysql.err.OperationalError) (1049, "Unknown database 'university_recommendation_db'")
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-07-15 20:22:12 | app.main | ERROR | main.py:38 | lifespan() | Failed to initialize application: (pymysql.err.OperationalError) (1049, "Unknown database 'university_recommendation_db'")
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-07-15 20:30:04 | app.database | ERROR | database.py:107 | create_tables() | Failed to create MySQL tables: (pymysql.err.OperationalError) (1049, "Unknown database 'university_recommendation_db'")
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-07-15 20:30:04 | app.main | ERROR | main.py:38 | lifespan() | Failed to initialize application: (pymysql.err.OperationalError) (1049, "Unknown database 'university_recommendation_db'")
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-07-15 20:42:08 | app.services.neo4j_user_service | ERROR | neo4j_user_service.py:40 | create_user_node() | Failed to create user node in Neo4j: {code: Neo.ClientError.Statement.SyntaxError} {message: WITH is required between MERGE and MATCH (line 3, column 13 (offset: 64))
+"            MATCH (u:User {user_id: $user_id})"
+             ^}
+2025-07-15 21:46:55 | app.services.neo4j_program_service | ERROR | neo4j_program_service.py:169 | create_program_node() | Failed to create program node in Neo4j: {code: Neo.ClientError.Statement.SemanticError} {message: Cannot merge the following node because of null property value for 'tuition_fee': (:Program {tuition_fee: null})}
+2025-07-15 21:48:37 | app.services.neo4j_program_service | ERROR | neo4j_program_service.py:169 | create_program_node() | Failed to create program node in Neo4j: {code: Neo.ClientError.Statement.SyntaxError} {message: Invalid input 'CASE': expected an expression, ',', 'AS', 'ORDER BY', 'CALL', 'CREATE', 'LOAD CSV', 'DELETE', 'DETACH', 'FINISH', 'FOREACH', 'INSERT', 'LIMIT', 'MATCH', 'MERGE', 'NODETACH', 'OFFSET', 'OPTIONAL', 'REMOVE', 'RETURN', 'SET', 'SKIP', 'UNION', 'UNWIND', 'USE', 'WHERE', 'WITH' or <EOF> (line 20, column 13 (offset: 717))
+"            CASE"
+             ^}
+2025-07-15 21:50:36 | app.services.neo4j_user_service | ERROR | neo4j_user_service.py:423 | create_interest_relationship() | Failed to create interest relationship in Neo4j: {code: Neo.ClientError.Statement.SyntaxError} {message: WITH is required between MERGE and MATCH (line 3, column 17 (offset: 81))
+"                MATCH (u:User {user_id: $user_id})"
+                 ^}
+2025-07-15 21:55:19 | app.services.neo4j_user_service | ERROR | neo4j_user_service.py:423 | create_interest_relationship() | Failed to create interest relationship in Neo4j: {code: Neo.ClientError.Statement.SyntaxError} {message: WITH is required between MERGE and MATCH (line 3, column 17 (offset: 81))
+"                MATCH (u:User {user_id: $user_id})"
+                 ^}
+2025-07-17 11:24:45 | app.database | ERROR | database.py:162 | initialize() | Neo4j service unavailable: Couldn't connect to localhost:7687 (resolved to ()):
+Failed to establish connection to ResolvedIPv6Address(('::1', 7687, 0, 0)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 7687)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+2025-07-17 11:24:45 | app.main | ERROR | main.py:38 | lifespan() | Failed to initialize application: Couldn't connect to localhost:7687 (resolved to ()):
+Failed to establish connection to ResolvedIPv6Address(('::1', 7687, 0, 0)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 7687)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+2025-08-08 21:03:23 | app.repositories.user_repository | ERROR | user_repository.py:90 | create_user() | Failed to create user: 'UserCreate' object has no attribute 'qualifications'
+2025-08-08 21:03:23 | app.routes.user | ERROR | user.py:115 | create_user() | Unexpected error creating user: 'UserCreate' object has no attribute 'qualifications'
+2025-08-31 18:00:05 | app.services.neo4j_user_service | ERROR | neo4j_user_service.py:40 | create_user_node() | Failed to create user node in Neo4j: {code: Neo.ClientError.Statement.SyntaxError} {message: WITH is required between MERGE and MATCH (line 3, column 13 (offset: 64))
+"            MATCH (u:User {user_id: $user_id})"
+             ^}
+2025-09-01 00:02:25 | app.services.neo4j_program_service | ERROR | neo4j_program_service.py:187 | create_program_node() | Failed to create program node in Neo4j: {code: Neo.ClientError.Statement.SemanticError} {message: Cannot merge the following node because of null property value for 'tuition_fee': (:Program {tuition_fee: null})}
+2025-09-02 18:20:40 | app.database | ERROR | database.py:162 | initialize() | Neo4j service unavailable: Couldn't connect to localhost:7687 (resolved to ()):
+Failed to establish connection to ResolvedIPv6Address(('::1', 7687, 0, 0)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 7687)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+2025-09-02 18:20:40 | app.main | ERROR | main.py:42 | lifespan() | Failed to initialize application: Couldn't connect to localhost:7687 (resolved to ()):
+Failed to establish connection to ResolvedIPv6Address(('::1', 7687, 0, 0)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 7687)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+2025-09-03 19:17:15 | app.services.neo4j_program_service | ERROR | neo4j_program_service.py:187 | create_program_node() | Failed to create program node in Neo4j: {code: Neo.ClientError.Statement.SemanticError} {message: Cannot merge the following node because of null property value for 'tuition_fee': (:Program {tuition_fee: null})}
+2025-09-03 19:19:03 | app.services.neo4j_program_service | ERROR | neo4j_program_service.py:187 | create_program_node() | Failed to create program node in Neo4j: {code: Neo.ClientError.Statement.SemanticError} {message: Cannot merge the following node because of null property value for 'tuition_fee': (:Program {tuition_fee: null})}
+2025-09-03 19:20:44 | app.services.neo4j_program_service | ERROR | neo4j_program_service.py:187 | create_program_node() | Failed to create program node in Neo4j: {code: Neo.ClientError.Statement.SemanticError} {message: Cannot merge the following node because of null property value for 'tuition_fee': (:Program {tuition_fee: null})}
+2025-09-03 19:57:22 | app.services.neo4j_user_service | ERROR | neo4j_user_service.py:40 | create_user_node() | Failed to create user node in Neo4j: {code: Neo.ClientError.Statement.SyntaxError} {message: WITH is required between MERGE and MATCH (line 3, column 13 (offset: 64))
+"            MATCH (u:User {user_id: $user_id})"
+             ^}
+2025-09-03 20:07:13 | app.services.neo4j_program_service | ERROR | neo4j_program_service.py:183 | create_program_node() | Failed to create program node in Neo4j: {code: Neo.ClientError.Statement.SyntaxError} {message: Invalid input 'CASE': expected an expression, ',', 'AS', 'ORDER BY', 'CALL', 'CREATE', 'LOAD CSV', 'DELETE', 'DETACH', 'FINISH', 'FOREACH', 'INSERT', 'LIMIT', 'MATCH', 'MERGE', 'NODETACH', 'OFFSET', 'OPTIONAL', 'REMOVE', 'RETURN', 'SET', 'SKIP', 'UNION', 'UNWIND', 'USE', 'WHERE', 'WITH' or <EOF> (line 18, column 13 (offset: 711))
+"            CASE"
+             ^}
+2025-09-03 20:12:27 | app.services.neo4j_program_service | ERROR | neo4j_program_service.py:183 | create_program_node() | Failed to create program node in Neo4j: {code: Neo.ClientError.Statement.SyntaxError} {message: Invalid input 'CASE': expected an expression, ',', 'AS', 'ORDER BY', 'CALL', 'CREATE', 'LOAD CSV', 'DELETE', 'DETACH', 'FINISH', 'FOREACH', 'INSERT', 'LIMIT', 'MATCH', 'MERGE', 'NODETACH', 'OFFSET', 'OPTIONAL', 'REMOVE', 'RETURN', 'SET', 'SKIP', 'UNION', 'UNWIND', 'USE', 'WHERE', 'WITH' or <EOF> (line 18, column 13 (offset: 711))
+"            CASE"
+             ^}
+2025-09-04 09:51:28 | app.database | ERROR | database.py:162 | initialize() | Neo4j service unavailable: Couldn't connect to localhost:7687 (resolved to ()):
+Failed to establish connection to ResolvedIPv6Address(('::1', 7687, 0, 0)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 7687)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+2025-09-04 09:51:28 | app.main | ERROR | main.py:42 | lifespan() | Failed to initialize application: Couldn't connect to localhost:7687 (resolved to ()):
+Failed to establish connection to ResolvedIPv6Address(('::1', 7687, 0, 0)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 7687)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+2025-09-07 17:46:45 | app.services.neo4j_program_service | ERROR | neo4j_program_service.py:183 | create_program_node() | Failed to create program node in Neo4j: {code: Neo.ClientError.Statement.SyntaxError} {message: Invalid input 'CASE': expected an expression, ',', 'AS', 'ORDER BY', 'CALL', 'CREATE', 'LOAD CSV', 'DELETE', 'DETACH', 'FINISH', 'FOREACH', 'INSERT', 'LIMIT', 'MATCH', 'MERGE', 'NODETACH', 'OFFSET', 'OPTIONAL', 'REMOVE', 'RETURN', 'SET', 'SKIP', 'UNION', 'UNWIND', 'USE', 'WHERE', 'WITH' or <EOF> (line 18, column 13 (offset: 711))
+"            CASE"
+             ^}
+2025-09-09 18:13:39 | app.database | ERROR | database.py:162 | initialize() | Neo4j service unavailable: Couldn't connect to localhost:7687 (resolved to ()):
+Failed to establish connection to ResolvedIPv6Address(('::1', 7687, 0, 0)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 7687)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+2025-09-09 18:13:39 | app.main | ERROR | main.py:42 | lifespan() | Failed to initialize application: Couldn't connect to localhost:7687 (resolved to ()):
+Failed to establish connection to ResolvedIPv6Address(('::1', 7687, 0, 0)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 7687)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+2025-09-09 18:14:51 | app.database | ERROR | database.py:162 | initialize() | Neo4j service unavailable: Couldn't connect to localhost:7687 (resolved to ()):
+Failed to establish connection to ResolvedIPv6Address(('::1', 7687, 0, 0)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 7687)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+2025-09-09 18:14:51 | app.main | ERROR | main.py:42 | lifespan() | Failed to initialize application: Couldn't connect to localhost:7687 (resolved to ()):
+Failed to establish connection to ResolvedIPv6Address(('::1', 7687, 0, 0)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 7687)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+2025-09-09 18:56:27 | app.repositories.application_repository | ERROR | application_repository.py:38 | create_application() | Failed to create application: (pymysql.err.OperationalError) (2006, "MySQL server has gone away (ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))")
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-09-09 18:56:27 | app.routes.application | ERROR | application.py:268 | create_application_with_documents() | Unexpected error creating application with documents: (pymysql.err.OperationalError) (2006, "MySQL server has gone away (ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))")
+(Background on this error at: https://sqlalche.me/e/20/e3q8)

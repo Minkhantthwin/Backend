@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0">
+	<title>Admin - Program Management</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script>
+		tailwind.config = { theme:{ extend:{ colors:{ primary:'#3B82F6', accent:'#F59E0B', danger:'#DC2626', success:'#059669', grayBorder:'#E5E7EB'} } } }
+	</script>
+	<link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="min-h-screen bg-gray-50">
+	<div id="navbarMount"></div>
+
+	<main class="max-w-7xl mx-auto px-4 py-8 space-y-8">
+		<section class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+			<div>
+				<h2 class="text-2xl font-semibold text-gray-800">Programs</h2>
+				<p class="text-sm text-gray-600">Manage academic programs (create, edit, deactivate)</p>
+			</div>
+			<div class="flex flex-col sm:flex-row gap-3">
+				<div class="flex items-center bg-white rounded-lg border border-grayBorder px-3">
+					<svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-4.35-4.35M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16z"/></svg>
+					<input id="searchField" type="text" placeholder="Search by field" class="px-2 py-2 outline-none text-sm w-56">
+				</div>
+				<button id="searchBtn" class="bg-primary text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-600">Search</button>
+				<button id="clearSearchBtn" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-300">Clear</button>
+				<button id="newProgramBtn" class="bg-accent text-white px-4 py-2 rounded-lg text-sm hover:bg-yellow-600">New Program</button>
+			</div>
+		</section>
+
+		<section class="bg-white border border-grayBorder rounded-xl shadow-sm overflow-hidden">
+			<div class="overflow-x-auto">
+				<table class="min-w-full text-left text-sm">
+					<thead class="bg-gray-100 text-gray-700">
+						<tr>
+							<th class="px-4 py-3 font-medium">ID</th>
+							<th class="px-4 py-3 font-medium">Name</th>
+							<th class="px-4 py-3 font-medium">University</th>
+							<th class="px-4 py-3 font-medium">Level</th>
+							<th class="px-4 py-3 font-medium">Field</th>
+							<th class="px-4 py-3 font-medium">Duration</th>
+							<th class="px-4 py-3 font-medium">Active</th>
+							<th class="px-4 py-3 font-medium text-right">Actions</th>
+						</tr>
+					</thead>
+					<tbody id="programsTableBody">
+						<tr><td colspan="8" class="px-4 py-6 text-center text-gray-500">Loading programs...</td></tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="flex items-center justify-between p-4 border-t border-gray-100">
+				<div class="text-xs text-gray-500" id="programInfo">--</div>
+				<div class="flex gap-2">
+					<button id="prevPage" class="px-3 py-1.5 text-sm bg-gray-100 rounded disabled:opacity-40">Prev</button>
+					<span id="currentPage" class="text-sm font-medium text-gray-700">1</span>
+					<button id="nextPage" class="px-3 py-1.5 text-sm bg-gray-100 rounded disabled:opacity-40">Next</button>
+				</div>
+			</div>
+		</section>
+
+		<section class="text-xs text-gray-500">
+			Pagination size: 20. Deleting will deactivate the program (soft delete).
+		</section>
+	</main>
+
+	<div id="footerMount"></div>
+
+	<!-- Create/Edit Modal -->
+	<div id="programModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+		<div class="bg-white rounded-xl p-6 w-full max-w-3xl space-y-5 max-h-[95vh] overflow-y-auto">
+			<h3 id="programModalTitle" class="text-lg font-semibold text-gray-800">New Program</h3>
+			<div class="grid md:grid-cols-3 gap-4">
+				<div class="md:col-span-2">
+					<label class="block text-xs font-medium text-gray-600 mb-1">Program Name *</label>
+					<input id="progName" type="text" class="w-full px-3 py-2 border border-grayBorder rounded-lg text-sm">
+				</div>
+				<div>
+					<label class="block text-xs font-medium text-gray-600 mb-1">University *</label>
+					<select id="progUniversity" class="w-full px-3 py-2 border border-grayBorder rounded-lg text-sm"></select>
+				</div>
+				<div>
+					<label class="block text-xs font-medium text-gray-600 mb-1">Degree Level *</label>
+					<select id="progLevel" class="w-full px-3 py-2 border border-grayBorder rounded-lg text-sm">
+						<option value="">Select</option>
+						<option value="bachelor">Bachelor</option>
+						<option value="master">Master</option>
+						<option value="phd">PhD</option>
+						<option value="diploma">Diploma</option>
+						<option value="certificate">Certificate</option>
+					</select>
+				</div>
+				<div>
+					<label class="block text-xs font-medium text-gray-600 mb-1">Field of Study *</label>
+					<input id="progField" type="text" class="w-full px-3 py-2 border border-grayBorder rounded-lg text-sm">
+				</div>
+				<div>
+					<label class="block text-xs font-medium text-gray-600 mb-1">Duration (years)</label>
+					<input id="progDuration" type="number" min="0" step="0.5" class="w-full px-3 py-2 border border-grayBorder rounded-lg text-sm">
+				</div>
+				<div>
+					<label class="block text-xs font-medium text-gray-600 mb-1">Language</label>
+					<input id="progLanguage" type="text" placeholder="English" class="w-full px-3 py-2 border border-grayBorder rounded-lg text-sm">
+				</div>
+				<div>
+					<label class="block text-xs font-medium text-gray-600 mb-1">Tuition Fee</label>
+					<input id="progTuition" type="number" min="0" step="0.01" class="w-full px-3 py-2 border border-grayBorder rounded-lg text-sm">
+				</div>
+				<div>
+					<label class="block text-xs font-medium text-gray-600 mb-1">Currency</label>
+					<input id="progCurrency" type="text" maxlength="3" placeholder="USD" class="w-full px-3 py-2 border border-grayBorder rounded-lg text-sm uppercase">
+				</div>
+				<div>
+					<label class="block text-xs font-medium text-gray-600 mb-1">Application Deadline</label>
+					<input id="progDeadline" type="date" class="w-full px-3 py-2 border border-grayBorder rounded-lg text-sm">
+				</div>
+				<div>
+					<label class="block text-xs font-medium text-gray-600 mb-1">Start Date</label>
+					<input id="progStart" type="date" class="w-full px-3 py-2 border border-grayBorder rounded-lg text-sm">
+				</div>
+				<div class="md:col-span-3">
+					<label class="block text-xs font-medium text-gray-600 mb-1">Description</label>
+					<textarea id="progDesc" rows="3" class="w-full px-3 py-2 border border-grayBorder rounded-lg text-sm resize-y"></textarea>
+				</div>
+			</div>
+
+			<div class="space-y-2">
+				<div class="flex items-center justify-between">
+					<h4 class="text-sm font-semibold text-gray-700">Requirements</h4>
+					<button id="addRequirementBtn" class="text-xs bg-primary text-white px-2 py-1 rounded hover:bg-blue-600">Add</button>
+				</div>
+				<div id="requirementsContainer" class="space-y-3"></div>
+			</div>
+
+			<p id="progModalError" class="hidden text-xs text-danger"></p>
+			<div class="flex justify-end gap-3">
+				<button id="cancelProgramBtn" class="px-4 py-2 text-sm bg-gray-100 rounded-lg hover:bg-gray-200">Cancel</button>
+				<button id="saveProgramBtn" class="px-4 py-2 text-sm bg-primary text-white rounded-lg hover:bg-blue-600">Save</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- Delete Modal -->
+	<div id="deleteProgramModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+		<div class="bg-white rounded-xl p-6 w-full max-w-sm space-y-4">
+			<h3 class="text-lg font-semibold text-gray-800">Deactivate Program</h3>
+			<p class="text-sm text-gray-600">Are you sure you want to deactivate <span id="deleteProgramName" class="font-medium"></span>? This action can be reversed only via database.</p>
+			<div class="flex justify-end gap-3 pt-2">
+				<button id="cancelDeleteProgram" class="px-4 py-2 text-sm bg-gray-100 rounded-lg hover:bg-gray-200">Cancel</button>
+				<button id="confirmDeleteProgram" class="px-4 py-2 text-sm bg-danger text-white rounded-lg hover:bg-red-600">Deactivate</button>
+			</div>
+		</div>
+	</div>
+
+	<script src="../js/admin.js"></script>
+	<script>
+		// Initialize page when DOM is loaded
+		document.addEventListener('DOMContentLoaded', async () => {
+			// Use admin.js layout injection and admin authentication
+			await injectAdminLayout('programs');
+			
+			// Initialize page-specific functionality
+			initProgramPage();
+		});
+
+		// Page-specific initialization
+		async function initProgramPage(){
+			// Ensure admin authentication before loading data
+			const me = await adminRequireAuth();
+			if (me) {
+				loadUniversities().then(loadPrograms);
+			}
+			
+			// Bind event listeners
+			document.getElementById('searchBtn').addEventListener('click', performSearch);
+			document.getElementById('clearSearchBtn').addEventListener('click', ()=>{ document.getElementById('searchField').value=''; loadPrograms(); });
+			document.getElementById('searchField').addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); performSearch(); }});
+			document.getElementById('newProgramBtn').addEventListener('click', openCreate);
+			document.getElementById('cancelProgramBtn').addEventListener('click', closeProgramModal);
+			document.getElementById('saveProgramBtn').addEventListener('click', saveProgram);
+			document.getElementById('addRequirementBtn').addEventListener('click', ()=>addRequirementRow());
+			document.getElementById('cancelDeleteProgram').addEventListener('click', closeDeleteModal);
+			document.getElementById('confirmDeleteProgram').addEventListener('click', deleteProgram);
+			document.getElementById('prevPage').addEventListener('click', ()=>{ if(currentPage>1){ currentPage--; renderPrograms(); }});
+			document.getElementById('nextPage').addEventListener('click', ()=>{ if(currentPage*pageSize<programs.length){ currentPage++; renderPrograms(); }});
+		}
+
+		// State
+		let programs = [];
+		let universities = [];
+		let currentPage = 1;
+		const pageSize = 20;
+		let editingProgramId = null;
+		let deletingProgramId = null;
+		let fullLoaded = false;
+
+		function paginate(list){ const start=(currentPage-1)*pageSize; return list.slice(start,start+pageSize); }
+		function updatePaginationInfo(){
+			const total = programs.length;
+			const totalPages = Math.max(1, Math.ceil(total / pageSize));
+			if(currentPage>totalPages) currentPage=totalPages;
+			document.getElementById('currentPage').textContent = currentPage;
+			document.getElementById('prevPage').disabled = currentPage<=1;
+			document.getElementById('nextPage').disabled = currentPage>=totalPages;
+			document.getElementById('programInfo').textContent = total ? `Showing ${(currentPage-1)*pageSize+1}-${Math.min(currentPage*pageSize,total)} of ${total}${fullLoaded?'':' (partial)'}` : 'No programs';
+		}
+		function uniName(id){ const u=universities.find(x=>x.id===id); return u?u.name:'—'; }
+
+		function renderPrograms(){
+			const tbody=document.getElementById('programsTableBody');
+			if(!programs.length){
+				tbody.innerHTML='<tr><td colspan="8" class="px-4 py-6 text-center text-gray-500">No programs found</td></tr>';
+				updatePaginationInfo(); return;
+			}
+			const slice=paginate(programs);
+			tbody.innerHTML='';
+			slice.forEach(p=>{
+				const tr=document.createElement('tr');
+				tr.className='border-t border-gray-100 hover:bg-gray-50';
+				tr.innerHTML=`
+					<td class="px-4 py-3 text-gray-700">${p.id}</td>
+					<td class="px-4 py-3 text-gray-800">${p.name}</td>
+					<td class="px-4 py-3 text-gray-700">${uniName(p.university_id)}</td>
+					<td class="px-4 py-3 text-gray-700 capitalize">${(p.degree_level||'').toLowerCase()}</td>
+					<td class="px-4 py-3 text-gray-700">${p.field_of_study||'—'}</td>
+					<td class="px-4 py-3 text-gray-700">${p.duration_years||'—'}</td>
+					<td class="px-4 py-3">${p.is_active ? '<span class="px-2 py-1 text-xs rounded bg-green-100 text-success font-medium">Yes</span>' : '<span class="px-2 py-1 text-xs rounded bg-gray-200 text-gray-700">No</span>'}</td>
+					<td class="px-4 py-3 text-right space-x-3">
+						<button data-edit="${p.id}" class="text-primary hover:underline text-sm">Edit</button>
+						<button data-del="${p.id}" class="text-danger hover:underline text-sm">Deactivate</button>
+					</td>`;
+				tbody.appendChild(tr);
+			});
+			tbody.querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',()=>openEdit(b.getAttribute('data-edit'))));
+			tbody.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>openDelete(b.getAttribute('data-del'))));
+			updatePaginationInfo();
+		}
+
+		async function loadUniversities(){
+			try{
+				const data = await adminApi('/universities?page=1&per_page=100');
+				universities = Array.isArray(data)?data:data.universities||[];
+				const sel=document.getElementById('progUniversity');
+				sel.innerHTML='<option value="">Select university</option>'+universities.map(u=>`<option value="${u.id}">${u.name}</option>`).join('');
+			}catch(e){ console.warn('Failed to load universities', e); }
+		}
+
+		async function loadPrograms(){
+			try{
+				const data = await adminApi('/programs?page=1&per_page=100&active_only=true');
+				programs = Array.isArray(data)?data:[];
+				fullLoaded = programs.length < 100;
+				currentPage=1;
+				renderPrograms();
+			}catch(e){
+				document.getElementById('programsTableBody').innerHTML=`<tr><td colspan="8" class="px-4 py-6 text-center text-red-600">Failed to load programs: ${e.message||e}</td></tr>`;
+			}
+		}
+
+		async function performSearch(){
+			const q=document.getElementById('searchField').value.trim();
+			if(!q){ await loadPrograms(); return; }
+			document.getElementById('programsTableBody').innerHTML='<tr><td colspan="8" class="px-4 py-6 text-center text-gray-500">Searching...</td></tr>';
+			try{
+				const res = await adminApi(`/programs/search/field/${encodeURIComponent(q)}`);
+				programs = Array.isArray(res)?res:res.programs||[];
+				currentPage=1; fullLoaded=true;
+				renderPrograms();
+			}catch(e){
+				document.getElementById('programsTableBody').innerHTML=`<tr><td colspan="8" class="px-4 py-6 text-center text-red-600">Search failed: ${e.message||e}</td></tr>`;
+			}
+		}
+
+		function clearProgramForm(){
+			['progName','progField','progDuration','progLanguage','progTuition','progCurrency','progDeadline','progStart','progDesc'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+			document.getElementById('progUniversity').value='';
+			document.getElementById('progLevel').value='';
+			document.getElementById('requirementsContainer').innerHTML='';
+			document.getElementById('progModalError').classList.add('hidden');
+		}
+		function addRequirementRow(data={}){
+			const wrap=document.createElement('div');
+			wrap.className='grid grid-cols-12 gap-2 p-3 border border-gray-200 rounded-lg bg-gray-50';
+			wrap.innerHTML=`
+				<input placeholder="Type" value="${data.requirement_type||''}" class="col-span-2 px-2 py-1 border border-grayBorder rounded text-xs req-type">
+				<input placeholder="Value" value="${data.requirement_value||''}" class="col-span-2 px-2 py-1 border border-grayBorder rounded text-xs req-value">
+				<input placeholder="Test Type" value="${data.test_type||''}" class="col-span-2 px-2 py-1 border border-grayBorder rounded text-xs req-test">
+				<label class="col-span-2 flex items-center gap-1 text-xs">
+					<input type="checkbox" ${data.is_mandatory!==false?'checked':''} class="req-mandatory">
+					<span>Mandatory</span>
+				</label>
+				<input placeholder="Description" value="${data.description||''}" class="col-span-3 px-2 py-1 border border-grayBorder rounded text-xs req-desc">
+				<button class="col-span-1 text-danger text-xs remove-req hover:underline">X</button>`;
+			wrap.querySelector('.remove-req').addEventListener('click',()=>wrap.remove());
+			document.getElementById('requirementsContainer').appendChild(wrap);
+		}
+		function showProgramModal(){ document.getElementById('programModal').classList.remove('hidden'); }
+		function closeProgramModal(){ document.getElementById('programModal').classList.add('hidden'); }
+		function openCreate(){ editingProgramId=null; document.getElementById('programModalTitle').textContent='New Program'; clearProgramForm(); showProgramModal(); }
+		function openEdit(id){
+			const p=programs.find(x=>String(x.id)===String(id)); if(!p) return;
+			editingProgramId=p.id;
+			document.getElementById('programModalTitle').textContent='Edit Program';
+			clearProgramForm();
+			document.getElementById('progName').value=p.name||'';
+			document.getElementById('progUniversity').value=p.university_id||'';
+			document.getElementById('progLevel').value=(p.degree_level||'').toLowerCase();
+			document.getElementById('progField').value=p.field_of_study||'';
+			document.getElementById('progDuration').value=p.duration_years||'';
+			document.getElementById('progLanguage').value=p.language||'';
+			document.getElementById('progTuition').value=p.tuition_fee||'';
+			document.getElementById('progCurrency').value=p.currency||'';
+			document.getElementById('progDeadline').value=p.application_deadline||'';
+			document.getElementById('progStart').value=p.start_date||'';
+			document.getElementById('progDesc').value=p.description||'';
+			if(p.requirements){
+				p.requirements.forEach(r=>addRequirementRow(r));
+			}
+			showProgramModal();
+		}
+		function openDelete(id){
+			const p=programs.find(x=>String(x.id)===String(id)); if(!p) return;
+			deletingProgramId=p.id;
+			document.getElementById('deleteProgramName').textContent=p.name;
+			document.getElementById('deleteProgramModal').classList.remove('hidden');
+		}
+		function closeDeleteModal(){ deletingProgramId=null; document.getElementById('deleteProgramModal').classList.add('hidden'); }
+
+		function collectRequirements(){
+			return Array.from(document.querySelectorAll('#requirementsContainer > div')).map(div=>({
+				requirement_type: div.querySelector('.req-type').value.trim()||null,
+				requirement_value: div.querySelector('.req-value').value.trim()||null,
+				test_type: div.querySelector('.req-test').value.trim()||null,
+				is_mandatory: div.querySelector('.req-mandatory').checked,
+				description: div.querySelector('.req-desc').value.trim()||null
+			})).filter(r=>r.requirement_type || r.requirement_value || r.test_type || r.description);
+		}
+
+		async function saveProgram(){
+			const errEl=document.getElementById('progModalError');
+			const name=document.getElementById('progName').value.trim();
+			const university_id=document.getElementById('progUniversity').value;
+			const degree_level=document.getElementById('progLevel').value;
+			const field_of_study=document.getElementById('progField').value.trim();
+			if(!name || !university_id || !degree_level || !field_of_study){
+				errEl.textContent='Name, University, Degree Level and Field are required';
+				errEl.classList.remove('hidden'); return;
+			}
+			errEl.classList.add('hidden');
+			const payload={
+				university_id: parseInt(university_id),
+				name,
+				degree_level: degree_level.toLowerCase(),
+				field_of_study,
+				duration_years: document.getElementById('progDuration').value || null,
+				language: document.getElementById('progLanguage').value || null,
+				tuition_fee: document.getElementById('progTuition').value || null,
+				currency: document.getElementById('progCurrency').value || null,
+				application_deadline: document.getElementById('progDeadline').value || null,
+				start_date: document.getElementById('progStart').value || null,
+				description: document.getElementById('progDesc').value || null,
+				requirements: collectRequirements()
+			};
+			try{
+				if(editingProgramId){
+					await adminApi(`/programs/${editingProgramId}`, { method:'PUT', body: JSON.stringify(payload) });
+				}else{
+					await adminApi('/programs', { method:'POST', body: JSON.stringify(payload) });
+				}
+				closeProgramModal();
+				await loadPrograms();
+			}catch(e){
+				errEl.textContent=e.message||'Save failed'; errEl.classList.remove('hidden');
+			}
+		}
+
+		async function deleteProgram(){
+			if(!deletingProgramId) return;
+			try{
+				await adminApi(`/programs/${deletingProgramId}`, { method:'DELETE' });
+				closeDeleteModal();
+				await loadPrograms();
+			}catch(e){
+				alert('Deactivate failed: '+(e.message||e));
+			}
+		}
+	</script>
+</body>
+</html>

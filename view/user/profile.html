@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniRecommend - My Profile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        accent: '#F59E0B',
+                        'light-blue': '#EFF6FF',
+                        'lighter-blue': '#DBEAFE',
+                        'gray-border': '#E5E7EB',
+                        'gray-medium': '#6B7280',
+                        'dark-bg': '#1F2937',
+                        'dark-nav': '#374151',
+                        'dark-text': '#F3F4F6',
+                        'muted-text': '#D1D5DB'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- Layout configuration -->
+    <script>
+        window.__LAYOUT_PATHS__ = [
+            'user/partials/layout.html',
+            'view/user/partials/layout.html',
+            '/view/user/partials/layout.html'
+        ];
+    </script>
+    <script defer src="/js/index.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation placeholder -->
+    <div id="navbarContainer"></div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Profile Header -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-border mb-8">
+            <div class="px-6 py-8">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                    <div class="flex items-center space-x-4">
+                        <div id="profileAvatar" class="w-20 h-20 bg-gradient-to-r from-primary to-accent rounded-full flex items-center justify-center text-white font-bold text-2xl">
+                            UR
+                        </div>
+                        <div>
+                            <h1 id="profileName" class="text-2xl font-bold text-gray-900">Loading...</h1>
+                            <p id="profileEmail" class="text-gray-600">Loading...</p>
+                            <p id="memberSince" class="text-sm text-gray-500">Member since Loading...</p>
+                        </div>
+                    </div>
+                    <div class="mt-4 md:mt-0">
+                        <button id="editProfileBtn" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-blue-600 transition">
+                            Edit Profile
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Sections -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column - Personal Information -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Personal Information Card -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-border">
+                    <div class="px-6 py-4 border-b border-gray-border">
+                        <h2 class="text-lg font-semibold text-gray-900">Personal Information</h2>
+                    </div>
+                    <div class="px-6 py-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                                <p id="profileFirstName" class="text-gray-900">Loading...</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                                <p id="profileLastName" class="text-gray-900">Loading...</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                <p id="profileEmailDetail" class="text-gray-900">Loading...</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                                <p id="profilePhone" class="text-gray-900">Not provided</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
+                                <p id="profileDateOfBirth" class="text-gray-900">Not provided</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Nationality</label>
+                                <p id="profileNationality" class="text-gray-900">Not provided</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Academic Interests Card -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-border">
+                    <div class="px-6 py-4 border-b border-gray-border flex justify-between items-center">
+                        <h2 class="text-lg font-semibold text-gray-900">Academic Interests</h2>
+                        <button id="addInterestBtn" class="text-primary hover:text-blue-600 text-sm font-medium">
+                            + Add Interest
+                        </button>
+                    </div>
+                    <div class="px-6 py-6">
+                        <div id="interestsList" class="space-y-3">
+                            <div class="flex items-center justify-center py-8 text-gray-500">
+                                <span>Loading interests...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Test Scores Card -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-border">
+                    <div class="px-6 py-4 border-b border-gray-border flex justify-between items-center">
+                        <h2 class="text-lg font-semibold text-gray-900">Test Scores</h2>
+                        <button id="addTestScoreBtn" class="text-primary hover:text-blue-600 text-sm font-medium">
+                            + Add Score
+                        </button>
+                    </div>
+                    <div class="px-6 py-6">
+                        <div id="testScoresList" class="space-y-4">
+                            <div class="flex items-center justify-center py-8 text-gray-500">
+                                <span>Loading test scores...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Qualifications Card -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-border">
+                    <div class="px-6 py-4 border-b border-gray-border flex justify-between items-center">
+                        <h2 class="text-lg font-semibold text-gray-900">Educational Background</h2>
+                        <button id="addQualificationBtn" class="text-primary hover:text-blue-600 text-sm font-medium">
+                            + Add Qualification
+                        </button>
+                    </div>
+                    <div class="px-6 py-6">
+                        <div id="qualificationsList" class="space-y-4">
+                            <div class="flex items-center justify-center py-8 text-gray-500">
+                                <span>Loading qualifications...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Quick Actions & Stats -->
+            <div class="space-y-8">
+                <!-- Quick Actions Card -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-border" id="quickActionsCard">
+                    <div class="px-6 py-4 border-b border-gray-border flex items-center justify-between">
+                        <h2 class="text-lg font-semibold text-gray-900">Quick Actions</h2>
+                        <span id="quickActionsMeta" class="text-xs text-gray-500 hidden"></span>
+                    </div>
+                    <div class="px-6 py-6 space-y-3">
+                        <button id="getRecommendationsBtn" class="group w-full px-4 py-3 bg-gradient-to-r from-primary to-blue-600 text-white rounded-lg hover:opacity-90 transition flex items-center justify-center space-x-2">
+                            <svg class="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                            </svg>
+                            <span id="recBtnLabel">Get Recommendations</span>
+                        </button>
+                        <button id="viewApplicationsBtn" class="group w-full px-4 py-3 border border-gray-border text-gray-700 rounded-lg hover:bg-gray-50 transition flex items-center justify-center space-x-2">
+                            <svg class="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <span id="appsBtnLabel">View Applications</span>
+                        </button>
+                        <button id="searchProgramsBtn" class="group w-full px-4 py-3 border border-gray-border text-gray-700 rounded-lg hover:bg-gray-50 transition flex items-center justify-center space-x-2">
+                            <svg class="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                            <span>Search Programs</span>
+                        </button>
+                        <div id="quickActionsContent" class="pt-4 border-t border-gray-100 hidden"></div>
+                    </div>
+                </div>
+
+                <!-- Profile Completion Card -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-border">
+                    <div class="px-6 py-4 border-b border-gray-border">
+                        <h2 class="text-lg font-semibold text-gray-900">Profile Completion</h2>
+                    </div>
+                    <div class="px-6 py-6">
+                        <div class="mb-4">
+                            <div class="flex justify-between text-sm text-gray-600 mb-2">
+                                <span>Completion</span>
+                                <span id="completionPercentage">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div id="completionBar" class="bg-gradient-to-r from-primary to-accent h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div id="completionTips" class="space-y-2 text-sm text-gray-600">
+                            <!-- Completion tips will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity Card -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-border">
+                    <div class="px-6 py-4 border-b border-gray-border">
+                        <h2 class="text-lg font-semibold text-gray-900">Recent Activity</h2>
+                    </div>
+                    <div class="px-6 py-6">
+                        <div id="recentActivity" class="space-y-3">
+                            <div class="flex items-center justify-center py-8 text-gray-500">
+                                <span>No recent activity</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error and Success Messages -->
+    <div id="errorMessage" class="fixed top-4 right-4 max-w-md bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg shadow-lg hidden z-50">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                </svg>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm font-medium" id="errorText"></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="successMessage" class="fixed top-4 right-4 max-w-md bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg shadow-lg hidden z-50">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm font-medium" id="successText"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer placeholder -->
+    <div id="footerContainer"></div>
+
+    <!-- Profile logic handled centrally in /js/index.js -->
+</body>
+</html>

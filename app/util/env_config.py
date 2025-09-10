@@ -48,6 +48,12 @@ class Settings(BaseSettings):
     NEO4J_MAX_CONNECTION_POOL_SIZE: int = 50
     NEO4J_CONNECTION_ACQUISITION_TIMEOUT: int = 60
 
+    # JWT Authentication Settings
+    JWT_SECRET_KEY: str = "your-secret-key-change-in-production"
+    JWT_ALGORITHM: str = "HS256"
+    JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    JWT_REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+
     @classmethod
     def settings_customise_sources(
         cls,

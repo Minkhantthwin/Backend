@@ -56,6 +56,7 @@ class User(Base):
     date_of_birth = Column(Date)
     nationality = Column(String(100))
     phone = Column(String(20))
+    is_admin = Column(Boolean, default=False, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -161,6 +162,9 @@ class Application(Base):
     decision_date = Column(DateTime)
     personal_statement = Column(Text)
     additional_documents = Column(JSON)
+    # Stores metadata about files saved on disk under the documents/ folder
+    # Example: [{"id": str, "filename": str, "content_type": str, "size": int, "path": str, "uploaded_at": str}]
+    supporting_documents = Column(JSON)
 
     user = relationship("User", back_populates="applications")
     program = relationship("Program", back_populates="applications")

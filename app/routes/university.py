@@ -211,3 +211,37 @@ async def delete_university(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal server error occurred while deleting university",
         )
+
+
+@router.get(
+    "/regions/{region_id}/universities",
+    response_model=List[dict],
+    summary="Get universities by region from Neo4j",
+    description="Get universities in a specific region using Neo4j graph relationships",
+)
+async def get_universities_by_region_neo4j(
+    region_id: int,
+    university_repo: UniversityRepository = Depends(get_university_repository),
+):
+    """
+    Get universities in a specific region using Neo4j graph data.
+
+    This endpoint leverages Neo4j relationships to find universities in a region.
+
+    - **region_id**: The ID of the region to get universities for
+    """
+    try:
+        universities = university_repo.get_universities_by_region_neo4j(region_id)
+
+        return {
+            "region_id": region_id,
+            "universities": universities,
+            "total_universities": len(universities),
+        }
+
+    except Exception as e:
+        logger.error(f"Unexpected error getting universities by region: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error occurred while getting universities",
+        )
