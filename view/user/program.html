@@ -130,12 +130,45 @@ function initProgramPage() {
 	const urlParams = new URLSearchParams(window.location.search);
 	currentUniversityId = urlParams.get('university_id');
 	const universityName = urlParams.get('university_name');
+	
+	// Handle search parameters from home page
+	const searchQuery = urlParams.get('search');
+	const filterType = urlParams.get('filter_type');
+	
+	if (searchQuery) {
+		currentQuery = searchQuery;
+		if (searchInput) {
+			searchInput.value = searchQuery;
+		}
+	}
+	
+	// Handle filter type (if searching by field)
+	if (filterType === 'field' && searchQuery) {
+		currentField = searchQuery;
+		if (fieldFilter) {
+			// Try to find matching option or add new one
+			const existingOption = Array.from(fieldFilter.options).find(opt => 
+				opt.value.toLowerCase().includes(searchQuery.toLowerCase())
+			);
+			if (existingOption) {
+				fieldFilter.value = existingOption.value;
+			} else {
+				// Add new option for the search term
+				const newOption = new Option(searchQuery, searchQuery, true, true);
+				fieldFilter.appendChild(newOption);
+			}
+		}
+	}
 
 	// Update page title and breadcrumb if we're viewing programs for a specific university
 	if (currentUniversityId && universityName) {
 		document.getElementById('pageTitle').textContent = `Programs at ${universityName}`;
 		document.getElementById('pageDescription').textContent = `Browse programs offered by ${universityName}`;
 		document.getElementById('universityName').textContent = universityName;
+	} else if (searchQuery) {
+		// Update page title for search results
+		document.getElementById('pageTitle').textContent = `Search Results`;
+		document.getElementById('pageDescription').textContent = `Showing results for "${searchQuery}"`;
 	}
 
 	async function fetchPrograms(){
@@ -154,18 +187,21 @@ function initProgramPage() {
 				// Fetch all programs
 				endpoint = `/programs`;
 				params.append('active_only', 'true');
+				
+				// Add search parameter if available
+				if (currentQuery) {
+					params.append('search', currentQuery);
+				}
 			}
 
 			let list = await apiCall(`${endpoint}${currentUniversityId ? '' : '?' + params.toString()}`);
 			
-			// Apply client-side filtering
-			if(currentQuery || currentDegree || currentField) {
-				const q = currentQuery.toLowerCase();
+			// Apply client-side filtering for degree and field (only if no search query or for university-specific search)
+			if((currentDegree || currentField) && (!currentQuery || currentUniversityId)) {
 				list = list.filter(p => {
-					const nameMatch = !currentQuery || (p.name||'').toLowerCase().includes(q);
 					const degreeMatch = !currentDegree || (p.degree_level||'').toLowerCase() === currentDegree;
 					const fieldMatch = !currentField || (p.field_of_study||'').toLowerCase().includes(currentField.toLowerCase());
-					return nameMatch && degreeMatch && fieldMatch;
+					return degreeMatch && fieldMatch;
 				});
 			}
 			

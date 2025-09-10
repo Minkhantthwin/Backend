@@ -103,14 +103,18 @@ async def check_user_against_all_programs(
     - Saves qualification status to MySQL database
     - Updates qualification relationships in Neo4j graph database
     - Returns detailed qualification results for all programs
-    
+
     This is useful for generating recommendations based on qualification match
     and ensuring data consistency between MySQL and Neo4j.
     """
     try:
-        logger.info(f"Starting qualification check for user {user_id} against all programs")
+        logger.info(
+            f"Starting qualification check for user {user_id} against all programs"
+        )
         results = qualification_service.check_user_against_all_programs(user_id)
-        logger.info(f"Qualification check completed for user {user_id}: {len(results)} programs processed")
+        logger.info(
+            f"Qualification check completed for user {user_id}: {len(results)} programs processed"
+        )
         return results
 
     except Exception as e:

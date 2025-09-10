@@ -101,6 +101,36 @@ class ProgramRepository:
             logger.error(f"Failed to get programs for field {field_of_study}: {e}")
             raise
 
+    def search_programs(
+        self,
+        search_query: str = None,
+        skip: int = 0,
+        limit: int = 100,
+        active_only: bool = True,
+    ) -> List[Program]:
+        """Search programs by name, field of study, or university name"""
+        try:
+            from app.models import University
+
+            query = self.db.query(Program).join(Program.university)
+
+            if active_only:
+                query = query.filter(Program.is_active == True)
+
+            if search_query:
+                search_term = f"%{search_query}%"
+                query = query.filter(
+                    Program.name.ilike(search_term)
+                    | Program.field_of_study.ilike(search_term)
+                    | University.name.ilike(search_term)
+                )
+
+            programs = query.offset(skip).limit(limit).all()
+            return programs
+        except Exception as e:
+            logger.error(f"Failed to search programs with query '{search_query}': {e}")
+            raise
+
     def count_programs(self, active_only: bool = True) -> int:
         """Count total number of programs"""
         try:
@@ -207,10 +237,16 @@ class ProgramRepository:
                         {
                             "program_id": prog.id,
                             "program_name": prog.name,
-                            "degree_level": prog.degree_level.value if prog.degree_level else None,
+                            "degree_level": (
+                                prog.degree_level.value if prog.degree_level else None
+                            ),
                             "field_of_study": prog.field_of_study,
                             "language": prog.language,
-                            "tuition_fee": float(prog.tuition_fee) if prog.tuition_fee is not None else None,
+                            "tuition_fee": (
+                                float(prog.tuition_fee)
+                                if prog.tuition_fee is not None
+                                else None
+                            ),
                             "currency": prog.currency,
                             "university_id": uni.id,
                             "university_name": uni.name,
@@ -223,12 +259,12 @@ class ProgramRepository:
             results.sort(key=lambda r: (r["university_ranking_world"] or 1_000_000))
             return results
         except Exception as e:
-            logger.error(
-                f"Failed to get programs from top ranked universities: {e}"
-            )
+            logger.error(f"Failed to get programs from top ranked universities: {e}")
             return []
 
-    def update_program(self, program_id: int, program_data: ProgramCreate) -> Optional[Program]:
+    def update_program(
+        self, program_id: int, program_data: ProgramCreate
+    ) -> Optional[Program]:
         """Update program details and replace requirements"""
         try:
             program = self.get_program_by_id(program_id)
@@ -248,7 +284,9 @@ class ProgramRepository:
                 self.db.flush()
                 # Add new
                 for req_data in program_data.requirements:
-                    new_req = ProgramRequirement(program_id=program.id, **req_data.model_dump())
+                    new_req = ProgramRequirement(
+                        program_id=program.id, **req_data.model_dump()
+                    )
                     self.db.add(new_req)
 
             self.db.commit()

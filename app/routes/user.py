@@ -13,7 +13,11 @@ from app.schemas import (
     MessageResponse,
     RecommendationListResponse,
 )
-from app.dependencies.auth import get_current_user, get_optional_current_user, require_admin
+from app.dependencies.auth import (
+    get_current_user,
+    get_optional_current_user,
+    require_admin,
+)
 from app.models import User
 from app.util.log import get_logger
 

@@ -90,8 +90,12 @@ async def program_counts(
     description="List programs offered by the top N world-ranked universities (public)",
 )
 async def get_programs_from_top_ranked_unis(
-    top_universities: int = Query(10, ge=1, le=100, description="Number of top universities to include"),
-    per_university: int = Query(5, ge=1, le=50, description="Max programs per university"),
+    top_universities: int = Query(
+        10, ge=1, le=100, description="Number of top universities to include"
+    ),
+    per_university: int = Query(
+        5, ge=1, le=50, description="Max programs per university"
+    ),
     program_repo: ProgramRepository = Depends(get_program_repository),
 ):
     """Return programs offered by top ranked universities (static route placed before /programs/{program_id} to avoid 422)."""
@@ -111,6 +115,7 @@ async def get_programs_from_top_ranked_unis(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal server error occurred while retrieving top ranked programs",
         )
+
 
 @router.get(
     "/programs/{program_id}",
@@ -155,21 +160,32 @@ async def get_programs(
     page: int = Query(1, ge=1, description="Page number"),
     per_page: int = Query(10, ge=1, le=100, description="Number of programs per page"),
     active_only: bool = Query(True, description="Only return active programs"),
+    search: str = Query(
+        None, description="Search programs by name, field, or university"
+    ),
     program_repo: ProgramRepository = Depends(get_program_repository),
 ):
     """
-    Get a paginated list of programs.
+    Get a paginated list of programs with optional search.
 
     - **page**: Page number (starts from 1)
     - **per_page**: Number of programs per page (1-100)
     - **active_only**: Whether to include only active programs
+    - **search**: Search term to filter programs by name, field of study, or university name
     """
     try:
         skip = (page - 1) * per_page
 
-        programs = program_repo.get_programs(
-            skip=skip, limit=per_page, active_only=active_only
-        )
+        if search:
+            # Use search method when search query is provided
+            programs = program_repo.search_programs(
+                search_query=search, skip=skip, limit=per_page, active_only=active_only
+            )
+        else:
+            # Use regular get_programs when no search query
+            programs = program_repo.get_programs(
+                skip=skip, limit=per_page, active_only=active_only
+            )
         return programs
 
     except Exception as e:
@@ -301,7 +317,9 @@ async def update_program(
     try:
         program = program_repo.update_program(program_id, program_data)
         if not program:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Program not found")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Program not found"
+            )
         logger.info(f"Program updated successfully: {program.name}")
         return program
     except ValueError as e:

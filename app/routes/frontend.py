@@ -1,6 +1,7 @@
 """
 Frontend routes and static file handling for demo pages
 """
+
 import os
 from fastapi import APIRouter, FastAPI
 from fastapi.staticfiles import StaticFiles
@@ -9,15 +10,16 @@ from app.util.log import get_logger
 
 logger = get_logger(__name__)
 
+
 def setup_frontend_routes(app: FastAPI) -> None:
     """
     Set up frontend routes and static file serving for demo pages.
-    
+
     This function configures:
     - Static file mounting for CSS, JS, and other assets
     - Route handlers for serving HTML pages
     - Proper path resolution for the view directory
-    
+
     Args:
         app: FastAPI application instance
     """
@@ -27,30 +29,38 @@ def setup_frontend_routes(app: FastAPI) -> None:
     static_dir = os.path.join(project_root, "view")
     user_dir = os.path.join(static_dir, "user")
     admin_dir = os.path.join(static_dir, "admin")
-    
+
     logger.info(f"Looking for static directory at: {static_dir}")
-    
+
     if not os.path.exists(static_dir):
         logger.warning(f"Static directory not found: {static_dir}")
         return
-    
+
     try:
         # Mount CSS and JS directories specifically
         css_dir = os.path.join(static_dir, "css")
         js_dir = os.path.join(static_dir, "js")
-        
+
         if os.path.exists(css_dir):
             app.mount("/css", StaticFiles(directory=css_dir), name="css")
             logger.info(f"Mounted CSS directory: {css_dir}")
         else:
             logger.warning(f"CSS directory not found: {css_dir}")
-        
+
         if os.path.exists(js_dir):
             app.mount("/js", StaticFiles(directory=js_dir), name="js")
             logger.info(f"Mounted JS directory: {js_dir}")
         else:
             logger.warning(f"JS directory not found: {js_dir}")
-        
+
+        # Mount images directory
+        images_dir = os.path.join(static_dir, "images")
+        if os.path.exists(images_dir):
+            app.mount("/images", StaticFiles(directory=images_dir), name="images")
+            logger.info(f"Mounted images directory: {images_dir}")
+        else:
+            logger.warning(f"Images directory not found: {images_dir}")
+
         # Mount the main static directory (root) plus user/admin sub-folders if present
         app.mount("/static", StaticFiles(directory=static_dir), name="static")
         # Unified mount for whole view tree to give a stable absolute path
@@ -60,22 +70,26 @@ def setup_frontend_routes(app: FastAPI) -> None:
         logger.info(f"Mounted static base directory: {static_dir}")
 
         if os.path.exists(user_dir):
-            app.mount("/user-static", StaticFiles(directory=user_dir), name="user_static")
+            app.mount(
+                "/user-static", StaticFiles(directory=user_dir), name="user_static"
+            )
             logger.info(f"Mounted user directory: {user_dir}")
         else:
             logger.warning(f"User directory not found: {user_dir}")
 
         if os.path.exists(admin_dir):
-            app.mount("/admin-static", StaticFiles(directory=admin_dir), name="admin_static")
+            app.mount(
+                "/admin-static", StaticFiles(directory=admin_dir), name="admin_static"
+            )
             logger.info(f"Mounted admin directory: {admin_dir}")
         else:
             logger.warning(f"Admin directory not found: {admin_dir}")
-        
+
         # Add route handlers for HTML pages & partials
         _add_frontend_routes(app, static_dir)
-        
+
         logger.info("Frontend routes and static files configured successfully")
-        
+
     except Exception as e:
         logger.error(f"Error setting up frontend routes: {e}")
         raise
@@ -84,12 +98,12 @@ def setup_frontend_routes(app: FastAPI) -> None:
 def _add_frontend_routes(app: FastAPI, static_dir: str) -> None:
     """
     Add route handlers for serving HTML pages.
-    
+
     Args:
         app: FastAPI application instance
         static_dir: Path to the static files directory
     """
-    
+
     @app.get("/")
     async def read_root():
         """Serve main page (login)."""
@@ -103,7 +117,7 @@ def _add_frontend_routes(app: FastAPI, static_dir: str) -> None:
             return FileResponse(legacy_login)
         logger.error(f"Login file not found in expected paths: {login_file}")
         return {"error": "Login page not found"}
-    
+
     @app.get("/login")
     async def login_page():
         """Serve the login page."""
@@ -116,7 +130,7 @@ def _add_frontend_routes(app: FastAPI, static_dir: str) -> None:
             return FileResponse(legacy_login)
         logger.error(f"Login file not found: {login_file}")
         return {"error": "Login page not found"}
-    
+
     @app.get("/home")
     async def home_page():
         """Serve the user home/dashboard page."""
@@ -129,7 +143,7 @@ def _add_frontend_routes(app: FastAPI, static_dir: str) -> None:
             return FileResponse(legacy_home)
         logger.error(f"Home file not found: {home_file}")
         return {"error": "Home page not found"}
-    
+
     @app.get("/register")
     async def register_page():
         """Serve the registration page."""
@@ -142,7 +156,7 @@ def _add_frontend_routes(app: FastAPI, static_dir: str) -> None:
             return FileResponse(legacy_register)
         logger.error(f"Register file not found: {register_file}")
         return {"error": "Register page not found"}
-    
+
     @app.get("/profile")
     async def profile_page():
         """Serve the user profile page."""
@@ -205,20 +219,29 @@ def _add_frontend_routes(app: FastAPI, static_dir: str) -> None:
             return FileResponse(application_file)
         logger.error(f"Application file not found: {application_file}")
         return {"error": "Application page not found"}
-    
+
+    @app.get("/my-applications")
+    async def my_applications_page():
+        """Serve the my applications page."""
+        my_applications_file = os.path.join(static_dir, "user", "my_applications.html")
+        if os.path.exists(my_applications_file):
+            return FileResponse(my_applications_file)
+        logger.error(f"My applications file not found: {my_applications_file}")
+        return {"error": "My applications page not found"}
+
     # Add .html extensions as well for direct access
     @app.get("/login.html")
     async def login_html():
         return await login_page()
-    
+
     @app.get("/home.html")
     async def home_html():
         return await home_page()
-    
+
     @app.get("/register.html")
     async def register_html():
         return await register_page()
-    
+
     @app.get("/profile.html")
     async def profile_html():
         return await profile_page()
@@ -246,6 +269,10 @@ def _add_frontend_routes(app: FastAPI, static_dir: str) -> None:
     @app.get("/application.html")
     async def application_html():
         return await application_page()
+
+    @app.get("/my-applications.html")
+    async def my_applications_html():
+        return await my_applications_page()
 
     # Admin specific pages
     @app.get("/admin/login")
@@ -347,7 +374,29 @@ def _add_frontend_routes(app: FastAPI, static_dir: str) -> None:
     @app.get("/admin/applications.html")
     async def admin_applications_html():
         return await admin_applications_page()
-    
+
+    @app.get("/admin/user_application")
+    async def admin_user_application_page():
+        ua_page = os.path.join(static_dir, "admin", "user_application.html")
+        if os.path.exists(ua_page):
+            logger.info("Serving admin user application detail page")
+            return FileResponse(ua_page)
+        logger.error(f"Admin user application detail page not found: {ua_page}")
+        return {"error": "Admin user application detail page not found"}
+
+    @app.get("/admin/user_application.html")
+    async def admin_user_application_html():
+        return await admin_user_application_page()
+
+    # Add alias route with dash for backward compatibility
+    @app.get("/admin/user-application")
+    async def admin_user_application_dash():
+        return await admin_user_application_page()
+
+    @app.get("/admin/user-application.html")
+    async def admin_user_application_dash_html():
+        return await admin_user_application_page()
+
     # Add specific routes for partials
     @app.get("/user/partials/layout.html")
     async def user_layout_partial():
@@ -357,12 +406,12 @@ def _add_frontend_routes(app: FastAPI, static_dir: str) -> None:
             return FileResponse(layout_file)
         logger.error(f"Layout partial not found: {layout_file}")
         return {"error": "Layout partial not found"}
-    
+
     @app.get("/view/user/partials/layout.html")
     async def user_layout_partial_view():
         """Serve the user layout partial with view prefix."""
         return await user_layout_partial()
-    
+
     @app.get("/static/user/partials/layout.html")
     async def user_layout_partial_static():
         """Serve the user layout partial with static prefix."""
@@ -395,11 +444,12 @@ def _add_frontend_routes(app: FastAPI, static_dir: str) -> None:
 # Router for any additional frontend API endpoints if needed
 router = APIRouter()
 
+
 @router.get("/frontend/status")
 async def frontend_status():
     """
     Get the status of the frontend setup.
-    
+
     Returns:
         dict: Status information about frontend configuration
     """
@@ -422,14 +472,20 @@ async def frontend_status():
         "files": {
             "user/login.html": os.path.exists(os.path.join(user_dir, "login.html")),
             "user/home.html": os.path.exists(os.path.join(user_dir, "home.html")),
-            "user/register.html": os.path.exists(os.path.join(user_dir, "register.html")),
-            "user/partials/layout.html": os.path.exists(os.path.join(user_dir, "partials", "layout.html")),
+            "user/register.html": os.path.exists(
+                os.path.join(user_dir, "register.html")
+            ),
+            "user/partials/layout.html": os.path.exists(
+                os.path.join(user_dir, "partials", "layout.html")
+            ),
             "legacy_login.html": os.path.exists(os.path.join(static_dir, "login.html")),
             "legacy_home.html": os.path.exists(os.path.join(static_dir, "home.html")),
-            "legacy_register.html": os.path.exists(os.path.join(static_dir, "register.html")),
+            "legacy_register.html": os.path.exists(
+                os.path.join(static_dir, "register.html")
+            ),
             "style.css": os.path.exists(os.path.join(css_dir, "style.css")),
             "index.js": os.path.exists(os.path.join(js_dir, "index.js")),
-        }
+        },
     }
-    
+
     return status

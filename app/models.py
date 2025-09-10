@@ -162,6 +162,9 @@ class Application(Base):
     decision_date = Column(DateTime)
     personal_statement = Column(Text)
     additional_documents = Column(JSON)
+    # Stores metadata about files saved on disk under the documents/ folder
+    # Example: [{"id": str, "filename": str, "content_type": str, "size": int, "path": str, "uploaded_at": str}]
+    supporting_documents = Column(JSON)
 
     user = relationship("User", back_populates="applications")
     program = relationship("Program", back_populates="applications")

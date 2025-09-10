@@ -139,7 +139,9 @@ class UserUpdate(BaseModel):
     phone: Optional[str] = Field(None, max_length=20)
     date_of_birth: Optional[date] = None
     nationality: Optional[str] = Field(None, max_length=100)
-    is_admin: Optional[bool] = None  # Only processed if requester is admin (enforced in route/service layer)
+    is_admin: Optional[bool] = (
+        None  # Only processed if requester is admin (enforced in route/service layer)
+    )
 
     @field_validator("phone")
     @classmethod
@@ -381,7 +383,9 @@ class ProgramBase(BaseModel):
             try:
                 return DegreeLevel(v_lower)
             except ValueError:
-                raise ValueError("Invalid degree_level. Valid: bachelor, master, phd, diploma, certificate")
+                raise ValueError(
+                    "Invalid degree_level. Valid: bachelor, master, phd, diploma, certificate"
+                )
         return v
 
 
@@ -411,6 +415,8 @@ class ApplicationBase(BaseModel):
     program_id: int
     personal_statement: Optional[str] = None
     additional_documents: Optional[dict] = None
+    # New: metadata for files saved on disk
+    supporting_documents: Optional[list] = None
 
 
 class ApplicationCreate(ApplicationBase):
@@ -425,6 +431,7 @@ class ApplicationUpdate(BaseModel):
     status: Optional[ApplicationStatus] = None
     personal_statement: Optional[str] = None
     additional_documents: Optional[dict] = None
+    supporting_documents: Optional[list] = None
     decision_date: Optional[datetime] = None
 
 

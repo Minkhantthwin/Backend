@@ -104,7 +104,9 @@ class UserRepository:
 
         except IntegrityError as e:
             self.db.rollback()
-            logger.error(f"Failed to create admin user due to integrity constraint: {e}")
+            logger.error(
+                f"Failed to create admin user due to integrity constraint: {e}"
+            )
             raise ValueError("Admin user with this email already exists")
         except Exception as e:
             self.db.rollback()

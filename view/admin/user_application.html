@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Admin - Application Detail</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script>
+		tailwind.config = { theme:{ extend:{ colors:{ primary:'#3B82F6', accent:'#F59E0B', danger:'#DC2626', success:'#059669', grayBorder:'#E5E7EB' }}}};
+	</script>
+	<link rel="stylesheet" href="../css/style.css" />
+		<style>
+			.label { font-size: 0.75rem; font-weight: 500; color: #6B7280; }
+		</style>
+	<script src="../js/admin.js"></script>
+	<script>
+		document.addEventListener('DOMContentLoaded', async () => {
+			await injectAdminLayout('applications');
+			const me = await adminRequireAuth();
+			if (!me) return;
+			initPage();
+		});
+
+		function getQueryParam(key){ const u=new URL(window.location.href); return u.searchParams.get(key); }
+
+		let appData = null;
+
+		async function initPage(){
+			const id = getQueryParam('id');
+			if(!id){ renderError('Missing application id'); return; }
+			setText('pageTitle', `Application #${id}`);
+			try{
+				appData = await adminApi(`/applications/${id}`);
+				// Hydrate user & program if missing
+				const hydrates = [];
+				if(!appData.user && appData.user_id){ hydrates.push(adminApi(`/users/${appData.user_id}`).then(u=> appData.user=u).catch(()=>{})); }
+				if(!appData.program && appData.program_id){ hydrates.push(adminApi(`/programs/${appData.program_id}`).then(p=> appData.program=p).catch(()=>{})); }
+				if(hydrates.length) await Promise.all(hydrates);
+				renderApplication();
+				bindActions();
+			}catch(e){ renderError(e.message || 'Failed to load application'); }
+		}
+
+		function renderError(msg){
+			const root = document.getElementById('appRoot');
+			if(root) root.innerHTML = `<div class="p-6 bg-red-50 text-red-700 border border-red-200 rounded-lg">${msg}</div>`;
+		}
+
+		function formatDate(dt){ if(!dt) return '—'; try{ return new Date(dt).toLocaleString(); }catch{ return dt; } }
+
+		function statusBadge(status){
+			const map = {draft:'bg-gray-200 text-gray-700',submitted:'bg-blue-100 text-primary',under_review:'bg-amber-100 text-accent',accepted:'bg-green-100 text-success',rejected:'bg-red-100 text-danger',waitlisted:'bg-purple-100 text-purple-700'};
+			const cls = map[(status||'').toLowerCase()] || 'bg-gray-100 text-gray-700';
+			const label = (status||'').toLowerCase().replace('_',' ');
+			return `<span class="px-2 py-1 text-xs rounded ${cls} font-medium capitalize">${label||'unknown'}</span>`;
+		}
+
+		function renderApplication(){
+			const app = appData || {};
+			// Header summary
+			setText('appId', `#${app.id}`);
+			document.getElementById('statusBadge').innerHTML = statusBadge(app.status);
+			setText('appliedAt', formatDate(app.application_date));
+			setText('decisionAt', formatDate(app.decision_date));
+
+			// User
+			setText('userName', app.user ? `${app.user.first_name||''} ${app.user.last_name||''}`.trim() : '—');
+			setText('userEmail', app.user?.email || '—');
+			setText('userPhone', app.user?.phone || '—');
+			setText('userNationality', app.user?.nationality || '—');
+
+			// Program
+			setText('programName', app.program?.name || '—');
+			setText('programUniv', app.program?.university?.name || '—');
+			setText('programLevel', (app.program?.degree_level||'').toLowerCase());
+			setText('programField', app.program?.field_of_study || '—');
+
+			// Statement & text data
+			setText('personalStatement', app.personal_statement || '—');
+			const td = app.additional_documents?.text_data || {};
+			setText('acadBackground', td.academic_background || '—');
+			setText('workExp', td.work_experience || '—');
+			setText('researchInt', td.research_interests || '—');
+			setText('additionalInfo', td.additional_info || '—');
+
+			// Documents (supporting_documents preferred; fallback to additional_documents.uploaded_files)
+			const docs = Array.isArray(app.supporting_documents) && app.supporting_documents.length
+				? app.supporting_documents
+				: (app.additional_documents?.uploaded_files || []);
+			// If identity doc exists and not already in list, prepend it for clarity
+			const idDoc = app.additional_documents?.identity_document;
+			let finalDocs = docs.slice();
+			if (idDoc && !finalDocs.find(d => d.id === idDoc.id)) {
+				finalDocs = [idDoc, ...finalDocs];
+			}
+			const list = document.getElementById('docList');
+			list.innerHTML='';
+			if(!finalDocs || !finalDocs.length){
+				list.innerHTML = '<li class="text-sm text-gray-500">No documents uploaded</li>';
+			} else {
+				finalDocs.forEach(d=>{
+					const li = document.createElement('li');
+					li.className = 'flex items-center justify-between p-3 border border-gray-100 rounded-lg hover:bg-gray-50';
+					const meta = `${d.category==='identity' ? 'Identity' : ((d.content_type||'').split('/')[1]||'file')} • ${(Math.round((d.size||0)/1024))} KB • ${new Date(d.uploaded_at||Date.now()).toLocaleString()}`;
+					li.innerHTML = `
+						<div class="min-w-0">
+							<div class="text-sm font-medium text-gray-800 truncate">${d.filename||'document'}</div>
+							<div class="text-xs text-gray-500 truncate">${meta}</div>
+						</div>
+						<div class="flex items-center gap-2">
+							<button class="px-3 py-1.5 text-xs bg-white border border-gray-200 rounded hover:bg-gray-100" data-dl="${d.id}">Download</button>
+						</div>`;
+					list.appendChild(li);
+				});
+			}
+
+			// Status control
+			const select = document.getElementById('statusSelect');
+			if(select){ select.value = (app.status||'').toLowerCase(); }
+		}
+
+		function bindActions(){
+			const id = appData?.id;
+			document.getElementById('backBtn')?.addEventListener('click', (e)=>{ e.preventDefault(); window.location.href='/admin/applications'; });
+			document.getElementById('updateStatusBtn')?.addEventListener('click', updateStatus);
+			document.querySelectorAll('[data-dl]')?.forEach(btn=>{
+				btn.addEventListener('click', ()=> downloadDoc(id, btn.getAttribute('data-dl')));
+			});
+		}
+
+		async function updateStatus(){
+			const id = appData?.id; if(!id) return;
+			const newStatus = document.getElementById('statusSelect').value;
+			const btn = document.getElementById('updateStatusBtn');
+			btn.disabled = true; btn.textContent = 'Updating...';
+			try{
+				await adminApi(`/applications/${id}`, { method:'PUT', body: JSON.stringify({ status: newStatus }) });
+				appData.status = newStatus;
+				document.getElementById('statusBadge').innerHTML = statusBadge(newStatus);
+			}catch(e){ alert('Failed to update status: ' + (e.message||e)); }
+			finally{ btn.disabled=false; btn.textContent='Update Status'; }
+		}
+
+		async function downloadDoc(appId, docId){
+			try{
+				const token = adminGetToken();
+				const res = await fetch(ADMIN_API_BASE + `/applications/${appId}/documents/${docId}`, {
+					headers: token ? { 'Authorization': 'Bearer ' + token } : {},
+				});
+				if(!res.ok){
+					let msg = 'Download failed ('+res.status+')';
+					try{ const j = await res.json(); if(j?.detail) msg = j.detail; }catch{}
+					throw new Error(msg);
+				}
+				const blob = await res.blob();
+				// Try to derive a filename from Content-Disposition or fallback to docId
+				const cd = res.headers.get('Content-Disposition') || '';
+				const match = cd.match(/filename\*=UTF-8''([^;]+)|filename="?([^";]+)"?/i);
+				const filename = decodeURIComponent(match?.[1] || match?.[2] || `document-${docId}`);
+				const url = URL.createObjectURL(blob);
+				const a = document.createElement('a');
+				a.href = url; a.download = filename; document.body.appendChild(a); a.click();
+				a.remove(); URL.revokeObjectURL(url);
+			}catch(e){ alert(e.message||'Download failed'); }
+		}
+
+		function setText(id, value){ const el = document.getElementById(id); if(el) el.textContent = (value===undefined||value===null||value==='')?'—':value; }
+	</script>
+</head>
+<body class="min-h-screen bg-gray-50">
+	<div id="navbarMount"></div>
+
+	<main class="max-w-6xl mx-auto px-4 py-8 space-y-6">
+		<div class="flex items-center justify-between">
+			<div>
+				<h1 id="pageTitle" class="text-2xl font-semibold text-gray-900">Application</h1>
+				<p class="text-sm text-gray-600">View and manage a user's application</p>
+			</div>
+			<a id="backBtn" href="#" class="px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg hover:bg-gray-100">Back to Applications</a>
+		</div>
+
+		<section id="appRoot" class="bg-white border border-gray-100 rounded-xl shadow-sm p-6 space-y-6">
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+				<div class="space-y-2">
+					<div class="label">Application</div>
+					<div class="text-gray-800 font-medium" id="appId">#—</div>
+					<div id="statusBadge"></div>
+				</div>
+				<div class="space-y-2">
+					<div class="label">Applied</div>
+					<div class="text-gray-800" id="appliedAt">—</div>
+				</div>
+				<div class="space-y-2">
+					<div class="label">Decision</div>
+					<div class="text-gray-800" id="decisionAt">—</div>
+				</div>
+			</div>
+
+			<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+				<div class="bg-gray-50 rounded-lg p-4 border border-gray-100 space-y-3">
+					<div class="font-medium text-gray-800">User</div>
+					<div class="grid grid-cols-2 gap-3 text-sm">
+						<div><div class="label">Name</div><div id="userName">—</div></div>
+						<div><div class="label">Email</div><div id="userEmail" class="break-all">—</div></div>
+						<div><div class="label">Phone</div><div id="userPhone">—</div></div>
+						<div><div class="label">Nationality</div><div id="userNationality">—</div></div>
+					</div>
+				</div>
+				<div class="bg-gray-50 rounded-lg p-4 border border-gray-100 space-y-3">
+					<div class="font-medium text-gray-800">Program</div>
+					<div class="grid grid-cols-2 gap-3 text-sm">
+						<div><div class="label">Program</div><div id="programName">—</div></div>
+						<div><div class="label">University</div><div id="programUniv">—</div></div>
+						<div><div class="label">Level</div><div id="programLevel">—</div></div>
+						<div><div class="label">Field</div><div id="programField">—</div></div>
+					</div>
+				</div>
+			</div>
+
+			<div class="bg-white rounded-lg border border-gray-100">
+				<div class="p-4 border-b border-gray-100 flex items-center justify-between">
+					<div class="font-medium text-gray-800">Status Management</div>
+					<div class="flex items-center gap-3">
+						<select id="statusSelect" class="px-3 py-2 text-sm border border-gray-300 rounded-lg">
+							<option value="submitted">Submitted</option>
+							<option value="under_review">Under Review</option>
+							<option value="accepted">Accepted</option>
+							<option value="rejected">Rejected</option>
+							<option value="waitlisted">Waitlisted</option>
+							<option value="draft">Draft</option>
+						</select>
+						<button id="updateStatusBtn" class="px-4 py-2 text-sm bg-primary text-white rounded-lg hover:bg-blue-600">Update Status</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+				<div class="space-y-4">
+					<div class="font-medium text-gray-800">Personal Statement</div>
+					<div id="personalStatement" class="text-sm text-gray-700 whitespace-pre-wrap bg-gray-50 p-4 rounded-lg border border-gray-100">—</div>
+				</div>
+				<div class="space-y-3">
+					<div class="font-medium text-gray-800">Additional Information</div>
+					<div class="grid grid-cols-2 gap-3 text-sm">
+						<div><div class="label">Academic Background</div><div id="acadBackground">—</div></div>
+						<div><div class="label">Work Experience</div><div id="workExp">—</div></div>
+						<div><div class="label">Research Interests</div><div id="researchInt">—</div></div>
+						<div><div class="label">Additional Info</div><div id="additionalInfo">—</div></div>
+					</div>
+				</div>
+			</div>
+
+			<div class="space-y-3">
+				<div class="font-medium text-gray-800">Supporting Documents</div>
+				<ul id="docList" class="space-y-2"></ul>
+			</div>
+		</section>
+	</main>
+
+	<div id="footerMount"></div>
+</body>
+</html>

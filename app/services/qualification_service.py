@@ -361,7 +361,9 @@ class QualificationService:
                 self.db.add(status)
 
             self.db.commit()
-            logger.debug(f"Successfully updated qualification status for user {user_id}, program {program_id}")
+            logger.debug(
+                f"Successfully updated qualification status for user {user_id}, program {program_id}"
+            )
 
         except Exception as e:
             self.db.rollback()
@@ -420,20 +422,26 @@ class QualificationService:
             results = []
             total_programs = len(programs)
 
-            logger.info(f"Checking user {user_id} against {total_programs} active programs")
+            logger.info(
+                f"Checking user {user_id} against {total_programs} active programs"
+            )
 
             for program in programs:
                 try:
                     result = self.check_user_qualification(user_id, program.id)
                     results.append(result)
-                    logger.debug(f"Updated qualification status for user {user_id}, program {program.id}")
+                    logger.debug(
+                        f"Updated qualification status for user {user_id}, program {program.id}"
+                    )
                 except Exception as e:
                     logger.error(
                         f"Error checking program {program.id} for user {user_id}: {e}"
                     )
                     continue
 
-            logger.info(f"Completed qualification check for user {user_id}: {len(results)} programs checked")
+            logger.info(
+                f"Completed qualification check for user {user_id}: {len(results)} programs checked"
+            )
             return results
 
         except Exception as e:
@@ -463,20 +471,25 @@ class QualificationService:
             recommendations = []
             for status in statuses:
                 program = status.program
-                recommendations.append({
-                    "program_id": status.program_id,
-                    "program_name": program.name,
-                    "university_name": program.university.name if program.university else None,
-                    "field_of_study": program.field_of_study,
-                    "degree_level": program.degree_level.value,
-                    "qualification_score": float(status.qualification_score),
-                    "is_qualified": status.is_qualified,
-                    "recommendation_reason": (
-                        "You meet all requirements" if status.is_qualified 
-                        else f"High qualification match ({status.qualification_score}%)"
-                    ),
-                    "checked_at": status.last_checked,
-                })
+                recommendations.append(
+                    {
+                        "program_id": status.program_id,
+                        "program_name": program.name,
+                        "university_name": (
+                            program.university.name if program.university else None
+                        ),
+                        "field_of_study": program.field_of_study,
+                        "degree_level": program.degree_level.value,
+                        "qualification_score": float(status.qualification_score),
+                        "is_qualified": status.is_qualified,
+                        "recommendation_reason": (
+                            "You meet all requirements"
+                            if status.is_qualified
+                            else f"High qualification match ({status.qualification_score}%)"
+                        ),
+                        "checked_at": status.last_checked,
+                    }
+                )
 
             return recommendations
 

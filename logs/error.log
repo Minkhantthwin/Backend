@@ -184,3 +184,19 @@ Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 7687)) (reas
 2025-09-07 17:46:45 | app.services.neo4j_program_service | ERROR | neo4j_program_service.py:183 | create_program_node() | Failed to create program node in Neo4j: {code: Neo.ClientError.Statement.SyntaxError} {message: Invalid input 'CASE': expected an expression, ',', 'AS', 'ORDER BY', 'CALL', 'CREATE', 'LOAD CSV', 'DELETE', 'DETACH', 'FINISH', 'FOREACH', 'INSERT', 'LIMIT', 'MATCH', 'MERGE', 'NODETACH', 'OFFSET', 'OPTIONAL', 'REMOVE', 'RETURN', 'SET', 'SKIP', 'UNION', 'UNWIND', 'USE', 'WHERE', 'WITH' or <EOF> (line 18, column 13 (offset: 711))
 "            CASE"
              ^}
+2025-09-09 18:13:39 | app.database | ERROR | database.py:162 | initialize() | Neo4j service unavailable: Couldn't connect to localhost:7687 (resolved to ()):
+Failed to establish connection to ResolvedIPv6Address(('::1', 7687, 0, 0)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 7687)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+2025-09-09 18:13:39 | app.main | ERROR | main.py:42 | lifespan() | Failed to initialize application: Couldn't connect to localhost:7687 (resolved to ()):
+Failed to establish connection to ResolvedIPv6Address(('::1', 7687, 0, 0)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 7687)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+2025-09-09 18:14:51 | app.database | ERROR | database.py:162 | initialize() | Neo4j service unavailable: Couldn't connect to localhost:7687 (resolved to ()):
+Failed to establish connection to ResolvedIPv6Address(('::1', 7687, 0, 0)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 7687)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+2025-09-09 18:14:51 | app.main | ERROR | main.py:42 | lifespan() | Failed to initialize application: Couldn't connect to localhost:7687 (resolved to ()):
+Failed to establish connection to ResolvedIPv6Address(('::1', 7687, 0, 0)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 7687)) (reason [WinError 10061] No connection could be made because the target machine actively refused it)
+2025-09-09 18:56:27 | app.repositories.application_repository | ERROR | application_repository.py:38 | create_application() | Failed to create application: (pymysql.err.OperationalError) (2006, "MySQL server has gone away (ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))")
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-09-09 18:56:27 | app.routes.application | ERROR | application.py:268 | create_application_with_documents() | Unexpected error creating application with documents: (pymysql.err.OperationalError) (2006, "MySQL server has gone away (ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))")
+(Background on this error at: https://sqlalche.me/e/20/e3q8)

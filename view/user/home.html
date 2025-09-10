@@ -44,30 +44,31 @@ tailwind.config = {
 <!-- Hero -->
 <section class="relative overflow-hidden">
   <div class="absolute inset-0 bg-gradient-to-br from-light-blue via-white to-lighter-blue"></div>
+  <!-- University building background image with transparency -->
+  <div class="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20" style="background-image: url('/images/university.jpg')"></div>
   <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(circle at 20% 30%, #3B82F6 0, transparent 60%), radial-gradient(circle at 80% 70%, #F59E0B 0, transparent 55%);"></div>
   <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
     <div class="max-w-3xl">
       <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight text-gray-900">
         Find the Right <span class="text-primary">University</span> for Your Future
       </h1>
-      <p class="mt-4 text-lg text-gray-600">Personalized recommendations based on your goals and interests.</p>
     </div>
     <!-- Search Bar -->
-    <form id="searchForm" class="mt-8 bg-white rounded-2xl shadow-xl p-4 flex flex-col md:flex-row gap-4 md:items-center border border-gray-border">
+    <!-- <form id="searchForm" class="mt-8 bg-white/40 backdrop-blur-md rounded-2xl shadow-lg p-4 flex flex-col md:flex-row gap-4 md:items-center border border-white/40">
       <div class="flex-1 flex flex-col md:flex-row gap-4">
         <div class="relative md:w-48">
-          <select class="w-full h-full px-4 py-3 rounded-xl border border-gray-border focus:ring-2 focus:ring-primary focus:border-primary bg-white text-sm" name="filter">
+          <select class="w-full h-full px-4 py-3 rounded-xl border border-white/50 focus:ring-2 focus:ring-primary focus:border-primary bg-white/40 backdrop-blur-sm text-sm text-gray-900" name="filter">
             <option value="program">Program</option>
             <option value="country">Country</option>
             <option value="university">University</option>
           </select>
         </div>
         <div class="flex-1">
-          <input type="text" name="q" placeholder="e.g., Computer Science in Canada" class="w-full px-4 py-3 rounded-xl border border-gray-border focus:ring-2 focus:ring-primary focus:border-primary text-sm">
+          <input type="text" name="q" placeholder="e.g., Computer Science in Canada" class="w-full px-4 py-3 rounded-xl border border-white/50 focus:ring-2 focus:ring-primary focus:border-primary bg-white/40 backdrop-blur-sm text-sm text-gray-900 placeholder-gray-700">
         </div>
       </div>
       <button type="submit" class="px-8 py-3 rounded-xl bg-gradient-to-r from-primary to-blue-600 text-white font-medium shadow hover:opacity-90 transition text-sm">Search</button>
-    </form>
+    </form> -->
   </div>
 </section>
 
@@ -486,7 +487,22 @@ tailwind.config = {
     searchForm.addEventListener('submit', e => {
       e.preventDefault();
       const data = new FormData(e.target);
-      console.log('Search:', Object.fromEntries(data.entries()));
+      const searchData = Object.fromEntries(data.entries());
+      
+      // Build URL parameters for redirection to programs page
+      const params = new URLSearchParams();
+      
+      if (searchData.q && searchData.q.trim()) {
+        params.set('search', searchData.q.trim());
+      }
+      
+      if (searchData.filter && searchData.filter !== 'program') {
+        params.set('filter_type', searchData.filter);
+      }
+      
+      // Redirect to programs page with search parameters
+      const url = `/programs${params.toString() ? '?' + params.toString() : ''}`;
+      window.location.href = url;
     });
   }
 })();

@@ -29,7 +29,9 @@ def get_recommendation_service(
 )
 async def get_user_recommendations(
     user_id: int,
-    limit: int = Query(10, ge=1, le=50, description="Maximum number of recommendations"),
+    limit: int = Query(
+        10, ge=1, le=50, description="Maximum number of recommendations"
+    ),
     current_user: User = Depends(get_current_user),
     recommendation_service: RecommendationService = Depends(get_recommendation_service),
 ):
@@ -87,6 +89,7 @@ async def get_user_recommendations(
             detail="Internal server error occurred while getting recommendations",
         )
 
+
 @router.get(
     "/users/{user_id}/recommendations/similar-programs",
     response_model=List[dict],
@@ -111,20 +114,20 @@ async def get_similar_program_recommendations(
         if current_user.id != user_id and not current_user.is_admin:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="You can only access your own recommendations"
+                detail="You can only access your own recommendations",
             )
 
         # Get user interests first
         from app.repositories.user_interest_repository import UserInterestRepository
         from app.database import get_mysql_session
-        
+
         db = next(get_mysql_session())
         interest_repo = UserInterestRepository(db)
         user_interests = interest_repo.get_interests_by_user(user_id)
-        
+
         if not user_interests:
             return []
-        
+
         # Get similar programs for each interest field
         all_similar = []
         for interest in user_interests:
@@ -132,7 +135,7 @@ async def get_similar_program_recommendations(
                 interest.field_of_study, limit=5
             )
             all_similar.extend(similar)
-        
+
         # Remove duplicates and limit
         seen = set()
         unique_similar = []
@@ -140,7 +143,7 @@ async def get_similar_program_recommendations(
             if program["program_id"] not in seen:
                 seen.add(program["program_id"])
                 unique_similar.append(program)
-        
+
         logger.info(f"Found {len(unique_similar)} similar programs for user {user_id}")
         return unique_similar[:limit]
 
@@ -173,7 +176,7 @@ async def get_recommendation_stats(
         if current_user.id != user_id and not current_user.is_admin:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="You can only access your own recommendation statistics"
+                detail="You can only access your own recommendation statistics",
             )
 
         # Get basic counts from each recommendation source
@@ -197,7 +200,7 @@ async def get_recommendation_stats(
                 return []
 
         all_recs = interest_recs + qualification_recs + test_score_recs
-        
+
         stats = {
             "user_id": user_id,
             "recommendation_sources": {
@@ -205,9 +208,13 @@ async def get_recommendation_stats(
                 "qualification_based_count": len(qualification_recs),
                 "test_score_based_count": len(test_score_recs),
             },
-            "total_unique_programs": len(set(safe_extract_field(all_recs, "program_id"))),
+            "total_unique_programs": len(
+                set(safe_extract_field(all_recs, "program_id"))
+            ),
             "top_countries": list(set(safe_extract_field(all_recs, "country")))[:10],
-            "top_fields": list(set(safe_extract_field(all_recs, "field_of_study")))[:10],
+            "top_fields": list(set(safe_extract_field(all_recs, "field_of_study")))[
+                :10
+            ],
             "degree_levels": list(set(safe_extract_field(all_recs, "degree_level"))),
         }
 
@@ -257,4 +264,3 @@ async def get_similar_programs(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal server error occurred while getting similar programs",
         )
-

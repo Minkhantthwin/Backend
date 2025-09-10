@@ -22,6 +22,7 @@
       
       <!-- Authenticated state (simplified: Profile + Logout) -->
       <div id="authenticated-nav" class="hidden flex items-center gap-3">
+        <a href="/my-applications" class="px-4 py-2 rounded-lg border border-gray-border text-sm font-medium hover:bg-light-blue transition">My Applications</a>
         <a href="/profile" class="px-4 py-2 rounded-lg border border-gray-border text-sm font-medium hover:bg-light-blue transition">Profile</a>
         <button id="logout-btn" class="px-4 py-2 rounded-lg border border-red-200 text-sm font-medium text-red-600 hover:bg-red-50 transition">Logout</button>
       </div>
@@ -51,6 +52,7 @@
         
         <!-- Authenticated mobile (simplified) -->
         <div id="mobile-authenticated" class="hidden flex flex-col gap-2">
+          <a href="/my-applications" class="px-4 py-2 rounded-lg border border-gray-border hover:bg-light-blue">My Applications</a>
           <a href="/profile" class="px-4 py-2 rounded-lg border border-gray-border hover:bg-light-blue">Profile</a>
           <button id="mobile-logout-btn" class="text-left px-4 py-2 rounded-lg border border-red-200 text-red-600 hover:bg-red-50">Logout</button>
         </div>
@@ -275,29 +277,3 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
       
-      if (mobileLogoutBtn) {
-        mobileLogoutBtn.addEventListener('click', () => this.logout());
-      }
-
-      // Mobile menu toggle
-      const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-      const mobileMenu = document.getElementById('mobileMenu');
-      
-      if (mobileMenuBtn && mobileMenu) {
-        mobileMenuBtn.addEventListener('click', () => {
-          mobileMenu.classList.toggle('hidden');
-        });
-      }
-    }
-  }
-
-  // Initialize authentication manager
-  new AuthManager();
-
-  // Update footer year
-  const yearElement = document.getElementById('year');
-  if (yearElement) {
-    yearElement.textContent = new Date().getFullYear();
-  }
-});
-</script>

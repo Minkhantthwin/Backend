@@ -103,7 +103,7 @@ class RecommendationService:
         """Refresh qualification statuses that are stale or missing."""
         try:
             cutoff = datetime.utcnow() - timedelta(minutes=ttl_minutes)
-            
+
             # Get existing statuses
             existing_statuses = {
                 s.program_id: s
@@ -111,24 +111,26 @@ class RecommendationService:
                 .filter(UserQualificationStatus.user_id == user_id)
                 .all()
             }
-            
+
             # Get active programs
             active_programs = (
                 self.db.query(Program).filter(Program.is_active == True).limit(50).all()
             )
-            
+
             refreshed = 0
             for prog in active_programs:
                 s = existing_statuses.get(prog.id)
                 if (not s) or (s.last_checked is None) or (s.last_checked < cutoff):
                     try:
-                        self.qualification_service.check_user_qualification(user_id, prog.id)
+                        self.qualification_service.check_user_qualification(
+                            user_id, prog.id
+                        )
                         refreshed += 1
                     except Exception as inner:
                         logger.warning(
                             f"Qualification refresh failed user={user_id} program={prog.id}: {inner}"
                         )
-            
+
             if refreshed:
                 logger.info(
                     f"Qualification statuses refreshed for user {user_id}: {refreshed} programs"
@@ -286,10 +288,10 @@ class RecommendationService:
 
             # Get programs with requirements that match user's test scores
             query = self.db.query(Program).join(University).join(Region)
-            
+
             if degree_level:
                 query = query.filter(Program.degree_level == degree_level)
-            
+
             query = query.filter(Program.is_active == True)
             programs = query.limit(limit * 3).all()  # Get more to filter
 
@@ -297,40 +299,50 @@ class RecommendationService:
             for program in programs:
                 score = self._calculate_test_score_match(user_test_scores, program)
                 if score > 50:  # Only include if decent match
-                    recommendations.append({
-                        "program_id": program.id,
-                        "program_name": program.name,
-                        "university_name": program.university.name,
-                        "country": program.university.region.name,
-                        "field_of_study": program.field_of_study,
-                        "degree_level": program.degree_level.value,
-                        "tuition_fee": (
-                            float(program.tuition_fee) if program.tuition_fee else None
-                        ),
-                        "currency": program.currency,
-                        "language": program.language,
-                        "match_score": score,
-                        "recommendation_type": "test_score_based",
-                        "matching_factors": ["Test score compatibility"],
-                        "recommendation_reasons": [
-                            "Your test scores are competitive for this program"
-                        ],
-                    })
+                    recommendations.append(
+                        {
+                            "program_id": program.id,
+                            "program_name": program.name,
+                            "university_name": program.university.name,
+                            "country": program.university.region.name,
+                            "field_of_study": program.field_of_study,
+                            "degree_level": program.degree_level.value,
+                            "tuition_fee": (
+                                float(program.tuition_fee)
+                                if program.tuition_fee
+                                else None
+                            ),
+                            "currency": program.currency,
+                            "language": program.language,
+                            "match_score": score,
+                            "recommendation_type": "test_score_based",
+                            "matching_factors": ["Test score compatibility"],
+                            "recommendation_reasons": [
+                                "Your test scores are competitive for this program"
+                            ],
+                        }
+                    )
 
-            return sorted(recommendations, key=lambda x: x["match_score"], reverse=True)[:limit]
+            return sorted(
+                recommendations, key=lambda x: x["match_score"], reverse=True
+            )[:limit]
 
         except Exception as e:
             logger.error(f"Error getting test score based recommendations: {e}")
             return []
 
-    def _calculate_test_score_match(self, user_test_scores: List[UserTestScore], program: Program) -> float:
+    def _calculate_test_score_match(
+        self, user_test_scores: List[UserTestScore], program: Program
+    ) -> float:
         """Calculate how well user's test scores match program requirements"""
         try:
             # Get program requirements
             requirements = (
                 self.db.query(ProgramRequirement)
                 .filter(ProgramRequirement.program_id == program.id)
-                .filter(ProgramRequirement.requirement_type.in_(["test_score", "language"]))
+                .filter(
+                    ProgramRequirement.requirement_type.in_(["test_score", "language"])
+                )
                 .all()
             )
 
@@ -341,7 +353,9 @@ class RecommendationService:
             matched_requirements = 0
 
             for req in requirements:
-                test_type = req.test_type or self._extract_test_type_from_description(req.description)
+                test_type = req.test_type or self._extract_test_type_from_description(
+                    req.description
+                )
                 required_score = self._parse_requirement_value(req.requirement_value)
 
                 if test_type and required_score:
@@ -460,28 +474,33 @@ class RecommendationService:
                     similarity_score = 100.0
                 elif field_of_study.lower() in program.field_of_study.lower():
                     similarity_score = 80.0
-                elif any(word in program.field_of_study.lower() for word in field_of_study.lower().split()):
+                elif any(
+                    word in program.field_of_study.lower()
+                    for word in field_of_study.lower().split()
+                ):
                     similarity_score = 60.0
                 else:
                     similarity_score = 40.0
 
-                recommendations.append({
-                    "program_id": program.id,
-                    "program_name": program.name,
-                    "university_name": program.university.name,
-                    "country": program.university.region.name,
-                    "field_of_study": program.field_of_study,
-                    "degree_level": program.degree_level.value,
-                    "tuition_fee": (
-                        float(program.tuition_fee) if program.tuition_fee else None
-                    ),
-                    "currency": program.currency,
-                    "language": program.language,
-                    "similarity_score": similarity_score,
-                    "recommendation_type": "field_similar",
-                    "matching_factors": [f"Similar field to {field_of_study}"],
-                    "recommendation_reasons": [f"Related to {field_of_study}"],
-                })
+                recommendations.append(
+                    {
+                        "program_id": program.id,
+                        "program_name": program.name,
+                        "university_name": program.university.name,
+                        "country": program.university.region.name,
+                        "field_of_study": program.field_of_study,
+                        "degree_level": program.degree_level.value,
+                        "tuition_fee": (
+                            float(program.tuition_fee) if program.tuition_fee else None
+                        ),
+                        "currency": program.currency,
+                        "language": program.language,
+                        "similarity_score": similarity_score,
+                        "recommendation_type": "field_similar",
+                        "matching_factors": [f"Similar field to {field_of_study}"],
+                        "recommendation_reasons": [f"Related to {field_of_study}"],
+                    }
+                )
 
             return sorted(
                 recommendations, key=lambda x: x["similarity_score"], reverse=True
@@ -570,10 +589,13 @@ class RecommendationService:
         except (ValueError, TypeError):
             return None
 
-    def _get_best_user_score(self, user_test_scores: List[UserTestScore], test_type: str) -> Optional[float]:
+    def _get_best_user_score(
+        self, user_test_scores: List[UserTestScore], test_type: str
+    ) -> Optional[float]:
         """Get user's best score for a specific test type"""
         matching_scores = [
-            score for score in user_test_scores
+            score
+            for score in user_test_scores
             if score.test_type.upper() == test_type.upper()
         ]
 
@@ -843,28 +865,33 @@ class RecommendationService:
                     similarity_score = 100.0
                 elif field_of_study.lower() in program.field_of_study.lower():
                     similarity_score = 80.0
-                elif any(word in program.field_of_study.lower() for word in field_of_study.lower().split()):
+                elif any(
+                    word in program.field_of_study.lower()
+                    for word in field_of_study.lower().split()
+                ):
                     similarity_score = 60.0
                 else:
                     similarity_score = 40.0
 
-                recommendations.append({
-                    "program_id": program.id,
-                    "program_name": program.name,
-                    "university_name": program.university.name,
-                    "country": program.university.region.name,
-                    "field_of_study": program.field_of_study,
-                    "degree_level": program.degree_level.value,
-                    "tuition_fee": (
-                        float(program.tuition_fee) if program.tuition_fee else None
-                    ),
-                    "currency": program.currency,
-                    "language": program.language,
-                    "similarity_score": similarity_score,
-                    "recommendation_type": "field_similar",
-                    "matching_factors": [f"Similar field to {field_of_study}"],
-                    "recommendation_reasons": [f"Related to {field_of_study}"],
-                })
+                recommendations.append(
+                    {
+                        "program_id": program.id,
+                        "program_name": program.name,
+                        "university_name": program.university.name,
+                        "country": program.university.region.name,
+                        "field_of_study": program.field_of_study,
+                        "degree_level": program.degree_level.value,
+                        "tuition_fee": (
+                            float(program.tuition_fee) if program.tuition_fee else None
+                        ),
+                        "currency": program.currency,
+                        "language": program.language,
+                        "similarity_score": similarity_score,
+                        "recommendation_type": "field_similar",
+                        "matching_factors": [f"Similar field to {field_of_study}"],
+                        "recommendation_reasons": [f"Related to {field_of_study}"],
+                    }
+                )
 
             return sorted(
                 recommendations, key=lambda x: x["similarity_score"], reverse=True

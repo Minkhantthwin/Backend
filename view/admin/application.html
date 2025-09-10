@@ -169,13 +169,13 @@
 							? `<button data-acc="${a.id}" class="text-success hover:underline text-xs font-medium">Accept</button>
 								 <button data-rej="${a.id}" class="text-danger hover:underline text-xs font-medium">Decline</button>`
 							: '<span class="text-xs text-gray-400">—</span>'}
-						<button data-manage="${a.id}" class="ml-1 text-xs px-2 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-700">Manage</button>
+						<button data-manage="${a.id}" class="ml-1 text-xs px-2 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-700">View</button>
 					</td>`;
 				tbody.appendChild(tr);
 			});
 			tbody.querySelectorAll('[data-acc]').forEach(b=>b.addEventListener('click',()=>openDecision(b.getAttribute('data-acc'),'accepted')));
 			tbody.querySelectorAll('[data-rej]').forEach(b=>b.addEventListener('click',()=>openDecision(b.getAttribute('data-rej'),'rejected')));
-			tbody.querySelectorAll('[data-manage]').forEach(b=>b.addEventListener('click',()=>openManageStatus(b.getAttribute('data-manage'))));
+			tbody.querySelectorAll('[data-manage]').forEach(b=>b.addEventListener('click',()=>{ window.location.href = `/admin/user_application?id=${b.getAttribute('data-manage')}`; }));
 			updatePagination();
 		}
 

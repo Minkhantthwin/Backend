@@ -1300,7 +1300,7 @@ async function initQuickActions(){
             // Attempt to fetch applications (if endpoint exists)
             let apps = [];
             try {
-                const appsResp = await apiCall(`/applications?user_id=${uid}`);
+                const appsResp = await apiCall(`/users/${uid}/applications`);
                 apps = Array.isArray(appsResp)? appsResp: (appsResp.items||[]);
             } catch(e){
                 console.warn('[quick-actions] applications fetch failed:', e.message);
@@ -1340,21 +1340,6 @@ async function initQuickActions(){
                 }).join('');
                 html = `<div class="mb-3 text-sm font-medium text-gray-700">Top Matches</div>${items}<a href="/program" class="block mt-2 text-xs text-primary hover:underline">See all recommendations →</a>`;
             }
-        } else if(type==='apps'){
-            if(!cached.apps.length){
-                html = `<div class="text-sm text-gray-500 py-4 text-center">You haven't started any applications yet.</div>`;
-            } else {
-                const items = cached.apps.slice(0,3).map(a=>{
-                    return `<div class="flex items-start justify-between p-3 bg-gray-50 rounded-lg mb-2">
-                        <div>
-                            <div class="font-medium text-gray-900 truncate max-w-[180px]">${a.program_name || a.program?.name || 'Application'}</div>
-                            <div class="text-xs text-gray-500 capitalize">Status: ${a.status || a.application_status || 'pending'}</div>
-                        </div>
-                        <span class="ml-2 text-xs px-2 py-1 rounded bg-light-blue text-primary">${a.status || a.application_status || 'pending'}</span>
-                    </div>`;
-                }).join('');
-                html = `<div class="mb-3 text-sm font-medium text-gray-700">Recent Applications</div>${items}<a href="/application" class="block mt-2 text-xs text-primary hover:underline">Manage applications →</a>`;
-            }
         }
         content.innerHTML = html;
         content.classList.remove('hidden');
@@ -1373,7 +1358,10 @@ async function initQuickActions(){
     }
 
     recBtn.addEventListener('click', ()=> toggle('recs'));
-    appsBtn.addEventListener('click', ()=> toggle('apps'));
+    appsBtn.addEventListener('click', ()=> {
+        // Always redirect to my-applications page
+        window.location.href = '/my-applications';
+    });
     if(searchBtn){
         searchBtn.addEventListener('click', ()=>{ window.location.href='/program'; });
     }
